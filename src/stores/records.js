@@ -8,7 +8,8 @@ export const useRecordsStore = defineStore('records', {
     categories: {
       expense: ['餐饮', '交通', '购物', '娱乐', '医疗', '其他'],
       income: ['工资', '投资', '礼金', '其他']
-    }
+    },
+    idCounter: Date.now()
   }),
 
   getters: {
@@ -96,9 +97,10 @@ export const useRecordsStore = defineStore('records', {
   actions: {
     // 添加记录
     addRecord(record) {
+      this.idCounter++
       const newRecord = {
         ...record,
-        id: Date.now().toString(),
+        id: this.idCounter.toString(),
         amount: record.type === 'expense' ? -Math.abs(record.amount) : Math.abs(record.amount),
         createdAt: new Date().toISOString()
       }

@@ -1,5 +1,5 @@
 <template>
-  <div class="transaction-item">
+  <div class="transaction-item" @click="handleClick">
     <div class="transaction-icon" :style="{ background: categoryColor }">
       <svg v-html="categoryIcon"></svg>
     </div>
@@ -15,7 +15,10 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useUIStore } from '@/stores/ui'
 import { formatAmount, formatRelativeTime } from '@/utils/format'
+
+const uiStore = useUIStore()
 
 const props = defineProps({
   record: {
@@ -50,4 +53,20 @@ const categoryIcons = {
 
 const categoryColor = computed(() => categoryColors[props.record.category] || 'var(--text-secondary)')
 const categoryIcon = computed(() => categoryIcons[props.record.category] || categoryIcons['其他'])
+
+function handleClick() {
+  uiStore.openEditModal(props.record)
+}
 </script>
+
+<style scoped>
+.transaction-item {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.transaction-item:hover {
+  opacity: 0.8;
+  transform: translateX(4px);
+}
+</style>

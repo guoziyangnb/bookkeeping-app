@@ -7,7 +7,7 @@
     >
       <div class="modal-content">
         <div class="modal-header">
-          <div class="modal-title">添加记录</div>
+          <div class="modal-title">{{ modalTitle }}</div>
           <button class="modal-close-btn" @click="uiStore.closeModal">
             <svg viewBox="0 0 24 24">
               <path
@@ -81,7 +81,14 @@
           <DatePicker v-model="formData.date" />
         </div>
 
-        <button class="submit-btn" @click="handleSubmit">保存记录</button>
+        <div class="modal-actions">
+          <button v-if="isEditMode" class="delete-btn" @click="handleDelete">
+            删除记录
+          </button>
+          <button class="submit-btn" @click="handleSubmit">
+            {{ isEditMode ? '保存修改' : '保存记录' }}
+          </button>
+        </div>
       </div>
     </div>
   </Teleport>
@@ -96,6 +103,14 @@ import DatePicker from "@/components/common/DatePicker.vue";
 const uiStore = useUIStore();
 const recordsStore = useRecordsStore();
 const amountInput = ref(null);
+
+// 是否为编辑模式
+const isEditMode = computed(() => uiStore.editingRecord !== null);
+
+// 弹窗标题
+const modalTitle = computed(() =>
+  isEditMode.value ? '编辑记录' : '添加记录'
+);
 
 // 所有分类及其图标
 const allCategories = [
@@ -161,19 +176,30 @@ const currentCategories = computed(() => {
   );
 });
 
-// 监听弹窗打开，重置表单
+// 监听弹窗打开，重置表单或填充编辑数据
 watch(
   () => uiStore.isModalOpen,
   (isOpen) => {
     if (isOpen) {
-      formData.type = uiStore.modalType;
-      const firstCategory = allCategories.find(
-        (cat) => cat.type === formData.type || cat.type === "both"
-      );
-      formData.category = firstCategory?.name || "餐饮";
-      formData.amount = "";
-      formData.note = "";
-      formData.date = new Date().toISOString().split("T")[0];
+      if (isEditMode.value) {
+        // 编辑模式：填充现有数据
+        const record = uiStore.editingRecord;
+        formData.type = record.type;
+        formData.category = record.category;
+        formData.amount = Math.abs(record.amount);
+        formData.note = record.note || '';
+        formData.date = record.date.split('T')[0];
+      } else {
+        // 添加模式：重置表单
+        formData.type = uiStore.modalType;
+        const firstCategory = allCategories.find(
+          (cat) => cat.type === formData.type || cat.type === "both"
+        );
+        formData.category = firstCategory?.name || "餐饮";
+        formData.amount = "";
+        formData.note = "";
+        formData.date = new Date().toISOString().split("T")[0];
+      }
       nextTick(() => {
         amountInput.value?.focus();
       });
@@ -202,15 +228,37 @@ function handleSubmit() {
     return;
   }
 
-  recordsStore.addRecord({
-    type: formData.type,
-    amount: formData.amount,
-    category: formData.category,
-    note: formData.note,
-    date: new Date(formData.date).toISOString(),
-  });
+  if (isEditMode.value) {
+    // 编辑模式：更新记录
+    recordsStore.updateRecord(uiStore.editingRecord.id, {
+      type: formData.type,
+      amount: formData.amount,
+      category: formData.category,
+      note: formData.note,
+      date: new Date(formData.date).toISOString()
+    });
+  } else {
+    // 添加模式：创建新记录
+    recordsStore.addRecord({
+      type: formData.type,
+      amount: formData.amount,
+      category: formData.category,
+      note: formData.note,
+      date: new Date(formData.date).toISOString()
+    });
+  }
 
   uiStore.closeModal();
+}
+
+// 删除记录
+function handleDelete() {
+  if (isEditMode.value) {
+    if (confirm('确定要删除这条记录吗？')) {
+      recordsStore.deleteRecord(uiStore.editingRecord.id);
+      uiStore.closeModal();
+    }
+  }
 }
 </script>
 
@@ -448,9 +496,32 @@ function handleSubmit() {
   font-weight: 500;
 }
 
-/* 保存按钮 - 与原型图一致 */
+/* 底部操作按钮 */
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.delete-btn {
+  flex: 1;
+  padding: 18px;
+  border: none;
+  border-radius: 18px;
+  background: var(--text-secondary);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.delete-btn:hover {
+  opacity: 0.8;
+}
+
 .submit-btn {
-  width: 100%;
+  flex: 2;
   padding: 18px;
   border: none;
   border-radius: 18px;
@@ -461,7 +532,6 @@ function handleSubmit() {
   cursor: pointer;
   box-shadow: 0 4px 16px rgba(255, 138, 91, 0.3);
   transition: all 0.3s ease;
-  margin-top: 12px;
 }
 
 .submit-btn:hover {

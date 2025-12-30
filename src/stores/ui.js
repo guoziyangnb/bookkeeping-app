@@ -6,7 +6,8 @@ export const useUIStore = defineStore('ui', {
     theme: getStorage('theme', 'light'),
     currentTab: 'home',
     isModalOpen: false,
-    modalType: 'expense' // 'expense' | 'income'
+    modalType: 'expense', // 'expense' | 'income'
+    editingRecord: null // 正在编辑的记录对象
   }),
 
   getters: {
@@ -47,12 +48,21 @@ export const useUIStore = defineStore('ui', {
     // 打开添加记录弹窗
     openModal(type = 'expense') {
       this.modalType = type
+      this.editingRecord = null
+      this.isModalOpen = true
+    },
+
+    // 打开编辑记录弹窗
+    openEditModal(record) {
+      this.modalType = record.type
+      this.editingRecord = record
       this.isModalOpen = true
     },
 
     // 关闭弹窗
     closeModal() {
       this.isModalOpen = false
+      this.editingRecord = null
     }
   }
 })
