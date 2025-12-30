@@ -11,7 +11,7 @@
         <div class="tabbar-icon">
           <svg v-html="item.icon"></svg>
         </div>
-        <div class="tabbar-label">{{ item.label }}</div>
+        <!-- <div class="tabbar-label">{{ item.label }}</div> -->
       </button>
 
       <button class="tabbar-add-btn" @click="handleAddClick">
@@ -30,7 +30,7 @@
         <div class="tabbar-icon">
           <svg v-html="item.icon"></svg>
         </div>
-        <div class="tabbar-label">{{ item.label }}</div>
+        <!-- <div class="tabbar-label">{{ item.label }}</div> -->
       </button>
     </div>
   </div>
