@@ -64,7 +64,7 @@
   background: var(--bg-glass);
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
-  border: 1px solid var(--bg-glass-border);
+  border: 2px solid var(--bg-glass-border);
   border-radius: 50px;
   padding: 10px 20px;
   box-shadow: var(--shadow-medium);
@@ -291,10 +291,11 @@
   padding: 16px;
   background: var(--bg-glass);
   backdrop-filter: blur(20px);
-  border: 1px solid var(--bg-glass-border);
+  border: 1.5px solid var(--bg-glass-border);
   border-radius: 18px;
   margin-bottom: 12px;
   transition: all var(--transition-normal);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
 }
 
 .transaction-item:hover {
@@ -555,11 +556,12 @@
   padding: 16px;
   background: var(--bg-glass);
   backdrop-filter: blur(20px);
-  border: 1px solid var(--bg-glass-border);
+  border: 1.5px solid var(--bg-glass-border);
   border-radius: var(--radius-md);
   margin-bottom: 10px;
   cursor: pointer;
   transition: all var(--transition-normal);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 .settings-item:hover {
@@ -621,7 +623,7 @@
   }
 
   .tabbar-container {
-    padding: 8px 16px;
+    padding: 2px 8px;
   }
 
   .tabbar-item {

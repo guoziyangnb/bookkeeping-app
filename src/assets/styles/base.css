@@ -14,7 +14,8 @@ html {
 }
 
 body {
-  font-family: 'Poppins', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: "Poppins", "Noto Sans SC", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, sans-serif;
   background: var(--bg-primary);
   color: var(--text-primary);
   min-height: 100vh;
@@ -75,7 +76,7 @@ body {
 /* 明亮主题（默认） */
 :root {
   /* 背景色 */
-  --bg-primary: #F5F2EB;
+  --bg-primary: #f5f2eb;
   --bg-secondary: rgba(255, 255, 255, 0.25);
   --bg-glass: rgba(255, 255, 255, 0.15);
   --bg-glass-hover: rgba(255, 255, 255, 0.25);
@@ -85,18 +86,18 @@ body {
   --bg-input-hover: rgba(0, 0, 0, 0.06);
 
   /* 文字色 */
-  --text-primary: #2C2C2C;
-  --text-secondary: #8A8A8A;
-  --text-tertiary: #B8B8B8;
-  --text-on-primary: #FFFFFF;
-  --text-on-accent: #FFFFFF;
+  --text-primary: #2c2c2c;
+  --text-secondary: #8a8a8a;
+  --text-tertiary: #b8b8b8;
+  --text-on-primary: #ffffff;
+  --text-on-accent: #ffffff;
 
   /* 主题色 */
-  --accent-orange: #FF8A5B;
-  --accent-orange-light: #FFB087;
-  --accent-green: #7CB588;
-  --accent-blue: #6B9AC4;
-  --accent-purple: #9B7EBD;
+  --accent-orange: #ff8a5b;
+  --accent-orange-light: #ffb087;
+  --accent-green: #7cb588;
+  --accent-blue: #6b9ac4;
+  --accent-purple: #9b7ebd;
 
   /* 阴影 */
   --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.08);
@@ -104,8 +105,8 @@ body {
   --shadow-strong: 0 16px 48px rgba(0, 0, 0, 0.16);
 
   /* 渐变 */
-  --gradient-orange: linear-gradient(135deg, #FF8A5B, #FFB087);
-  --gradient-green: linear-gradient(135deg, #7CB588, #95D1A3);
+  --gradient-orange: linear-gradient(135deg, #ff8a5b, #ffb087);
+  --gradient-green: linear-gradient(135deg, #7cb588, #95d1a3);
 
   /* 过渡动画 */
   --transition-fast: 0.15s ease;
@@ -123,7 +124,7 @@ body {
 /* 暗黑主题 */
 [data-theme="dark"] {
   /* 背景色 */
-  --bg-primary: #1A1A1A;
+  --bg-primary: #1a1a1a;
   --bg-secondary: rgba(255, 255, 255, 0.08);
   --bg-glass: rgba(255, 255, 255, 0.05);
   --bg-glass-hover: rgba(255, 255, 255, 0.12);
@@ -133,18 +134,18 @@ body {
   --bg-input-hover: rgba(255, 255, 255, 0.12);
 
   /* 文字色 */
-  --text-primary: #FFFFFF;
-  --text-secondary: #A0A0A0;
-  --text-tertiary: #6B6B6B;
-  --text-on-primary: #FFFFFF;
-  --text-on-accent: #FFFFFF;
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --text-tertiary: #6b6b6b;
+  --text-on-primary: #ffffff;
+  --text-on-accent: #ffffff;
 
   /* 主题色（保持不变） */
-  --accent-orange: #FF8A5B;
-  --accent-orange-light: #FFB087;
-  --accent-green: #7CB588;
-  --accent-blue: #6B9AC4;
-  --accent-purple: #9B7EBD;
+  --accent-orange: #ff8a5b;
+  --accent-orange-light: #ffb087;
+  --accent-green: #7cb588;
+  --accent-blue: #6b9ac4;
+  --accent-purple: #9b7ebd;
 
   /* 阴影 */
   --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.3);
@@ -161,7 +162,7 @@ body {
   background: var(--bg-glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--bg-glass-border);
+  border: 1.5px solid var(--bg-glass-border);
   border-radius: var(--radius-lg);
   padding: 24px;
   box-shadow: var(--shadow-soft);
@@ -256,8 +257,12 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes scaleIn {
