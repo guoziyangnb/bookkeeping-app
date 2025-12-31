@@ -234,10 +234,11 @@ function handleDelete() {
 	-webkit-backdrop-filter: blur(8px);
 	z-index: 2000;
 	display: flex;
-	align-items: center;
+	align-items: flex-start;
 	justify-content: center;
 	animation: fadeIn 0.3s ease;
-	padding: 20px;
+	padding: 10vh 20px 20px;
+	overflow-y: auto;
 }
 
 @keyframes fadeIn {
@@ -256,7 +257,7 @@ function handleDelete() {
 	padding: 32px;
 	width: 100%;
 	max-width: 420px;
-	max-height: 85vh;
+	max-height: 60vh;
 	overflow-y: auto;
 	box-shadow: var(--shadow-medium);
 	animation: scaleIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -500,8 +501,13 @@ function handleDelete() {
 
 /* 响应式 */
 @media (max-width: 480px) {
+	.modal-overlay {
+		padding: 8vh 16px 16px;
+	}
+
 	.modal-content {
 		padding: 24px;
+		max-height: 70vh;
 	}
 
 	.category-grid {
