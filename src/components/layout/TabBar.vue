@@ -35,11 +35,24 @@
 </template>
 
 <script setup>
+import { watch } from 'vue'
 import { useUIStore } from '@/stores/ui'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 const uiStore = useUIStore()
 const router = useRouter()
+const route = useRoute()
+
+// 监听路由变化，自动同步 currentTab
+watch(
+	() => route.name,
+	(newRouteName) => {
+		if (newRouteName && ['home', 'calendar', 'stats', 'settings'].includes(newRouteName)) {
+			uiStore.setCurrentTab(newRouteName)
+		}
+	},
+	{ immediate: true } // 立即执行一次，确保初始状态正确
+)
 
 const tabs = [
 	{
