@@ -105,3 +105,16 @@ export function getTodayRange() {
 
 	return { start, end }
 }
+
+/**
+ * 将日期格式化为本地日期字符串 (YYYY-MM-DD)
+ * @param {Date|string} date - 日期对象或ISO字符串
+ * @returns {string} 本地日期字符串
+ */
+export function formatToLocalISODate(date) {
+	const d = date instanceof Date ? date : new Date(date)
+	const year = d.getFullYear()
+	const month = String(d.getMonth() + 1).padStart(2, '0')
+	const day = String(d.getDate()).padStart(2, '0')
+	return `${year}-${month}-${day}`
+}

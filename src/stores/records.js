@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { getStorage, setStorage } from '@/utils/storage'
 import { formatAmount } from '@/utils/format'
+import { formatToLocalISODate } from '@/utils/date'
 
 export const useRecordsStore = defineStore('records', {
 	state: () => {
@@ -38,7 +39,7 @@ export const useRecordsStore = defineStore('records', {
 		recordsByDate: state => {
 			const grouped = {}
 			state.records.forEach(record => {
-				const date = record.date.split('T')[0]
+				const date = formatToLocalISODate(record.date)
 				if (!grouped[date]) {
 					grouped[date] = []
 				}
@@ -151,8 +152,8 @@ export const useRecordsStore = defineStore('records', {
 
 		// 获取指定日期的记录
 		getRecordsByDate(date) {
-			const dateStr = date.split('T')[0]
-			return this.records.filter(r => r.date.split('T')[0] === dateStr)
+			const dateStr = formatToLocalISODate(date)
+			return this.records.filter(r => formatToLocalISODate(r.date) === dateStr)
 		},
 
 		// 获取日期范围内的记录

@@ -61,7 +61,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRecordsStore } from '@/stores/records'
-import { generateCalendar } from '@/utils/date'
+import { generateCalendar, formatToLocalISODate } from '@/utils/date'
 import Header from '@/components/layout/Header.vue'
 import TransactionItem from '@/components/features/TransactionItem.vue'
 
@@ -69,7 +69,7 @@ const recordsStore = useRecordsStore()
 
 const currentYear = ref(new Date().getFullYear())
 const currentMonth = ref(new Date().getMonth())
-const selectedDate = ref(new Date().toISOString().split('T')[0])
+const selectedDate = ref(formatToLocalISODate(new Date()))
 
 const weekdays = ['日', '一', '二', '三', '四', '五', '六']
 
@@ -92,11 +92,11 @@ const calendar = computed(() => {
 
 	// 标记有记录的日期
 	const monthlyRecords = recordsStore.getMonthlyRecords(currentYear.value, currentMonth.value)
-	const datesWithRecords = new Set(monthlyRecords.map(r => r.date.split('T')[0]))
+	const datesWithRecords = new Set(monthlyRecords.map(r => formatToLocalISODate(r.date)))
 
 	return cal.map(cell => {
 		if (cell.type === 'day') {
-			const dateStr = cell.date.toISOString().split('T')[0]
+			const dateStr = formatToLocalISODate(cell.date)
 			return {
 				...cell,
 				hasRecord: datesWithRecords.has(dateStr),
