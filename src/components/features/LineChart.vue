@@ -18,6 +18,7 @@ const chartRef = ref(null);
 const uiStore = useUIStore();
 const recordsStore = useRecordsStore();
 let chartInstance = null;
+let resizeObserver = null;
 
 // 获取本周数据
 function getWeekData() {
@@ -172,12 +173,38 @@ watch(
 
 onMounted(() => {
   initChart();
+
+  // 监听容器尺寸变化
+  resizeObserver = new ResizeObserver(() => {
+    if (chartInstance) {
+      chartInstance.resize();
+    }
+  });
+
+  if (chartRef.value) {
+    resizeObserver.observe(chartRef.value);
+  }
+
+  // 监听窗口resize事件
+  window.addEventListener('resize', handleResize);
 });
+
+// 处理窗口resize
+function handleResize() {
+  if (chartInstance) {
+    chartInstance.resize();
+  }
+}
 
 onUnmounted(() => {
   if (chartInstance) {
     chartInstance.dispose();
   }
+  if (resizeObserver && chartRef.value) {
+    resizeObserver.unobserve(chartRef.value);
+    resizeObserver.disconnect();
+  }
+  window.removeEventListener('resize', handleResize);
 });
 </script>
 

@@ -3,14 +3,20 @@ import { getStorage, setStorage } from '@/utils/storage'
 import { formatAmount } from '@/utils/format'
 
 export const useRecordsStore = defineStore('records', {
-  state: () => ({
-    records: [],
-    categories: {
-      expense: ['餐饮', '交通', '购物', '娱乐', '医疗', '其他'],
-      income: ['工资', '投资', '礼金', '其他']
-    },
-    idCounter: Date.now()
-  }),
+  state: () => {
+    // 在初始化时从 localStorage 加载数据
+    const savedRecords = getStorage('records', [])
+    const savedIdCounter = getStorage('idCounter', Date.now())
+
+    return {
+      records: savedRecords,
+      categories: {
+        expense: ['餐饮', '交通', '购物', '娱乐', '医疗', '其他'],
+        income: ['工资', '投资', '礼金', '其他']
+      },
+      idCounter: savedIdCounter
+    }
+  },
 
   getters: {
     // 总余额
@@ -148,6 +154,7 @@ export const useRecordsStore = defineStore('records', {
     // 保存到localStorage
     saveToStorage() {
       setStorage('records', this.records)
+      setStorage('idCounter', this.idCounter)
     },
 
     // 获取指定日期的记录

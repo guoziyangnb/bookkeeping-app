@@ -25,10 +25,8 @@ onMounted(() => {
   // 初始化主题
   uiStore.initTheme()
 
-  // 加载记录数据
-  recordsStore.loadFromStorage()
-
   // 如果没有数据，添加示例数据
+  // （数据已经在 store 初始化时自动从 localStorage 加载）
   if (recordsStore.records.length === 0) {
     addSampleData()
   }
