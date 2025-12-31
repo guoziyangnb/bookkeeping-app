@@ -186,7 +186,7 @@ onMounted(() => {
   }
 
   // 监听窗口resize事件
-  window.addEventListener('resize', handleResize);
+  window.addEventListener("resize", handleResize);
 });
 
 // 处理窗口resize
@@ -204,7 +204,7 @@ onUnmounted(() => {
     resizeObserver.unobserve(chartRef.value);
     resizeObserver.disconnect();
   }
-  window.removeEventListener('resize', handleResize);
+  window.removeEventListener("resize", handleResize);
 });
 </script>
 

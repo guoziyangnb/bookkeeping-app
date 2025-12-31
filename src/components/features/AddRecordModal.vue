@@ -86,7 +86,7 @@
             删除记录
           </button>
           <button class="submit-btn" @click="handleSubmit">
-            {{ isEditMode ? '保存修改' : '保存记录' }}
+            {{ isEditMode ? "保存修改" : "保存记录" }}
           </button>
         </div>
       </div>
@@ -108,9 +108,7 @@ const amountInput = ref(null);
 const isEditMode = computed(() => uiStore.editingRecord !== null);
 
 // 弹窗标题
-const modalTitle = computed(() =>
-  isEditMode.value ? '编辑记录' : '添加记录'
-);
+const modalTitle = computed(() => (isEditMode.value ? "编辑记录" : "添加记录"));
 
 // 所有分类及其图标
 const allCategories = [
@@ -187,8 +185,8 @@ watch(
         formData.type = record.type;
         formData.category = record.category;
         formData.amount = Math.abs(record.amount);
-        formData.note = record.note || '';
-        formData.date = record.date.split('T')[0];
+        formData.note = record.note || "";
+        formData.date = record.date.split("T")[0];
       } else {
         // 添加模式：重置表单
         formData.type = uiStore.modalType;
@@ -235,7 +233,7 @@ function handleSubmit() {
       amount: formData.amount,
       category: formData.category,
       note: formData.note,
-      date: new Date(formData.date).toISOString()
+      date: new Date(formData.date).toISOString(),
     });
   } else {
     // 添加模式：创建新记录
@@ -244,7 +242,7 @@ function handleSubmit() {
       amount: formData.amount,
       category: formData.category,
       note: formData.note,
-      date: new Date(formData.date).toISOString()
+      date: new Date(formData.date).toISOString(),
     });
   }
 
@@ -254,7 +252,7 @@ function handleSubmit() {
 // 删除记录
 function handleDelete() {
   if (isEditMode.value) {
-    if (confirm('确定要删除这条记录吗？')) {
+    if (confirm("确定要删除这条记录吗？")) {
       recordsStore.deleteRecord(uiStore.editingRecord.id);
       uiStore.closeModal();
     }

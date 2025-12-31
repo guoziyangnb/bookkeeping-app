@@ -1,31 +1,27 @@
 <template>
-  <input
-    v-model="inputValue"
-    type="date"
-    class="date-picker-input"
-  >
+  <input v-model="inputValue" type="date" class="date-picker-input" />
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed } from "vue";
 
 const props = defineProps({
   modelValue: {
     type: String,
-    default: ''
-  }
-})
+    default: "",
+  },
+});
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(["update:modelValue"]);
 
 const inputValue = computed({
   get() {
-    return props.modelValue
+    return props.modelValue;
   },
   set(value) {
-    emit('update:modelValue', value)
-  }
-})
+    emit("update:modelValue", value);
+  },
+});
 </script>
 
 <style scoped>
