@@ -16,7 +16,7 @@ export function formatAmount(amount, showSign = true) {
 	}).format(Math.abs(amount))
 
 	if (showSign) {
-		return amount >= 0 ? `+${formatted}` : `-${formatted}`
+		return amount >= 0 ? `${formatted}` : `-${formatted}`
 	}
 	return formatted
 }

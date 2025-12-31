@@ -2,7 +2,7 @@
 	<div class="balance-card">
 		<div class="balance-label">本月余额</div>
 		<div class="balance-amount">
-			{{ formatAmount(recordsStore.totalBalance, false) }}
+			{{ formatAmount(recordsStore.totalBalance, true) }}
 		</div>
 		<div class="balance-stats">
 			<div class="balance-stat">
@@ -13,7 +13,7 @@
 				</div>
 				<div class="balance-stat-info">
 					<span class="balance-stat-label">收入</span>
-					<span class="balance-stat-value">+{{ formatAmount(recordsStore.totalIncome, false) }}</span>
+					<span class="balance-stat-value">{{ formatAmount(recordsStore.totalIncome, false) }}</span>
 				</div>
 			</div>
 			<div class="balance-stat">
