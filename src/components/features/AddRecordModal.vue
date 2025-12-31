@@ -154,8 +154,13 @@ watch(
 			} else {
 				// 添加模式：重置表单
 				formData.type = uiStore.modalType
-				const firstCategory = allCategories.find(cat => cat.type === formData.type || cat.type === 'both')
-				formData.category = firstCategory?.name || '餐饮'
+				// 如果有指定的默认分类，使用它；否则使用该类型的第一个分类
+				if (uiStore.defaultCategory) {
+					formData.category = uiStore.defaultCategory
+				} else {
+					const firstCategory = allCategories.find(cat => cat.type === formData.type || cat.type === 'both')
+					formData.category = firstCategory?.name || '餐饮'
+				}
 				formData.amount = ''
 				formData.note = ''
 				formData.date = new Date().toISOString().split('T')[0]

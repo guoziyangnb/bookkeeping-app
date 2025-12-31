@@ -7,7 +7,8 @@ export const useUIStore = defineStore('ui', {
 		currentTab: 'home',
 		isModalOpen: false,
 		modalType: 'expense', // 'expense' | 'income'
-		editingRecord: null // 正在编辑的记录对象
+		editingRecord: null, // 正在编辑的记录对象
+		defaultCategory: null // 打开弹窗时的默认分类
 	}),
 
 	getters: {
@@ -46,8 +47,9 @@ export const useUIStore = defineStore('ui', {
 		},
 
 		// 打开添加记录弹窗
-		openModal(type = 'expense') {
+		openModal(type = 'expense', defaultCategory = null) {
 			this.modalType = type
+			this.defaultCategory = defaultCategory
 			this.editingRecord = null
 			this.isModalOpen = true
 		},
@@ -63,6 +65,7 @@ export const useUIStore = defineStore('ui', {
 		closeModal() {
 			this.isModalOpen = false
 			this.editingRecord = null
+			this.defaultCategory = null
 		}
 	}
 })

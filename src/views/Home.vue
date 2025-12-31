@@ -52,7 +52,7 @@ const uiStore = useUIStore()
 const recentRecords = computed(() => recordsStore.recentRecords.slice(0, 10))
 
 function handleQuickAction(action) {
-	uiStore.openModal(action.type)
+	uiStore.openModal(action.type, action.category)
 }
 </script>
 
