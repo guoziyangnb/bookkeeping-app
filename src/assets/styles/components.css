@@ -530,6 +530,18 @@
 	font-weight: 600;
 }
 
+.day-cell.selected {
+	color: var(--accent-orange);
+	border: 2px solid var(--accent-orange);
+	font-weight: 600;
+}
+
+.day-cell.selected.today {
+	background: var(--accent-orange);
+	color: white;
+	border: none;
+}
+
 .day-cell.has-record::after {
 	content: '';
 	position: absolute;
