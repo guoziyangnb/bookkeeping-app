@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 A Vue 3 bookkeeping/expense tracking application with a glassmorphism UI design. The app is a single-page application that targets mobile/web environments and can be packaged as an APK using webview containers.
 
 **Tech Stack:**
+
 - Vue 3 (Composition API with `<script setup>`)
 - Pinia for state management
 - Vue Router for routing
@@ -45,11 +46,13 @@ The app uses two Pinia stores located in `src/stores/`:
 ### Storage Pattern
 
 All data persistence uses the `src/utils/storage.js` utilities which wrap localStorage with:
+
 - Error handling
 - `bookkeeping_` prefix for all keys
 - JSON serialization
 
 Stored data:
+
 - `records`: Array of transaction records
 - `idCounter`: Counter for generating unique IDs
 - `theme`: Current theme preference
@@ -57,6 +60,7 @@ Stored data:
 ### Routing
 
 Routes are lazy-loaded in `src/router/index.js`:
+
 - `/` - Home (wallet overview with balance, charts, recent transactions)
 - `/calendar` - Calendar view of transactions
 - `/stats` - Statistics and charts
@@ -80,6 +84,7 @@ src/
 ### Record Data Model
 
 Each record has the structure:
+
 ```javascript
 {
   id: string,           // Unique ID
@@ -105,6 +110,7 @@ const recordsStore = useRecordsStore()
 ### Adding/Editing Records
 
 The `AddRecordModal` component handles both adding and editing:
+
 - Use `uiStore.openModal(type)` to add a new record
 - Use `uiStore.openEditModal(record)` to edit an existing record
 - The modal is rendered in `App.vue` globally

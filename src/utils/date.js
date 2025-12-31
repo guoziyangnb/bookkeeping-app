@@ -9,7 +9,7 @@
  * @returns {number} 天数
  */
 export function getDaysInMonth(year, month) {
-  return new Date(year, month + 1, 0).getDate();
+	return new Date(year, month + 1, 0).getDate()
 }
 
 /**
@@ -19,7 +19,7 @@ export function getDaysInMonth(year, month) {
  * @returns {number} 星期几 (0-6)
  */
 export function getFirstDayOfMonth(year, month) {
-  return new Date(year, month, 1).getDay();
+	return new Date(year, month, 1).getDay()
 }
 
 /**
@@ -28,12 +28,8 @@ export function getFirstDayOfMonth(year, month) {
  * @returns {boolean}
  */
 export function isToday(date) {
-  const today = new Date();
-  return (
-    date.getDate() === today.getDate() &&
-    date.getMonth() === today.getMonth() &&
-    date.getFullYear() === today.getFullYear()
-  );
+	const today = new Date()
+	return date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear()
 }
 
 /**
@@ -43,9 +39,9 @@ export function isToday(date) {
  * @returns {object} { start: Date, end: Date }
  */
 export function getMonthRange(year, month) {
-  const start = new Date(year, month, 1);
-  const end = new Date(year, month + 1, 0, 23, 59, 59);
-  return { start, end };
+	const start = new Date(year, month, 1)
+	const end = new Date(year, month + 1, 0, 23, 59, 59)
+	return { start, end }
 }
 
 /**
@@ -55,27 +51,27 @@ export function getMonthRange(year, month) {
  * @returns {Array} 日历数组
  */
 export function generateCalendar(year, month) {
-  const firstDay = getFirstDayOfMonth(year, month);
-  const daysInMonth = getDaysInMonth(year, month);
-  const calendar = [];
+	const firstDay = getFirstDayOfMonth(year, month)
+	const daysInMonth = getDaysInMonth(year, month)
+	const calendar = []
 
-  // 填充空白日期
-  for (let i = 0; i < firstDay; i++) {
-    calendar.push({ type: "empty", day: null });
-  }
+	// 填充空白日期
+	for (let i = 0; i < firstDay; i++) {
+		calendar.push({ type: 'empty', day: null })
+	}
 
-  // 填充实际日期
-  for (let day = 1; day <= daysInMonth; day++) {
-    const date = new Date(year, month, day);
-    calendar.push({
-      type: "day",
-      day,
-      date,
-      isToday: isToday(date),
-    });
-  }
+	// 填充实际日期
+	for (let day = 1; day <= daysInMonth; day++) {
+		const date = new Date(year, month, day)
+		calendar.push({
+			type: 'day',
+			day,
+			date,
+			isToday: isToday(date)
+		})
+	}
 
-  return calendar;
+	return calendar
 }
 
 /**
@@ -83,17 +79,17 @@ export function generateCalendar(year, month) {
  * @returns {object} { start: Date, end: Date }
  */
 export function getCurrentWeekRange() {
-  const now = new Date();
-  const dayOfWeek = now.getDay();
-  const start = new Date(now);
-  start.setDate(now.getDate() - dayOfWeek);
-  start.setHours(0, 0, 0, 0);
+	const now = new Date()
+	const dayOfWeek = now.getDay()
+	const start = new Date(now)
+	start.setDate(now.getDate() - dayOfWeek)
+	start.setHours(0, 0, 0, 0)
 
-  const end = new Date(start);
-  end.setDate(start.getDate() + 6);
-  end.setHours(23, 59, 59, 999);
+	const end = new Date(start)
+	end.setDate(start.getDate() + 6)
+	end.setHours(23, 59, 59, 999)
 
-  return { start, end };
+	return { start, end }
 }
 
 /**
@@ -101,11 +97,11 @@ export function getCurrentWeekRange() {
  * @returns {object} { start: Date, end: Date }
  */
 export function getTodayRange() {
-  const start = new Date();
-  start.setHours(0, 0, 0, 0);
+	const start = new Date()
+	start.setHours(0, 0, 0, 0)
 
-  const end = new Date();
-  end.setHours(23, 59, 59, 999);
+	const end = new Date()
+	end.setHours(23, 59, 59, 999)
 
-  return { start, end };
+	return { start, end }
 }

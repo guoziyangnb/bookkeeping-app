@@ -1,16 +1,16 @@
-import { createApp } from "vue";
-import { createPinia } from "pinia";
-import App from "./App.vue";
-import router from "./router";
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import App from './App.vue'
+import router from './router'
 
 // 导入样式
-import "@/assets/styles/base.css";
-import "@/assets/styles/components.css";
+import '@/assets/styles/base.css'
+import '@/assets/styles/components.css'
 
-const app = createApp(App);
-const pinia = createPinia();
+const app = createApp(App)
+const pinia = createPinia()
 
-app.use(pinia);
-app.use(router);
+app.use(pinia)
+app.use(router)
 
-app.mount("#app");
+app.mount('#app')

@@ -9,16 +9,16 @@
  * @returns {string} 格式化后的金额
  */
 export function formatAmount(amount, showSign = true) {
-  const formatted = new Intl.NumberFormat("zh-CN", {
-    style: "currency",
-    currency: "CNY",
-    minimumFractionDigits: 2,
-  }).format(Math.abs(amount));
+	const formatted = new Intl.NumberFormat('zh-CN', {
+		style: 'currency',
+		currency: 'CNY',
+		minimumFractionDigits: 2
+	}).format(Math.abs(amount))
 
-  if (showSign) {
-    return amount >= 0 ? `+${formatted}` : `-${formatted}`;
-  }
-  return formatted;
+	if (showSign) {
+		return amount >= 0 ? `+${formatted}` : `-${formatted}`
+	}
+	return formatted
 }
 
 /**
@@ -27,26 +27,26 @@ export function formatAmount(amount, showSign = true) {
  * @param {string} format - 格式类型 'full' | 'date' | 'time' | 'month'
  * @returns {string} 格式化后的日期
  */
-export function formatDate(date, format = "date") {
-  const d = new Date(date);
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  const hours = String(d.getHours()).padStart(2, "0");
-  const minutes = String(d.getMinutes()).padStart(2, "0");
+export function formatDate(date, format = 'date') {
+	const d = new Date(date)
+	const year = d.getFullYear()
+	const month = String(d.getMonth() + 1).padStart(2, '0')
+	const day = String(d.getDate()).padStart(2, '0')
+	const hours = String(d.getHours()).padStart(2, '0')
+	const minutes = String(d.getMinutes()).padStart(2, '0')
 
-  switch (format) {
-    case "full":
-      return `${year}年${month}月${day}日 ${hours}:${minutes}`;
-    case "date":
-      return `${year}-${month}-${day}`;
-    case "time":
-      return `${hours}:${minutes}`;
-    case "month":
-      return `${year}年 ${month}月`;
-    default:
-      return `${year}-${month}-${day}`;
-  }
+	switch (format) {
+		case 'full':
+			return `${year}年${month}月${day}日 ${hours}:${minutes}`
+		case 'date':
+			return `${year}-${month}-${day}`
+		case 'time':
+			return `${hours}:${minutes}`
+		case 'month':
+			return `${year}年 ${month}月`
+		default:
+			return `${year}-${month}-${day}`
+	}
 }
 
 /**
@@ -55,20 +55,20 @@ export function formatDate(date, format = "date") {
  * @returns {string} 相对时间描述
  */
 export function formatRelativeTime(date) {
-  const d = new Date(date);
-  const now = new Date();
-  const diff = now - d;
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+	const d = new Date(date)
+	const now = new Date()
+	const diff = now - d
+	const days = Math.floor(diff / (1000 * 60 * 60 * 24))
 
-  if (days === 0) {
-    return `今天 ${formatDate(date, "time")}`;
-  } else if (days === 1) {
-    return `昨天 ${formatDate(date, "time")}`;
-  } else if (days < 7) {
-    return `${days}天前`;
-  } else {
-    return formatDate(date, "date");
-  }
+	if (days === 0) {
+		return `今天 ${formatDate(date, 'time')}`
+	} else if (days === 1) {
+		return `昨天 ${formatDate(date, 'time')}`
+	} else if (days < 7) {
+		return `${days}天前`
+	} else {
+		return formatDate(date, 'date')
+	}
 }
 
 /**
@@ -78,6 +78,6 @@ export function formatRelativeTime(date) {
  * @returns {string} 百分比
  */
 export function formatPercentage(value, total) {
-  if (total === 0) return "0%";
-  return `${Math.round((value / total) * 100)}%`;
+	if (total === 0) return '0%'
+	return `${Math.round((value / total) * 100)}%`
 }

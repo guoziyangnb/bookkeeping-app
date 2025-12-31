@@ -3,7 +3,7 @@
  * 提供安全的存储操作，带有错误处理
  */
 
-const STORAGE_PREFIX = "bookkeeping_";
+const STORAGE_PREFIX = 'bookkeeping_'
 
 /**
  * 获取存储的数据
@@ -12,13 +12,13 @@ const STORAGE_PREFIX = "bookkeeping_";
  * @returns {*} 存储的数据或默认值
  */
 export function getStorage(key, defaultValue = null) {
-  try {
-    const item = localStorage.getItem(STORAGE_PREFIX + key);
-    return item ? JSON.parse(item) : defaultValue;
-  } catch (error) {
-    console.error("Error reading from localStorage:", error);
-    return defaultValue;
-  }
+	try {
+		const item = localStorage.getItem(STORAGE_PREFIX + key)
+		return item ? JSON.parse(item) : defaultValue
+	} catch (error) {
+		console.error('Error reading from localStorage:', error)
+		return defaultValue
+	}
 }
 
 /**
@@ -28,13 +28,13 @@ export function getStorage(key, defaultValue = null) {
  * @returns {boolean} 是否成功
  */
 export function setStorage(key, value) {
-  try {
-    localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(value));
-    return true;
-  } catch (error) {
-    console.error("Error writing to localStorage:", error);
-    return false;
-  }
+	try {
+		localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(value))
+		return true
+	} catch (error) {
+		console.error('Error writing to localStorage:', error)
+		return false
+	}
 }
 
 /**
@@ -43,13 +43,13 @@ export function setStorage(key, value) {
  * @returns {boolean} 是否成功
  */
 export function removeStorage(key) {
-  try {
-    localStorage.removeItem(STORAGE_PREFIX + key);
-    return true;
-  } catch (error) {
-    console.error("Error removing from localStorage:", error);
-    return false;
-  }
+	try {
+		localStorage.removeItem(STORAGE_PREFIX + key)
+		return true
+	} catch (error) {
+		console.error('Error removing from localStorage:', error)
+		return false
+	}
 }
 
 /**
@@ -57,16 +57,16 @@ export function removeStorage(key) {
  * @returns {boolean} 是否成功
  */
 export function clearStorage() {
-  try {
-    const keys = Object.keys(localStorage);
-    keys.forEach((key) => {
-      if (key.startsWith(STORAGE_PREFIX)) {
-        localStorage.removeItem(key);
-      }
-    });
-    return true;
-  } catch (error) {
-    console.error("Error clearing localStorage:", error);
-    return false;
-  }
+	try {
+		const keys = Object.keys(localStorage)
+		keys.forEach(key => {
+			if (key.startsWith(STORAGE_PREFIX)) {
+				localStorage.removeItem(key)
+			}
+		})
+		return true
+	} catch (error) {
+		console.error('Error clearing localStorage:', error)
+		return false
+	}
 }
