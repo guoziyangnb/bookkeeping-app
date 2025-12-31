@@ -19,13 +19,13 @@
 					@mouseenter="hoveredIndex = index"
 					@mouseleave="hoveredIndex = -1" />
 			</g>
-			<!-- 中心圆（创建环形图效果） -->
-			<circle cx="100" cy="100" r="60" fill="var(--bg-primary)" />
+			<!-- 中心圆（创建环形图效果） - 始终显示 -->
+			<circle v-if="slices.length > 0" cx="100" cy="100" r="55" fill="var(--bg-primary)" class="pie-chart-center-circle" />
 			<!-- 中心文字 -->
-			<text x="100" y="95" text-anchor="middle" class="pie-chart-label">
+			<text v-if="slices.length > 0" x="100" y="95" text-anchor="middle" class="pie-chart-label">
 				{{ centerText }}
 			</text>
-			<text x="100" y="120" text-anchor="middle" class="pie-chart-value">
+			<text v-if="slices.length > 0" x="100" y="120" text-anchor="middle" class="pie-chart-value">
 				{{ centerValue }}
 			</text>
 		</svg>
@@ -76,6 +76,25 @@ const slices = computed(() => {
 	return props.data.map((item, index) => {
 		const percentage = item.amount / totalAmount.value
 		const angle = percentage * 360
+
+		// 特殊处理100%的情况 - 生成完整的圆形
+		if (percentage === 1) {
+			// 使用两个半圆来组成完整的圆，确保SVG正确渲染
+			const halfCircle1 = [
+				`M ${centerX} ${centerY}`,
+				`L ${centerX} ${centerY - radius}`,
+				`A ${radius} ${radius} 0 0 1 ${centerX} ${centerY + radius}`,
+				`A ${radius} ${radius} 0 0 1 ${centerX} ${centerY - radius}`,
+				'Z'
+			].join(' ')
+
+			return {
+				path: halfCircle1,
+				color: categoryColors[index % categoryColors.length],
+				data: item,
+				index
+			}
+		}
 
 		// 计算起始和结束角度（弧度）
 		const startAngle = (currentAngle * Math.PI) / 180
@@ -159,6 +178,12 @@ function selectSlice(index) {
 	width: 200px;
 	height: 200px;
 	display: block;
+}
+
+.pie-chart-center-circle {
+	stroke: var(--bg-primary);
+	stroke-width: 2;
+	filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .pie-slice {
