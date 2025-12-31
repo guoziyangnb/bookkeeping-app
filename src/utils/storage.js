@@ -3,7 +3,7 @@
  * 提供安全的存储操作，带有错误处理
  */
 
-const STORAGE_PREFIX = 'bookkeeping_'
+const STORAGE_PREFIX = "bookkeeping_";
 
 /**
  * 获取存储的数据
@@ -13,11 +13,11 @@ const STORAGE_PREFIX = 'bookkeeping_'
  */
 export function getStorage(key, defaultValue = null) {
   try {
-    const item = localStorage.getItem(STORAGE_PREFIX + key)
-    return item ? JSON.parse(item) : defaultValue
+    const item = localStorage.getItem(STORAGE_PREFIX + key);
+    return item ? JSON.parse(item) : defaultValue;
   } catch (error) {
-    console.error('Error reading from localStorage:', error)
-    return defaultValue
+    console.error("Error reading from localStorage:", error);
+    return defaultValue;
   }
 }
 
@@ -29,11 +29,11 @@ export function getStorage(key, defaultValue = null) {
  */
 export function setStorage(key, value) {
   try {
-    localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(value))
-    return true
+    localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(value));
+    return true;
   } catch (error) {
-    console.error('Error writing to localStorage:', error)
-    return false
+    console.error("Error writing to localStorage:", error);
+    return false;
   }
 }
 
@@ -44,11 +44,11 @@ export function setStorage(key, value) {
  */
 export function removeStorage(key) {
   try {
-    localStorage.removeItem(STORAGE_PREFIX + key)
-    return true
+    localStorage.removeItem(STORAGE_PREFIX + key);
+    return true;
   } catch (error) {
-    console.error('Error removing from localStorage:', error)
-    return false
+    console.error("Error removing from localStorage:", error);
+    return false;
   }
 }
 
@@ -58,15 +58,15 @@ export function removeStorage(key) {
  */
 export function clearStorage() {
   try {
-    const keys = Object.keys(localStorage)
-    keys.forEach(key => {
+    const keys = Object.keys(localStorage);
+    keys.forEach((key) => {
       if (key.startsWith(STORAGE_PREFIX)) {
-        localStorage.removeItem(key)
+        localStorage.removeItem(key);
       }
-    })
-    return true
+    });
+    return true;
   } catch (error) {
-    console.error('Error clearing localStorage:', error)
-    return false
+    console.error("Error clearing localStorage:", error);
+    return false;
   }
 }
