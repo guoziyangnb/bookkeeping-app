@@ -4,8 +4,14 @@
 			<svg v-html="categoryIcon"></svg>
 		</div>
 		<div class="transaction-details">
-			<div class="transaction-category">{{ record.category }}</div>
-			<div class="transaction-time">{{ formatRelativeTime(record.date) }}</div>
+			<!-- 第一行：种类（左）+ 时间（右） -->
+			<div class="transaction-row-first">
+				<span class="transaction-category">{{ record.category }}</span>
+				<span class="transaction-time">{{ formatRelativeTime(record.date) }}</span>
+			</div>
+			<!-- 第二行：备注 -->
+			<div class="transaction-note" v-if="record.note">{{ record.note }}</div>
+			<div class="transaction-note transaction-note-empty" v-else>&nbsp;</div>
 		</div>
 		<div class="transaction-amount" :class="record.type">
 			{{ formatAmount(record.amount) }}
