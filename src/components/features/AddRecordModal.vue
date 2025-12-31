@@ -160,9 +160,10 @@ watch(
 				formData.note = ''
 				formData.date = new Date().toISOString().split('T')[0]
 			}
-			nextTick(() => {
-				amountInput.value?.focus()
-			})
+			// ? 不要一打开就触发焦点事件
+			// nextTick(() => {
+			// 	amountInput.value?.focus()
+			// })
 		}
 	}
 )
