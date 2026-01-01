@@ -27,6 +27,9 @@
 
 				<div v-if="recentRecords.length > 0">
 					<TransactionItem v-for="record in recentRecords" :key="record.id" :record="record" />
+					<div v-if="hasMoreRecords" class="records-limit-hint">
+						最近记录最多显示30条，其余请点击查看更多查看
+					</div>
 				</div>
 				<div v-else class="empty-state">
 					<p>暂无记录，点击下方按钮添加</p>
@@ -49,7 +52,9 @@ import TransactionItem from '@/components/features/TransactionItem.vue'
 const recordsStore = useRecordsStore()
 const uiStore = useUIStore()
 
-const recentRecords = computed(() => recordsStore.recentRecords.slice(0, 10))
+const recentRecords = computed(() => recordsStore.recentRecords.slice(0, 30))
+
+const hasMoreRecords = computed(() => recordsStore.recentRecords.length > 30)
 
 function handleQuickAction(action) {
 	uiStore.openModal(action.type, action.category)
@@ -100,5 +105,13 @@ function handleQuickAction(action) {
 
 .empty-state p {
 	font-size: 14px;
+}
+
+.records-limit-hint {
+	font-size: 12px;
+	color: var(--text-secondary);
+	text-align: center;
+	padding: 12px 20px;
+	margin-top: 8px;
 }
 </style>
