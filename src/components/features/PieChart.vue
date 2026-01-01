@@ -73,6 +73,7 @@ function getChartOption() {
 		// 图例
 		legend: {
 			// orient: 'horizontal',
+			type: 'scroll',
 			bottom: '0%',
 			left: 'center', //图例在水平方向居中对齐
 			// itemWidth: 12,
