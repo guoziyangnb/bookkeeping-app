@@ -9,6 +9,7 @@
 
 html {
 	font-size: 16px;
+	min-width: 375px;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
@@ -25,6 +26,8 @@ body {
 	background: var(--bg-primary);
 	color: var(--text-primary);
 	min-height: 100vh;
+	min-width: 375px;
+	width: 100%;
 	line-height: 1.6;
 	transition:
 		background-color 0.3s ease,
@@ -33,6 +36,8 @@ body {
 
 #app {
 	min-height: 100vh;
+	min-width: 375px;
+	width: 100%;
 	position: relative;
 	padding-bottom: 120px;
 }
