@@ -58,22 +58,24 @@ function getChartOption() {
 
 	return {
 		grid: {
-			left: '3%',
+			left: '3%', // 绘图区域距离容器左侧的距离
 			right: '4%',
 			bottom: '3%',
 			top: '10%',
-			containLabel: true
+			containLabel: true // 网格是否包含坐标轴的标签（防止标签超出容器）
 		},
+		//有文字提示
 		tooltip: {
 			trigger: 'axis',
 			axisPointer: {
+				//选中的时候有阴影
 				type: 'shadow'
 			}
 		},
 		xAxis: {
-			type: 'category',
-			data: weekData.map(d => d.date),
-			boundaryGap: false,
+			type: 'category', // 轴类型：'category' 类目轴（文本类数据，如日期、名称），'value' 数值轴，'time' 时间轴
+			data: weekData.map(d => d.date), // 数组数据
+			boundaryGap: false, // 轴两端是否留白：false 表示折线从X轴最左端开始，true 会留空白（默认true）
 			axisLine: {
 				lineStyle: {
 					color: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)'
@@ -87,53 +89,57 @@ function getChartOption() {
 		yAxis: {
 			type: 'value',
 			axisLine: {
-				show: false
+				show: false // 隐藏Y轴的轴线（只保留刻度和标签，更简洁）
 			},
 			axisLabel: {
 				color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
 				fontSize: 11
 			},
+			// Y轴网格线（横向分割线）样式
 			splitLine: {
 				lineStyle: {
 					color: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
-					type: 'dashed'
+					type: 'dashed' // 网格线类型：虚线（'solid' 是实线）
 				}
 			}
 		},
 		series: [
 			{
-				type: 'line',
-				smooth: true,
-				symbol: 'circle',
-				symbolSize: 6,
+				type: 'line', // 图表类型：'line' 折线图，'bar' 柱状图，'pie' 饼图等
+				smooth: true, // 折线是否平滑：true 是平滑曲线，false 是折线（默认false）
+				symbol: 'circle', // 数据点标记符号：'circle' 圆形，'square' 正方形，'none' 隐藏
+				symbolSize: 6, // 数据点标记的大小（像素）
 				data: weekData.map(d => d.amount),
+				// 折线的样式
 				lineStyle: {
 					width: 3,
 					color: '#FF8A5B'
 				},
+				// 数据点标记的样式
 				itemStyle: {
-					color: '#FF8A5B',
+					color: '#FF8A5B', // 标记填充色（和折线同色）
 					borderColor: '#fff',
 					borderWidth: 2
 				},
+				// 折线下方的面积填充样式（实现“面积图”效果）
 				areaStyle: {
 					color: {
-						type: 'linear',
+						type: 'linear', // 填充色类型：线性渐变
 						x: 0,
-						y: 0,
+						y: 0, // 渐变起始点：(0,0) 即左上角
 						x2: 0,
-						y2: 1,
+						y2: 1, // 渐变结束点：(0,1) 即左下角（垂直渐变）
 						colorStops: [
-							{ offset: 0, color: 'rgba(255, 138, 91, 0.3)' },
-							{ offset: 1, color: 'rgba(255, 138, 91, 0)' }
+							{ offset: 0, color: 'rgba(255, 138, 91, 0.3)' }, // 顶部：橙红色半透明（0.3透明度）
+							{ offset: 1, color: 'rgba(255, 138, 91, 0)' } // 底部：完全透明
 						]
 					}
 				},
-				animationDelay: idx => idx * 100
+				animationDelay: idx => idx * 300 // 每个数据点的动画延迟：第idx个点延迟 idx*100 毫秒（逐点动画）
 			}
 		],
-		animationDuration: 1000,
-		animationEasing: 'cubicOut'
+		animationDuration: 3000, // 图表动画总时长：3000毫秒（3秒）
+		animationEasing: 'cubicOut' // 动画缓动效果：'cubicOut' 先快后慢，更自然（还有 'linear' 匀速等）
 	}
 }
 
