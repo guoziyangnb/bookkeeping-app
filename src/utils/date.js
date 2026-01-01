@@ -118,3 +118,12 @@ export function formatToLocalISODate(date) {
 	const day = String(d.getDate()).padStart(2, '0')
 	return `${year}-${month}-${day}`
 }
+
+/**
+ * 将日期字符串（YYYY-MM-DD）转换为本地时区的ISO字符串
+ * @param {string} dateStr - 日期字符串 (YYYY-MM-DD)
+ * @returns {string} ISO字符串（使用本地时区的午夜时间）
+ */
+export function localDateToISO(dateStr) {
+	return new Date(dateStr + 'T00:00:00').toISOString()
+}

@@ -65,6 +65,7 @@ import { ref, reactive, computed, watch, nextTick } from 'vue'
 import { useUIStore } from '@/stores/ui'
 import { useRecordsStore } from '@/stores/records'
 import DatePicker from '@/components/common/DatePicker.vue'
+import { localDateToISO } from '@/utils/date'
 
 const uiStore = useUIStore()
 const recordsStore = useRecordsStore()
@@ -193,22 +194,23 @@ function handleSubmit() {
 	}
 
 	if (isEditMode.value) {
-		// 编辑模式：更新记录
+		// 编辑模式：更新记录，保留原有时间
+		const originalTime = uiStore.editingRecord.date.split('T')[1]
 		recordsStore.updateRecord(uiStore.editingRecord.id, {
 			type: formData.type,
 			amount: formData.amount,
 			category: formData.category,
 			note: formData.note,
-			date: new Date(formData.date).toISOString()
+			date: `${formData.date}T${originalTime}`
 		})
 	} else {
-		// 添加模式：创建新记录
+		// 添加模式：创建新记录，使用当前时间
 		recordsStore.addRecord({
 			type: formData.type,
 			amount: formData.amount,
 			category: formData.category,
 			note: formData.note,
-			date: new Date(formData.date).toISOString()
+			date: new Date().toISOString()
 		})
 	}
 
