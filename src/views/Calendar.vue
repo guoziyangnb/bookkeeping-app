@@ -45,11 +45,12 @@
 				<div class="section-header">
 					<div class="section-title">{{ selectedDateLabel }}</div>
 				</div>
-				<div class="glass-card">
-					<div v-if="selectedDateRecords.length > 0">
-						<TransactionItem v-for="record in selectedDateRecords" :key="record.id" :record="record" />
-					</div>
-					<div v-else class="empty-state">
+				<div style="margin-bottom: 16px"></div>
+				<div v-if="selectedDateRecords.length > 0">
+					<TransactionItem v-for="record in selectedDateRecords" :key="record.id" :record="record" />
+				</div>
+				<div v-else class="glass-card">
+					<div class="empty-state">
 						<p>这一天没有记录</p>
 					</div>
 				</div>
