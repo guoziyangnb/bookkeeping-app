@@ -295,7 +295,7 @@ onUnmounted(() => {
 
 <style scoped>
 .chart-card {
-	padding: 24px;
+	padding: 16px;
 }
 
 .chart-header {

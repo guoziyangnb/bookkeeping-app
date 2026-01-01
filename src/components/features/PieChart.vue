@@ -102,7 +102,7 @@ function getChartOption() {
 				// 每一项之间的边框设置
 				itemStyle: {
 					borderColor: '#ffffff',
-					borderWidth: 2,
+					borderWidth: 1,
 					borderRadius: 10
 				},
 				label: {
@@ -227,7 +227,7 @@ onUnmounted(() => {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	padding: 5px 0 20px;
+	/* padding:  0 20px; */
 	width: 100%;
 }
 
