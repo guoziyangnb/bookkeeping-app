@@ -1,7 +1,7 @@
 <template>
 	<div class="chart-card glass-card">
 		<div class="chart-header">
-			<div class="chart-title">支出趋势</div>
+			<div class="chart-title">收支趋势</div>
 			<div class="chart-period">本周</div>
 		</div>
 		<div ref="chartRef" class="chart-container"></div>
@@ -23,7 +23,6 @@ let resizeObserver = null
 // 获取本周数据
 function getWeekData() {
 	const today = new Date()
-	const dayOfWeek = today.getDay()
 	const weekData = []
 
 	// 获取过去7天的数据
@@ -41,14 +40,20 @@ function getWeekData() {
 		})
 
 		const dayExpense = dayRecords.filter(r => r.type === 'expense').reduce((sum, r) => sum + Math.abs(r.amount), 0)
+		const dayIncome = dayRecords.filter(r => r.type === 'income').reduce((sum, r) => sum + r.amount, 0)
 
 		weekData.push({
 			date: date.toLocaleDateString('zh-CN', { weekday: 'short' }),
-			amount: dayExpense
+			expense: dayExpense,
+			income: dayIncome
 		})
 	}
 
-	return weekData
+	return {
+		dates: weekData.map(d => d.date),
+		expenseData: weekData.map(d => d.expense),
+		incomeData: weekData.map(d => d.income)
+	}
 }
 
 // 获取图表配置
@@ -64,6 +69,11 @@ function getChartOption() {
 			top: '10%',
 			containLabel: true // 网格是否包含坐标轴的标签（防止标签超出容器）
 		},
+		// 图例
+		legend: {
+			top: 0,
+			left: 'center'
+		},
 		//有文字提示
 		tooltip: {
 			trigger: 'axis',
@@ -74,7 +84,7 @@ function getChartOption() {
 		},
 		xAxis: {
 			type: 'category', // 轴类型：'category' 类目轴（文本类数据，如日期、名称），'value' 数值轴，'time' 时间轴
-			data: weekData.map(d => d.date), // 数组数据
+			data: weekData.dates, // 数组数据
 			boundaryGap: false, // 轴两端是否留白：false 表示折线从X轴最左端开始，true 会留空白（默认true）
 			axisLine: {
 				lineStyle: {
@@ -110,7 +120,7 @@ function getChartOption() {
 				smooth: true, // 折线是否平滑：true 是平滑曲线，false 是折线（默认false）
 				symbol: 'circle', // 数据点标记符号：'circle' 圆形，'square' 正方形，'none' 隐藏
 				symbolSize: 6, // 数据点标记的大小（像素）
-				data: weekData.map(d => d.amount),
+				data: weekData.expenseData,
 				// 折线的样式
 				lineStyle: {
 					width: 3,
@@ -137,9 +147,39 @@ function getChartOption() {
 					}
 				}
 				// animationDelay: idx => idx * 100 // 每个数据点的动画延迟：第idx个点延迟 idx*100 毫秒（逐点动画）
+			},
+			{
+				name: '收入',
+				type: 'line',
+				smooth: true,
+				symbol: 'circle',
+				symbolSize: 6,
+				data: weekData.incomeData,
+				lineStyle: {
+					width: 3,
+					color: '#52C41A'
+				},
+				itemStyle: {
+					color: '#52C41A',
+					borderColor: '#fff',
+					borderWidth: 2
+				},
+				areaStyle: {
+					color: {
+						type: 'linear',
+						x: 0,
+						y: 0,
+						x2: 0,
+						y2: 1,
+						colorStops: [
+							{ offset: 0, color: 'rgba(82, 196, 26, 0.3)' },
+							{ offset: 1, color: 'rgba(82, 196, 26, 0)' }
+						]
+					}
+				}
 			}
 		],
-		animationDuration: 1500, // 图表动画总时长：2000毫秒（2秒）
+		animationDuration: 1500, // 图表动画总时长：1500毫秒（1.5秒）
 		animationEasing: 'cubicOut' // 动画缓动效果：'cubicOut' 先快后慢，更自然（还有 'linear' 匀速等）
 	}
 }
