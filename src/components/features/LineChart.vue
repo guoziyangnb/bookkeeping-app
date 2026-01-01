@@ -25,15 +25,26 @@ function getWeekData() {
 	const today = new Date()
 	const weekData = []
 
-	// 获取过去7天的数据
-	for (let i = 6; i >= 0; i--) {
-		const date = new Date(today)
-		date.setDate(today.getDate() - i)
+	// 获取本周一的日期
+	// getDay(): 0=周日, 1=周一, ..., 6=周六
+	// (today.getDay() + 6) % 7 可以将周日转为6，周一转为0，周二转为1，等等
+	const monday = new Date(today)
+	monday.setDate(today.getDate() - ((today.getDay() + 6) % 7))
+	monday.setHours(0, 0, 0, 0)
+
+	// 定义周几的标签
+	const weekDayLabels = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+
+	// 遍历本周的7天（从周一到周日）
+	for (let i = 0; i < 7; i++) {
+		const date = new Date(monday)
+		date.setDate(monday.getDate() + i)
 		date.setHours(0, 0, 0, 0)
 
 		const nextDate = new Date(date)
 		nextDate.setDate(date.getDate() + 1)
 
+		// 筛选当天的记录
 		const dayRecords = recordsStore.records.filter(r => {
 			const recordDate = new Date(r.date)
 			return recordDate >= date && recordDate < nextDate
@@ -43,7 +54,7 @@ function getWeekData() {
 		const dayIncome = dayRecords.filter(r => r.type === 'income').reduce((sum, r) => sum + r.amount, 0)
 
 		weekData.push({
-			date: date.toLocaleDateString('zh-CN', { weekday: 'short' }),
+			date: weekDayLabels[i],
 			expense: dayExpense,
 			income: dayIncome
 		})
