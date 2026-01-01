@@ -78,7 +78,8 @@ const expenseStats = computed(() => {
 })
 
 // 分类颜色
-const categoryColors = ['var(--accent-orange)', 'var(--accent-blue)', 'var(--accent-purple)', 'var(--accent-green)', 'var(--text-secondary)']
+// const categoryColors = ['var(--accent-orange)', 'var(--accent-blue)', 'var(--accent-purple)', 'var(--accent-green)', 'var(--text-secondary)']
+const categoryColors = ['#ffd10a', '#587bf3', '#0db8f5', '#b6d634', '#585b7d', '#ff6b98', '#785db0', '#ff994d']
 
 function getCategoryColor(index) {
 	return categoryColors[index % categoryColors.length]
