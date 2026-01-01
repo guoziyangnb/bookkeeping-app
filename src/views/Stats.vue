@@ -4,7 +4,7 @@
 
 		<div class="container">
 			<!-- 支出占比 - 扇形图 -->
-			<div class="glass-card">
+			<div class="glass-card" style="padding: 12px">
 				<div class="section-header">
 					<div class="section-title">&nbsp;&nbsp;本月支出占比</div>
 				</div>
