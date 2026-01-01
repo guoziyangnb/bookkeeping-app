@@ -2,7 +2,7 @@
 	<div class="quick-actions">
 		<div v-for="action in actions" :key="action.name" class="quick-action-item" @click="handleClick(action)">
 			<div class="quick-action-icon">
-				<svg v-html="action.icon"></svg>
+				<svg viewBox="0 0 24 24" v-html="action.icon"></svg>
 			</div>
 			<div class="quick-action-label">{{ action.label }}</div>
 		</div>
