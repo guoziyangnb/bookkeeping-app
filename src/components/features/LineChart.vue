@@ -107,27 +107,44 @@ function getChartOption() {
 				fontSize: 11
 			}
 		},
-		yAxis: {
-			type: 'value',
-			axisLine: {
-				show: false // 隐藏Y轴的轴线（只保留刻度和标签，更简洁）
+		yAxis: [
+			{
+				type: 'value',
+				position: 'left', // 左侧Y轴（收入）
+				axisLine: {
+					show: false
+				},
+				axisLabel: {
+					color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
+					fontSize: 11
+				},
+				splitLine: {
+					lineStyle: {
+						color: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+						type: 'dashed'
+					}
+				}
 			},
-			axisLabel: {
-				color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
-				fontSize: 11
-			},
-			// Y轴网格线（横向分割线）样式
-			splitLine: {
-				lineStyle: {
-					color: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
-					type: 'dashed' // 网格线类型：虚线（'solid' 是实线）
+			{
+				type: 'value',
+				position: 'right', // 右侧Y轴（支出）
+				axisLine: {
+					show: false
+				},
+				axisLabel: {
+					color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
+					fontSize: 11
+				},
+				splitLine: {
+					show: false // 隐藏右侧Y轴的网格线，避免重叠
 				}
 			}
-		},
+		],
 		series: [
 			{
 				name: '支出',
 				type: 'line', // 图表类型：'line' 折线图，'bar' 柱状图，'pie' 饼图等
+				yAxisIndex: 0, // 使用左侧Y轴
 				smooth: true, // 折线是否平滑：true 是平滑曲线，false 是折线（默认false）
 				symbol: 'circle', // 数据点标记符号：'circle' 圆形，'square' 正方形，'none' 隐藏
 				symbolSize: 6, // 数据点标记的大小（像素）
@@ -162,6 +179,7 @@ function getChartOption() {
 			{
 				name: '收入',
 				type: 'line',
+				yAxisIndex: 1, // 使用右侧Y轴
 				smooth: true,
 				symbol: 'circle',
 				symbolSize: 6,
