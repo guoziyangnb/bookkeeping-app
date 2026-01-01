@@ -110,11 +110,16 @@ function getChartOption() {
 		yAxis: [
 			{
 				type: 'value',
-				position: 'left', // 左侧Y轴（收入）
+				name: '支出/元', // 左侧Y轴名称
+				position: 'left', // 左侧Y轴（支出）
 				axisLine: {
 					show: false
 				},
 				axisLabel: {
+					color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
+					fontSize: 11
+				},
+				nameTextStyle: {
 					color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
 					fontSize: 11
 				},
@@ -127,11 +132,16 @@ function getChartOption() {
 			},
 			{
 				type: 'value',
-				position: 'right', // 右侧Y轴（支出）
+				name: '收入/元', // 右侧Y轴名称
+				position: 'right', // 右侧Y轴（收入）
 				axisLine: {
 					show: false
 				},
 				axisLabel: {
+					color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
+					fontSize: 11
+				},
+				nameTextStyle: {
 					color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
 					fontSize: 11
 				},
@@ -311,6 +321,6 @@ onUnmounted(() => {
 
 .chart-container {
 	width: 100%;
-	height: 200px;
+	height: 280px;
 }
 </style>
