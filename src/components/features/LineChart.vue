@@ -105,6 +105,7 @@ function getChartOption() {
 		},
 		series: [
 			{
+				name: '支出',
 				type: 'line', // 图表类型：'line' 折线图，'bar' 柱状图，'pie' 饼图等
 				smooth: true, // 折线是否平滑：true 是平滑曲线，false 是折线（默认false）
 				symbol: 'circle', // 数据点标记符号：'circle' 圆形，'square' 正方形，'none' 隐藏
@@ -134,11 +135,11 @@ function getChartOption() {
 							{ offset: 1, color: 'rgba(255, 138, 91, 0)' } // 底部：完全透明
 						]
 					}
-				},
-				animationDelay: idx => idx * 300 // 每个数据点的动画延迟：第idx个点延迟 idx*100 毫秒（逐点动画）
+				}
+				// animationDelay: idx => idx * 100 // 每个数据点的动画延迟：第idx个点延迟 idx*100 毫秒（逐点动画）
 			}
 		],
-		animationDuration: 3000, // 图表动画总时长：3000毫秒（3秒）
+		animationDuration: 1500, // 图表动画总时长：2000毫秒（2秒）
 		animationEasing: 'cubicOut' // 动画缓动效果：'cubicOut' 先快后慢，更自然（还有 'linear' 匀速等）
 	}
 }
@@ -154,6 +155,7 @@ function initChart() {
 // 更新图表
 function updateChart() {
 	if (chartInstance) {
+		chartInstance.clear() // ! 想要动画显现的话需要先清除数据
 		chartInstance.setOption(getChartOption())
 	}
 }
