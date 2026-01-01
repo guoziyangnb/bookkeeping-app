@@ -45,6 +45,7 @@ const chartData = computed(() => {
 // 获取图表配置
 function getChartOption() {
 	const isDark = uiStore.isDark
+	const isMobile = window.innerWidth <= 480
 
 	return {
 		title: {
@@ -71,34 +72,48 @@ function getChartOption() {
 			// extraCssText: 'box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); border-radius: 8px;'
 		},
 		// 图例
-		legend: {
-			// orient: 'horizontal',
-			bottom: '0%',
-			left: 'center', //图例在水平方向居中对齐
-			// itemWidth: 12,
-			// itemHeight: 12,
-			// itemGap: 16,
-			// icon: 'circle',
-			textStyle: {
-				fontSize: 13,
-				color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#2c2c2c'
-			},
-			formatter: name => {
-				const item = props.data.find(d => d.category === name)
-				const percentage = item ? item.percentage.toFixed(1) : 0
-				return `${name} ${percentage}%`
-			}
-			// tooltip: {
-			// 	show: true
-			// }
-		},
+		legend: isMobile
+			? {
+					// 移动端：图例放在右侧垂直排列
+					orient: 'vertical',
+					right: '0',
+					top: 'center',
+					itemWidth: 10,
+					itemHeight: 10,
+					itemGap: 8,
+					textStyle: {
+						fontSize: 11,
+						color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#2c2c2c'
+					},
+					formatter: name => {
+						const item = props.data.find(d => d.category === name)
+						const percentage = item ? item.percentage.toFixed(1) : 0
+						return `${name} ${percentage}%`
+					}
+				}
+			: {
+					// 桌面端：图例在底部水平排列
+					orient: 'horizontal',
+					bottom: '0%',
+					left: 'center',
+					itemGap: 16,
+					textStyle: {
+						fontSize: 13,
+						color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#2c2c2c'
+					},
+					formatter: name => {
+						const item = props.data.find(d => d.category === name)
+						const percentage = item ? item.percentage.toFixed(1) : 0
+						return `${name} ${percentage}%`
+					}
+				},
 		// 环形图系列
 		series: [
 			{
 				type: 'pie',
 				radius: ['40%', '70%'], //饼图半径（环形）
 				avoidLabelOverlap: true, //是否防止标签重叠
-				center: ['50%', '45%'], //饼图中心位置
+				center: isMobile ? ['40%', '50%'] : ['50%', '45%'], //饼图中心位置
 				// 每一项之间的边框设置
 				itemStyle: {
 					borderColor: '#ffffff',
@@ -172,6 +187,8 @@ function updateChart() {
 function handleResize() {
 	if (chartInstance) {
 		chartInstance.resize()
+		// 重新设置配置以适应可能的布局变化（移动端/桌面端）
+		chartInstance.setOption(getChartOption())
 	}
 }
 
@@ -199,6 +216,8 @@ onMounted(() => {
 	resizeObserver = new ResizeObserver(() => {
 		if (chartInstance) {
 			chartInstance.resize()
+			// 重新设置配置以适应可能的布局变化
+			chartInstance.setOption(getChartOption())
 		}
 	})
 
