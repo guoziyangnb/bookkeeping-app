@@ -65,7 +65,7 @@ import { ref, reactive, computed, watch, nextTick } from 'vue'
 import { useUIStore } from '@/stores/ui'
 import { useRecordsStore } from '@/stores/records'
 import DatePicker from '@/components/common/DatePicker.vue'
-import { localDateToISO } from '@/utils/date'
+import { formatToLocalISODate } from '@/utils/date'
 
 const uiStore = useUIStore()
 const recordsStore = useRecordsStore()
@@ -131,7 +131,7 @@ const formData = reactive({
 	amount: '',
 	category: '餐饮',
 	note: '',
-	date: new Date().toISOString().split('T')[0]
+	date: formatToLocalISODate(new Date())
 })
 
 // 根据类型显示不同的分类
@@ -164,7 +164,7 @@ watch(
 				}
 				formData.amount = ''
 				formData.note = ''
-				formData.date = new Date().toISOString().split('T')[0]
+				formData.date = formatToLocalISODate(new Date())
 			}
 			// ? 不要一打开就触发焦点事件
 			// nextTick(() => {
