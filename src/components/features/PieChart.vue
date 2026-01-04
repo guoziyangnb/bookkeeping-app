@@ -47,14 +47,14 @@ function getChartOption() {
 	const isDark = uiStore.isDark
 
 	return {
-		title: {
-			text: `总支出 ¥${totalAmount.value}`,
-			left: 'left',
-			top: 0,
-			textStyle: {
-				color: '#2c343c'
-			}
-		},
+		// title: {
+		// 	text: `总支出 ¥${totalAmount.value}`,
+		// 	left: 'left',
+		// 	top: 0,
+		// 	textStyle: {
+		// 		color: '#2c343c'
+		// 	}
+		// },
 		// 提示框
 		tooltip: {
 			trigger: 'item', // 触发类型为数据项触发,可选值还有 axis（坐标轴触发，适用于柱状图 / 折线图）、none（不触发）
@@ -97,7 +97,7 @@ function getChartOption() {
 		series: [
 			{
 				type: 'pie',
-				radius: ['40%', '70%'], //饼图半径（环形）
+				radius: ['50%', '70%'], //饼图半径（环形）
 				avoidLabelOverlap: true, //是否防止标签重叠
 				center: ['50%', '45%'], //饼图中心位置
 				// 每一项之间的边框设置

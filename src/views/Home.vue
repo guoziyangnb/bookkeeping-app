@@ -27,9 +27,7 @@
 
 				<div v-if="recentRecords.length > 0">
 					<TransactionItem v-for="record in recentRecords" :key="record.id" :record="record" />
-					<div v-if="hasMoreRecords" class="records-limit-hint">
-						最近记录最多显示30条，其余请点击查看更多查看
-					</div>
+					<div v-if="hasMoreRecords" class="records-limit-hint">最近记录最多显示30条，其余请点击查看更多查看</div>
 				</div>
 				<div v-else class="empty-state">
 					<p>暂无记录，点击下方按钮添加</p>

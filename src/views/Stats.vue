@@ -4,9 +4,10 @@
 
 		<div class="container">
 			<!-- 支出占比 - 扇形图 -->
-			<div class="glass-card" style="padding: 12px">
+			<div class="glass-card">
 				<div class="section-header">
 					<div class="section-title">&nbsp;&nbsp;本月支出占比</div>
+					<div class="section-title" style="font-size: 14px">&nbsp;&nbsp;总支出: &nbsp;¥ {{ totalExpense.toFixed(2) }}</div>
 				</div>
 				<PieChart v-if="totalExpense > 0" :data="expenseStats" />
 				<div v-else class="empty-state">
