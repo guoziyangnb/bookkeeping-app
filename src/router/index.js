@@ -30,6 +30,12 @@ const routes = [
 		name: 'profile',
 		component: () => import('@/views/Profile.vue'),
 		meta: { title: '个人资料' }
+	},
+	{
+		path: '/settings/edit-field',
+		name: 'editField',
+		component: () => import('@/views/FieldEditPage.vue'),
+		meta: { title: '编辑资料' }
 	}
 ]
 

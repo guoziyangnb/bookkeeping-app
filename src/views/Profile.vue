@@ -47,29 +47,35 @@
 			<!-- 表单区域 -->
 			<div class="form-section">
 				<!-- 用户名 -->
-				<div class="form-card">
+				<div class="form-card clickable" @click="goToEdit('username')">
 					<div class="form-label">
 						<svg viewBox="0 0 24 24">
 							<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
 						</svg>
 						<span>用户名</span>
 					</div>
-					<van-field v-model="formData.username" placeholder="请输入用户名" class="glass-input" :border="false" clearable clear-trigger="always" />
+					<div class="form-value-row">
+						<span class="form-value">{{ formData.username || '未设置' }}</span>
+						<div class="arrow-icon">›</div>
+					</div>
 				</div>
 
 				<!-- 邮箱 -->
-				<div class="form-card">
+				<div class="form-card clickable" @click="goToEdit('email')">
 					<div class="form-label">
 						<svg viewBox="0 0 24 24">
 							<path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
 						</svg>
 						<span>邮箱</span>
 					</div>
-					<van-field v-model="formData.email" type="email" placeholder="请输入邮箱地址" class="glass-input" :border="false" clearable clear-trigger="always" />
+					<div class="form-value-row">
+						<span class="form-value">{{ formData.email || '未设置' }}</span>
+						<div class="arrow-icon">›</div>
+					</div>
 				</div>
 
 				<!-- 手机号码 -->
-				<div class="form-card">
+				<div class="form-card clickable" @click="goToEdit('phone')">
 					<div class="form-label">
 						<svg viewBox="0 0 24 24">
 							<path
@@ -77,37 +83,21 @@
 						</svg>
 						<span>手机号码</span>
 					</div>
-					<van-field
-						v-model="formData.phone"
-						type="tel"
-						placeholder="请输入手机号码"
-						class="glass-input"
-						:border="false"
-						maxlength="11"
-						clearable
-						clear-trigger="always" />
+					<div class="form-value-row">
+						<span class="form-value">{{ formData.phone || '未设置' }}</span>
+						<div class="arrow-icon">›</div>
+					</div>
 				</div>
-			</div>
-
-			<!-- 保存按钮 -->
-			<div class="save-section">
-				<button class="save-btn" @click="handleSave">
-					<span class="save-btn-text">保存修改</span>
-					<svg class="save-btn-icon" viewBox="0 0 24 24">
-						<path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" />
-					</svg>
-				</button>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { Uploader as VanUploader, Field as VanField, showToast } from 'vant'
+import { Uploader as VanUploader, showToast } from 'vant'
 import 'vant/lib/uploader/style'
-import 'vant/lib/field/style'
 import 'vant/lib/toast/style'
 
 const router = useRouter()
@@ -130,6 +120,14 @@ const goBack = () => {
 	router.back()
 }
 
+// 跳转到编辑页面
+const goToEdit = field => {
+	router.push({
+		path: '/settings/edit-field',
+		query: { field }
+	})
+}
+
 // 文件上传回调
 const afterRead = file => {
 	// 这里应该上传到服务器
@@ -146,51 +144,6 @@ const onOversize = () => {
 	showToast('图片大小不能超过 5MB')
 }
 
-// 保存修改
-const handleSave = () => {
-	// 表单验证
-	if (!formData.username.trim()) {
-		showToast('请输入用户名')
-		return
-	}
-
-	if (formData.email && !isValidEmail(formData.email)) {
-		showToast('请输入有效的邮箱地址')
-		return
-	}
-
-	if (formData.phone && !isValidPhone(formData.phone)) {
-		showToast('请输入有效的手机号码')
-		return
-	}
-
-	// 保存逻辑
-	const profileData = {
-		avatar: avatarUrl.value,
-		...formData
-	}
-	localStorage.setItem('userProfile', JSON.stringify(profileData))
-
-	showToast('保存成功')
-
-	// 延迟返回
-	setTimeout(() => {
-		router.back()
-	}, 1000)
-}
-
-// 邮箱验证
-const isValidEmail = email => {
-	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-	return emailRegex.test(email)
-}
-
-// 手机号验证
-const isValidPhone = phone => {
-	const phoneRegex = /^1[3-9]\d{9}$/
-	return phoneRegex.test(phone)
-}
-
 // 加载用户数据
 const loadUserProfile = () => {
 	const savedProfile = localStorage.getItem('userProfile')
@@ -204,7 +157,9 @@ const loadUserProfile = () => {
 }
 
 // 初始化时加载数据
-loadUserProfile()
+onMounted(() => {
+	loadUserProfile()
+})
 </script>
 
 <style scoped>
@@ -417,7 +372,18 @@ loadUserProfile()
 	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
 }
 
-.form-card:hover {
+.form-card.clickable {
+	cursor: pointer;
+	position: relative;
+	overflow: hidden;
+}
+
+.form-card.clickable:active {
+	transform: scale(0.98);
+	background: var(--bg-glass-hover);
+}
+
+.form-card.clickable:hover {
 	transform: translateY(-2px);
 	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 	border-color: var(--accent-orange);
@@ -442,96 +408,34 @@ loadUserProfile()
 	color: var(--text-primary);
 }
 
-/* Glass Input */
-.glass-input {
-	background: var(--bg-input) !important;
-	border-radius: var(--radius-md) !important;
-	padding: 14px 16px !important;
-	transition: all 0.3s ease !important;
-}
-
-.glass-input:focus-within {
-	background: var(--bg-input-hover) !important;
-	box-shadow: 0 0 0 2px rgba(255, 138, 91, 0.2) !important;
-}
-
-.glass-input :deep(.van-field__control) {
-	color: var(--text-primary) !important;
-	font-size: 15px !important;
-	font-weight: 500 !important;
-}
-
-.glass-input :deep(.van-field__control::placeholder) {
-	color: var(--text-tertiary) !important;
-}
-
-.glass-input :deep(.van-field__clear) {
-	color: var(--text-secondary) !important;
-}
-
-/* ==================== 保存按钮 ==================== */
-.save-section {
-	padding: 0 20px;
-}
-
-.save-btn {
-	width: 100%;
-	padding: 18px 32px;
-	border: none;
-	border-radius: var(--radius-lg);
-	background: var(--gradient-orange);
-	color: white;
-	font-size: 16px;
-	font-weight: 600;
-	cursor: pointer;
-	box-shadow: 0 8px 24px rgba(255, 138, 91, 0.4);
-	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+.form-value-row {
 	display: flex;
 	align-items: center;
-	justify-content: center;
-	gap: 8px;
-	position: relative;
-	overflow: hidden;
+	justify-content: space-between;
+	gap: 12px;
 }
 
-.save-btn::before {
-	content: '';
-	position: absolute;
-	top: 0;
-	left: -100%;
-	width: 100%;
-	height: 100%;
-	background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-	transition: left 0.5s ease;
+.form-value {
+	font-size: 15px;
+	font-weight: 500;
+	color: var(--text-primary);
+	flex: 1;
 }
 
-.save-btn:hover::before {
-	left: 100%;
+.form-value:empty::before {
+	content: '未设置';
+	color: var(--text-tertiary);
 }
 
-.save-btn:hover {
-	transform: translateY(-2px);
-	box-shadow: 0 12px 32px rgba(255, 138, 91, 0.5);
-}
-
-.save-btn:active {
-	transform: translateY(0);
-}
-
-.save-btn-text {
-	font-size: 16px;
-	font-weight: 600;
-}
-
-.save-btn-icon {
-	width: 20px;
-	height: 20px;
-	fill: white;
+.arrow-icon {
+	font-size: 24px;
+	color: var(--text-tertiary);
+	font-weight: 300;
 	transition: transform 0.3s ease;
 }
 
-.save-btn:hover .save-btn-icon {
-	transform: scale(1.1);
+.form-card.clickable:hover .arrow-icon {
+	transform: translateX(4px);
 }
 
 /* ==================== 响应式设计 ==================== */
@@ -548,10 +452,6 @@ loadUserProfile()
 
 	.form-card {
 		padding: 16px;
-	}
-
-	.save-btn {
-		padding: 16px 24px;
 	}
 }
 </style>
