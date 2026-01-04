@@ -30,7 +30,7 @@
 
 			<!-- 其他设置 -->
 			<div class="settings-group">
-				<div class="settings-item">
+				<div class="settings-item" @click="goToProfile">
 					<div class="settings-item-left">
 						<div class="settings-icon" style="background: var(--accent-blue)">
 							<svg viewBox="0 0 24 24">
@@ -116,13 +116,19 @@
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router'
 import { useUIStore } from '@/stores/ui'
 import { useRecordsStore } from '@/stores/records'
 import { clearStorage } from '@/utils/storage'
 import Header from '@/components/layout/Header.vue'
 
+const router = useRouter()
 const uiStore = useUIStore()
 const recordsStore = useRecordsStore()
+
+function goToProfile() {
+	router.push('/settings/profile')
+}
 
 function handleClearData() {
 	if (confirm('确定要清除所有数据吗？此操作不可恢复！')) {

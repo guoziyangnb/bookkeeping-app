@@ -24,6 +24,12 @@ const routes = [
 		name: 'settings',
 		component: () => import('@/views/Settings.vue'),
 		meta: { title: '设置' }
+	},
+	{
+		path: '/settings/profile',
+		name: 'profile',
+		component: () => import('@/views/Profile.vue'),
+		meta: { title: '个人资料' }
 	}
 ]
 
