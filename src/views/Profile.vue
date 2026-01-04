@@ -87,9 +87,9 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { Uploader as VanUploader, showToast } from 'vant'
+import { Uploader as VanUploader } from 'vant'
 import 'vant/lib/uploader/style'
-import 'vant/lib/toast/style'
+import { message } from '@/utils/message'
 
 const router = useRouter()
 
@@ -124,7 +124,7 @@ const beforeRead = file => {
 	// 校验文件类型
 	const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg']
 	if (!allowedTypes.includes(file.type)) {
-		showToast('只支持 JPG、PNG 格式的图片')
+		message.warning('只支持 JPG、PNG 格式的图片')
 		return false
 	}
 	return true
@@ -151,12 +151,12 @@ const afterRead = file => {
 	// 清空文件列表，允许重复上传，避免直接显示预览图bug（不想显示预览图，fileList必须为空）
 	fileList.value = []
 
-	showToast('头像上传成功！')
+	message.success('头像上传成功！')
 }
 
 // 文件过大
 const onOversize = () => {
-	showToast('图片大小不能超过 5MB')
+	message.error('图片大小不能超过 5MB')
 }
 
 // 加载用户数据
