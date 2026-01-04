@@ -390,7 +390,7 @@ onMounted(() => {
 	background: var(--bg-glass-border);
 	backdrop-filter: blur(20px);
 	-webkit-backdrop-filter: blur(20px);
-	border-bottom: 0.5px solid var(--van-gray-5);
+	/* border-bottom: 0.5px solid var(--van-gray-5); */
 	border-radius: 0;
 	padding: 16px 20px;
 	display: flex;
@@ -401,7 +401,16 @@ onMounted(() => {
 	position: relative;
 }
 
-.form-card:last-child {
+.form-card::after {
+	content: '';
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	width: calc(100% - 44px);
+	border-bottom: 0.5px solid var(--van-gray-5);
+}
+
+.form-card:last-child::after {
 	border-bottom: none;
 }
 
@@ -420,14 +429,14 @@ onMounted(() => {
 
 /* 第一个卡片：顶部圆角 */
 .form-card.first-card {
-	border-top-left-radius: var(--radius-lg);
-	border-top-right-radius: var(--radius-lg);
+	border-top-left-radius: var(--radius-md);
+	border-top-right-radius: var(--radius-md);
 }
 
 /* 最后一个卡片：底部圆角 */
 .form-card.last-card {
-	border-bottom-left-radius: var(--radius-lg);
-	border-bottom-right-radius: var(--radius-lg);
+	border-bottom-left-radius: var(--radius-md);
+	border-bottom-right-radius: var(--radius-md);
 }
 
 /* 图标 */
