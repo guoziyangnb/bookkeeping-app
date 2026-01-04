@@ -8,6 +8,8 @@
 		<router-view></router-view>
 		<TabBar />
 		<AddRecordModal />
+		<!-- 全局 Toast 组件 -->
+		<Toast :message="toastState.message" :type="toastState.type" :visible="toastState.visible" />
 	</div>
 </template>
 
@@ -17,9 +19,12 @@ import { useUIStore } from '@/stores/ui'
 import { useRecordsStore } from '@/stores/records'
 import TabBar from '@/components/layout/TabBar.vue'
 import AddRecordModal from '@/components/features/AddRecordModal.vue'
+import Toast from '@/components/common/Toast.vue'
+import { useToast } from '@/utils/message'
 
 const uiStore = useUIStore()
 const recordsStore = useRecordsStore()
+const { state: toastState } = useToast()
 
 onMounted(() => {
 	// 初始化主题

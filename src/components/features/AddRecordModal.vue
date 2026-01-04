@@ -66,6 +66,7 @@ import { useUIStore } from '@/stores/ui'
 import { useRecordsStore } from '@/stores/records'
 import DatePicker from '@/components/common/DatePicker.vue'
 import { formatToLocalISODate } from '@/utils/date'
+import { message } from '@/utils/message'
 
 const uiStore = useUIStore()
 const recordsStore = useRecordsStore()
@@ -189,7 +190,8 @@ function selectCategory(categoryName) {
 
 function handleSubmit() {
 	if (!formData.amount || formData.amount <= 0) {
-		alert('请输入有效金额')
+		// alert('请输入有效金额')
+		message.warning('请输入有效金额')
 		return
 	}
 
