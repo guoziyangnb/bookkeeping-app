@@ -108,6 +108,7 @@ import { useRouter } from 'vue-router'
 import { Uploader as VanUploader, Field as VanField, showToast } from 'vant'
 import 'vant/lib/uploader/style'
 import 'vant/lib/field/style'
+import 'vant/lib/toast/style'
 
 const router = useRouter()
 
@@ -212,7 +213,7 @@ loadUserProfile()
 	min-height: 100vh;
 	background: var(--bg-primary);
 	position: relative;
-	padding-bottom: 40px;
+	padding-bottom: 20px;
 }
 
 /* 导航栏 */

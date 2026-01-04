@@ -1,12 +1,12 @@
 <template>
-	<div id="app" :class="{ 'dark-theme': uiStore.isDark }">
+	<div id="app" :class="{ 'dark-theme': uiStore.isDark, 'hide-tabbar': isSubPage }">
 		<!-- 背景装饰圆 -->
 		<div class="bg-decoration bg-decoration-1"></div>
 		<div class="bg-decoration bg-decoration-2"></div>
 		<div class="bg-decoration bg-decoration-3"></div>
 
 		<router-view></router-view>
-		<TabBar />
+		<TabBar v-if="!isSubPage" />
 		<AddRecordModal />
 		<!-- 全局 Toast 组件 -->
 		<Toast :message="toastState.message" :type="toastState.type" :visible="toastState.visible" />
@@ -14,7 +14,8 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useUIStore } from '@/stores/ui'
 import { useRecordsStore } from '@/stores/records'
 import TabBar from '@/components/layout/TabBar.vue'
@@ -22,9 +23,15 @@ import AddRecordModal from '@/components/features/AddRecordModal.vue'
 import Toast from '@/components/common/Toast.vue'
 import { useToast } from '@/utils/message'
 
+const route = useRoute()
 const uiStore = useUIStore()
 const recordsStore = useRecordsStore()
 const { state: toastState } = useToast()
+
+// 判断是否是子页面（不需要显示 TabBar 的页面）
+const isSubPage = computed(() => {
+	return route.path.startsWith('/settings/')
+})
 
 onMounted(() => {
 	// 初始化主题
@@ -80,5 +87,12 @@ onMounted(() => {
 #app {
 	position: relative;
 	z-index: 1;
+}
+</style>
+
+<style>
+/* 子页面隐藏底部 TabBar 时的样式调整 - 需要非 scoped 才能覆盖全局样式 */
+#app .hide-tabbar {
+	padding-bottom: 0 !important;
 }
 </style>
