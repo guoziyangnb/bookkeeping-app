@@ -351,10 +351,10 @@ onMounted(() => {
 }
 
 .form-card {
-	background: var(--bg-glass);
+	background: var(--bg-glass-border);
 	backdrop-filter: blur(20px);
 	-webkit-backdrop-filter: blur(20px);
-	border: 1.5px solid var(--bg-glass-border);
+	border-bottom: 0.5px solid var(--van-gray-5);
 	border-radius: 0;
 	padding: 16px 20px;
 	display: flex;
@@ -365,7 +365,7 @@ onMounted(() => {
 	position: relative;
 }
 
-.form-card:not(:last-child) {
+.form-card:last-child {
 	border-bottom: none;
 }
 
