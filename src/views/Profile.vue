@@ -47,46 +47,34 @@
 			<!-- 表单区域 -->
 			<div class="form-section">
 				<!-- 用户名 -->
-				<div class="form-card clickable" @click="goToEdit('username')">
-					<div class="form-label">
-						<svg viewBox="0 0 24 24">
-							<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-						</svg>
-						<span>用户名</span>
-					</div>
-					<div class="form-value-row">
-						<span class="form-value">{{ formData.username || '未设置' }}</span>
-						<div class="arrow-icon">›</div>
-					</div>
+				<div class="form-card clickable first-card" @click="goToEdit('username')">
+					<svg class="form-icon" viewBox="0 0 24 24">
+						<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+					</svg>
+					<span class="form-label-text">用户名</span>
+					<span class="form-value">{{ formData.username || '未设置' }}</span>
+					<div class="arrow-icon">›</div>
 				</div>
 
 				<!-- 邮箱 -->
 				<div class="form-card clickable" @click="goToEdit('email')">
-					<div class="form-label">
-						<svg viewBox="0 0 24 24">
-							<path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
-						</svg>
-						<span>邮箱</span>
-					</div>
-					<div class="form-value-row">
-						<span class="form-value">{{ formData.email || '未设置' }}</span>
-						<div class="arrow-icon">›</div>
-					</div>
+					<svg class="form-icon" viewBox="0 0 24 24">
+						<path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+					</svg>
+					<span class="form-label-text">邮箱</span>
+					<span class="form-value">{{ formData.email || '未设置' }}</span>
+					<div class="arrow-icon">›</div>
 				</div>
 
 				<!-- 手机号码 -->
-				<div class="form-card clickable" @click="goToEdit('phone')">
-					<div class="form-label">
-						<svg viewBox="0 0 24 24">
-							<path
-								d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
-						</svg>
-						<span>手机号码</span>
-					</div>
-					<div class="form-value-row">
-						<span class="form-value">{{ formData.phone || '未设置' }}</span>
-						<div class="arrow-icon">›</div>
-					</div>
+				<div class="form-card clickable last-card" @click="goToEdit('phone')">
+					<svg class="form-icon" viewBox="0 0 24 24">
+						<path
+							d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
+					</svg>
+					<span class="form-label-text">手机号码</span>
+					<span class="form-value">{{ formData.phone || '未设置' }}</span>
+					<div class="arrow-icon">›</div>
 				</div>
 			</div>
 		</div>
@@ -358,6 +346,8 @@ onMounted(() => {
 /* ==================== 表单区域 ==================== */
 .form-section {
 	margin-bottom: 32px;
+	display: flex;
+	flex-direction: column;
 }
 
 .form-card {
@@ -365,73 +355,82 @@ onMounted(() => {
 	backdrop-filter: blur(20px);
 	-webkit-backdrop-filter: blur(20px);
 	border: 1.5px solid var(--bg-glass-border);
-	border-radius: var(--radius-lg);
-	padding: 20px;
-	margin-bottom: 16px;
+	border-radius: 0;
+	padding: 16px 20px;
+	display: flex;
+	align-items: center;
+	gap: 12px;
 	transition: all 0.3s ease;
 	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+	position: relative;
+}
+
+.form-card:not(:last-child) {
+	border-bottom: none;
 }
 
 .form-card.clickable {
 	cursor: pointer;
-	position: relative;
 	overflow: hidden;
 }
 
 .form-card.clickable:active {
-	transform: scale(0.98);
 	background: var(--bg-glass-hover);
 }
 
 .form-card.clickable:hover {
-	transform: translateY(-2px);
-	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-	border-color: var(--accent-orange);
+	background: var(--bg-glass-hover);
 }
 
-.form-label {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	margin-bottom: 12px;
+/* 第一个卡片：顶部圆角 */
+.form-card.first-card {
+	border-top-left-radius: var(--radius-lg);
+	border-top-right-radius: var(--radius-lg);
 }
 
-.form-label svg {
-	width: 18px;
-	height: 18px;
+/* 最后一个卡片：底部圆角 */
+.form-card.last-card {
+	border-bottom-left-radius: var(--radius-lg);
+	border-bottom-right-radius: var(--radius-lg);
+}
+
+/* 图标 */
+.form-icon {
+	width: 20px;
+	height: 20px;
 	fill: var(--accent-orange);
+	flex-shrink: 0;
 }
 
-.form-label span {
-	font-size: 14px;
+/* 标签文本 */
+.form-label-text {
+	font-size: 15px;
 	font-weight: 600;
 	color: var(--text-primary);
+	min-width: 80px;
+	flex-shrink: 0;
 }
 
-.form-value-row {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 12px;
-}
-
+/* 值 */
 .form-value {
 	font-size: 15px;
 	font-weight: 500;
-	color: var(--text-primary);
+	color: var(--text-secondary);
 	flex: 1;
+	text-align: right;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
-.form-value:empty::before {
-	content: '未设置';
-	color: var(--text-tertiary);
-}
-
+/* 箭头图标 */
 .arrow-icon {
 	font-size: 24px;
 	color: var(--text-tertiary);
 	font-weight: 300;
 	transition: transform 0.3s ease;
+	flex-shrink: 0;
+	margin-left: 4px;
 }
 
 .form-card.clickable:hover .arrow-icon {
@@ -451,7 +450,21 @@ onMounted(() => {
 	}
 
 	.form-card {
-		padding: 16px;
+		padding: 10px 16px;
+	}
+
+	.form-icon {
+		width: 18px;
+		height: 18px;
+	}
+
+	.form-label-text {
+		font-size: 14px;
+		min-width: 70px;
+	}
+
+	.form-value {
+		font-size: 14px;
 	}
 }
 </style>
