@@ -85,6 +85,10 @@ onMounted(() => {
 
 <style scoped>
 #app {
+	min-height: 100vh;
+	min-width: 375px;
+	width: 100%;
+	padding-bottom: 120px;
 	position: relative;
 	z-index: 1;
 }
@@ -92,7 +96,7 @@ onMounted(() => {
 
 <style>
 /* 子页面隐藏底部 TabBar 时的样式调整 - 需要非 scoped 才能覆盖全局样式 */
-#app .hide-tabbar {
+#app.hide-tabbar {
 	padding-bottom: 0 !important;
 }
 </style>

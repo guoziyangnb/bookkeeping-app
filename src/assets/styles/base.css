@@ -52,13 +52,13 @@ button {
 	user-select: none;
 }
 
-#app {
+/* #app {
 	min-height: 100vh;
 	min-width: 375px;
 	width: 100%;
 	position: relative;
 	padding-bottom: 120px;
-}
+} */
 
 /* 背景装饰圆 */
 .bg-decoration {
