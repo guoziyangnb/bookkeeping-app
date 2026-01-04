@@ -19,11 +19,14 @@
 					<van-uploader
 						v-model="fileList"
 						:after-read="afterRead"
+						:before-read="beforeRead"
 						:max-size="5 * 1024 * 1024"
 						@oversize="onOversize"
 						class="avatar-uploader"
+						:max-count="1"
 						:preview-full-image="false"
-						accept="image/*">
+						:show-upload="false"
+						accept=".jpg, .jpeg, .png">
 						<div class="avatar-circle" :class="{ 'has-image': avatarUrl }">
 							<img v-if="avatarUrl" :src="avatarUrl" class="avatar-image" alt="头像" />
 							<div v-else class="avatar-placeholder">
@@ -41,7 +44,7 @@
 						</div>
 					</van-uploader>
 				</div>
-				<p class="avatar-hint">点击上传头像，支持 JPG、PNG 格式</p>
+				<p class="avatar-hint">点击上传头像，支持 JPG、PNG 格式，最大 5MB</p>
 			</div>
 
 			<!-- 表单区域 -->
@@ -116,6 +119,17 @@ const goToEdit = field => {
 	})
 }
 
+// 文件上传前的校验
+const beforeRead = file => {
+	// 校验文件类型
+	const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg']
+	if (!allowedTypes.includes(file.type)) {
+		showToast('只支持 JPG、PNG 格式的图片')
+		return false
+	}
+	return true
+}
+
 // 文件上传回调
 const afterRead = file => {
 	// 这里应该上传到服务器
@@ -123,8 +137,21 @@ const afterRead = file => {
 	if (file instanceof Array) {
 		file = file[0]
 	}
+
+	// 更新头像URL
 	avatarUrl.value = file.content
-	showToast('头像已选择')
+
+	// 保存到 localStorage
+	const savedProfile = localStorage.getItem('userProfile')
+	const profile = savedProfile ? JSON.parse(savedProfile) : {}
+	profile.avatar = file.content
+	console.log('🚀 ~ afterRead ~ profile.avatar:', profile.avatar)
+	localStorage.setItem('userProfile', JSON.stringify(profile))
+
+	// 清空文件列表，允许重复上传，避免直接显示预览图bug（不想显示预览图，fileList必须为空）
+	fileList.value = []
+
+	showToast('头像上传成功！')
 }
 
 // 文件过大
@@ -138,9 +165,9 @@ const loadUserProfile = () => {
 	if (savedProfile) {
 		const profile = JSON.parse(savedProfile)
 		avatarUrl.value = profile.avatar || ''
-		formData.username = profile.username || ''
-		formData.email = profile.email || ''
-		formData.phone = profile.phone || ''
+		formData.username = profile?.username || ''
+		formData.email = profile?.email || ''
+		formData.phone = profile?.phone || ''
 	}
 }
 
@@ -256,6 +283,15 @@ onMounted(() => {
 
 .avatar-uploader {
 	display: block;
+}
+
+/* 隐藏 Vant Uploader 的默认预览 */
+.avatar-uploader :deep(.van-uploader__preview) {
+	display: none !important;
+}
+
+.avatar-uploader :deep(.van-uploader__preview-image) {
+	display: none !important;
 }
 
 .avatar-circle {
