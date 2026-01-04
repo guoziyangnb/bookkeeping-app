@@ -54,9 +54,9 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { Field as VanField, showToast } from 'vant'
+import { Field as VanField } from 'vant'
 import 'vant/lib/field/style'
-import 'vant/lib/toast/style'
+import { message } from '@/utils/message'
 
 const router = useRouter()
 const route = useRoute()
@@ -130,7 +130,7 @@ const handleSave = () => {
 	// 验证输入
 	const error = fieldConfig.validate(inputValue.value)
 	if (error) {
-		showToast(error)
+		message.warning(error)
 		return
 	}
 
@@ -141,7 +141,7 @@ const handleSave = () => {
 	profile[fieldType] = inputValue.value.trim()
 	localStorage.setItem('userProfile', JSON.stringify(profile))
 
-	showToast('保存成功')
+	message.success('保存成功')
 
 	// 延迟返回
 	setTimeout(() => {
@@ -157,24 +157,24 @@ onMounted(() => {
 		inputValue.value = profile[fieldType] || ''
 	}
 
-	// 自动聚焦输入框
-	setTimeout(() => {
-		const input = document.querySelector('.edit-input input')
-		if (input) {
-			input.focus()
-		}
-	}, 300)
+	// // 自动聚焦输入框
+	// setTimeout(() => {
+	// 	const input = document.querySelector('.edit-input input')
+	// 	if (input) {
+	// 		input.focus()
+	// 	}
+	// }, 300)
 })
 
 // 监听键盘弹出，滚动到输入框
-watch(inputValue, () => {
-	setTimeout(() => {
-		const input = document.querySelector('.edit-input input')
-		if (input) {
-			input.scrollIntoView({ behavior: 'smooth', block: 'center' })
-		}
-	}, 100)
-})
+// watch(inputValue, () => {
+// 	setTimeout(() => {
+// 		const input = document.querySelector('.edit-input input')
+// 		if (input) {
+// 			input.scrollIntoView({ behavior: 'smooth', block: 'center' })
+// 		}
+// 	}, 100)
+// })
 </script>
 
 <style scoped>
