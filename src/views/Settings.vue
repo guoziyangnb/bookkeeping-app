@@ -60,7 +60,7 @@
 					<div class="settings-arrow">›</div>
 				</div>
 
-				<div class="settings-item">
+				<div class="settings-item" @click="goToBackup">
 					<div class="settings-item-left">
 						<div class="settings-icon" style="background: var(--accent-green)">
 							<svg viewBox="0 0 24 24">
@@ -135,6 +135,10 @@ const goToProfile = () => {
 
 const goToCategory = () => {
 	message.warning('功能开发中，敬请期待~')
+}
+
+const goToBackup = () => {
+	router.push('/settings/backup')
 }
 
 const goToAttenion = () => {

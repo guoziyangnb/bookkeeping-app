@@ -6,22 +6,36 @@
 			:key="item.field"
 			class="form-card"
 			:class="{
-				clickable: item.clickable !== false,
+				clickable: item.clickable !== false && !item.switchable,
 				'first-card': index === 0,
-				'last-card': index === items.length - 1
+				'last-card': index === items.length - 1,
+				'has-switch': item.switchable
 			}"
 			@click="handleClick(item)">
 			<svg class="form-icon" viewBox="0 0 24 24">
 				<path :d="item.icon" />
 			</svg>
 			<span class="form-label-text">{{ item.label }}</span>
-			<span class="form-value">{{ item.value || item.emptyText || '未设置' }}</span>
-			<div v-if="item.clickable !== false" class="arrow-icon">›</div>
+			<span v-if="!item.switchable" class="form-value">{{
+				item.value || item.emptyText || '未设置'
+			}}</span>
+			<van-switch
+				v-if="item.switchable"
+				:model-value="item.switchValue"
+				size="20px"
+				active-color="var(--accent-orange)"
+				inactive-color="var(--van-gray-5)"
+				@click.stop="handleSwitchChange(item)"
+				@change="handleSwitchChange(item)" />
+			<div v-else-if="item.clickable !== false" class="arrow-icon">›</div>
 		</div>
 	</div>
 </template>
 
 <script setup>
+import { Switch as VanSwitch } from 'vant'
+import 'vant/lib/switch/style'
+
 const props = defineProps({
 	items: {
 		type: Array,
@@ -36,12 +50,16 @@ const props = defineProps({
 	}
 })
 
-const emit = defineEmits(['click'])
+const emit = defineEmits(['click', 'switchChange'])
 
 const handleClick = item => {
-	if (item.clickable !== false) {
+	if (item.clickable !== false && !item.switchable) {
 		emit('click', item.field, item)
 	}
+}
+
+const handleSwitchChange = item => {
+	emit('switchChange', item.field, !item.switchValue, item)
 }
 </script>
 
@@ -153,6 +171,11 @@ const handleClick = item => {
 
 .form-card.clickable:hover .arrow-icon {
 	transform: translateX(4px);
+}
+
+/* Switch 样式 */
+.form-card.has-switch {
+	justify-content: space-between;
 }
 
 /* ==================== 响应式设计 ==================== */

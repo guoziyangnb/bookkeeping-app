@@ -36,6 +36,12 @@ const routes = [
 		name: 'editField',
 		component: () => import('@/views/FieldEditPage.vue'),
 		meta: { title: '编辑资料' }
+	},
+	{
+		path: '/settings/backup',
+		name: 'backup',
+		component: () => import('@/views/Backup.vue'),
+		meta: { title: '数据备份' }
 	}
 ]
 
