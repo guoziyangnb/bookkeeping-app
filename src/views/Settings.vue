@@ -45,7 +45,7 @@
 					<div class="settings-arrow">›</div>
 				</div>
 
-				<div class="settings-item">
+				<div class="settings-item" @click="goToCategory">
 					<div class="settings-item-left">
 						<div class="settings-icon" style="background: var(--accent-orange)">
 							<svg viewBox="0 0 24 24">
@@ -77,7 +77,7 @@
 			</div>
 
 			<div class="settings-group">
-				<div class="settings-item">
+				<div class="settings-item" @click="goToAttenion">
 					<div class="settings-item-left">
 						<div class="settings-icon" style="background: var(--accent-purple)">
 							<svg viewBox="0 0 24 24">
@@ -121,21 +121,42 @@ import { useUIStore } from '@/stores/ui'
 import { useRecordsStore } from '@/stores/records'
 import { clearStorage } from '@/utils/storage'
 import Header from '@/components/layout/Header.vue'
+import { message } from '@/utils/message'
+import { showConfirmDialog } from 'vant'
+import 'vant/lib/dialog/style'
 
 const router = useRouter()
 const uiStore = useUIStore()
 const recordsStore = useRecordsStore()
 
-function goToProfile() {
+const goToProfile = () => {
 	router.push('/settings/profile')
 }
 
-function handleClearData() {
-	if (confirm('确定要清除所有数据吗？此操作不可恢复！')) {
-		clearStorage()
-		recordsStore.records = []
-		alert('数据已清除')
-	}
+const goToCategory = () => {
+	message.warning('功能开发中，敬请期待~')
+}
+
+const goToAttenion = () => {
+	message.warning('功能开发中，敬请期待~')
+}
+
+const handleClearData = () => {
+	showConfirmDialog({
+		title: '清除数据',
+		message: '确定要清除所有数据吗？此操作不可恢复！',
+		confirmButtonColor: '#ff8a5b',
+		cancelButtonColor: '#8a8a8a'
+	})
+		.then(() => {
+			clearStorage()
+			recordsStore.records = []
+			message.success('数据已清除')
+		})
+		.catch(e => {
+			console.log('数据清除失败', e)
+			// message.error('数据清除失败', e)
+		})
 }
 </script>
 
