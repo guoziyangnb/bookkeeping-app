@@ -2,51 +2,51 @@
 	<teleport to="body">
 		<transition name="fade">
 			<div v-if="show" class="date-select-modal-overlay" @click="handleCancel">
-			<div class="date-select-modal" @click.stop>
-				<!-- 头部 -->
-				<div class="modal-header">
-					<button class="header-btn cancel-btn" @click="handleCancel">取消</button>
-					<div class="header-title">选择日期</div>
-					<button class="header-btn confirm-btn" @click="handleConfirm">确认</button>
-				</div>
-
-				<!-- 月份选择器 -->
-				<div class="month-selector">
-					<button class="month-nav-btn" @click="prevMonth">
-						<svg viewBox="0 0 24 24">
-							<path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
-						</svg>
-					</button>
-					<div class="current-month">{{ currentMonthLabel }}</div>
-					<button class="month-nav-btn" @click="nextMonth">
-						<svg viewBox="0 0 24 24">
-							<path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
-						</svg>
-					</button>
-				</div>
-
-				<!-- 日历网格 -->
-				<div class="calendar-grid">
-					<div class="weekdays">
-						<div v-for="day in weekdays" :key="day" class="weekday">{{ day }}</div>
+				<div class="date-select-modal" @click.stop>
+					<!-- 头部 -->
+					<div class="modal-header">
+						<button class="header-btn cancel-btn" @click="handleCancel">取消</button>
+						<div class="header-title">选择日期</div>
+						<button class="header-btn confirm-btn" @click="handleConfirm">确认</button>
 					</div>
-					<div class="days">
-						<div
-							v-for="(cell, index) in calendar"
-							:key="index"
-							class="day-cell"
-							:class="{
-								empty: cell.type === 'empty',
-								today: cell.isToday,
-								selected: isSelected(cell),
-								disabled: isDisabled(cell)
-							}"
-							@click="handleDateClick(cell)">
-							{{ cell.day }}
+
+					<!-- 月份选择器 -->
+					<div class="month-selector">
+						<button class="month-nav-btn" @click="prevMonth">
+							<svg viewBox="0 0 24 24">
+								<path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+							</svg>
+						</button>
+						<div class="current-month">{{ currentMonthLabel }}</div>
+						<button class="month-nav-btn" @click="nextMonth">
+							<svg viewBox="0 0 24 24">
+								<path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+							</svg>
+						</button>
+					</div>
+
+					<!-- 日历网格 -->
+					<div class="calendar-grid">
+						<div class="weekdays">
+							<div v-for="day in weekdays" :key="day" class="weekday">{{ day }}</div>
+						</div>
+						<div class="days">
+							<div
+								v-for="(cell, index) in calendar"
+								:key="index"
+								class="day-cell"
+								:class="{
+									empty: cell.type === 'empty',
+									today: cell.isToday,
+									selected: isSelected(cell),
+									disabled: isDisabled(cell)
+								}"
+								@click="handleDateClick(cell)">
+								{{ cell.day }}
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
 			</div>
 		</transition>
 	</teleport>
@@ -99,13 +99,13 @@ const calendar = computed(() => {
 })
 
 // 判断是否选中
-const isSelected = (cell) => {
+const isSelected = cell => {
 	if (cell.type !== 'day' || !tempSelectedDate.value) return false
 	return formatToLocalISODate(cell.date) === tempSelectedDate.value
 }
 
 // 判断是否禁用（超过最大日期）
-const isDisabled = (cell) => {
+const isDisabled = cell => {
 	if (cell.type !== 'day' || !maxDateISO.value) return false
 	const cellDateStr = formatToLocalISODate(cell.date)
 	return cellDateStr > maxDateISO.value
@@ -152,19 +152,22 @@ function handleCancel() {
 }
 
 // 监听显示状态变化，重置临时选择
-watch(() => props.show, (newVal) => {
-	if (newVal) {
-		// 打开时，设置当前选中的日期
-		if (props.modelValue) {
-			const date = new Date(props.modelValue)
-			currentDate.value = date
-			tempSelectedDate.value = formatToLocalISODate(date)
-		} else {
-			currentDate.value = new Date()
-			tempSelectedDate.value = null
+watch(
+	() => props.show,
+	newVal => {
+		if (newVal) {
+			// 打开时，设置当前选中的日期
+			if (props.modelValue) {
+				const date = new Date(props.modelValue)
+				currentDate.value = date
+				tempSelectedDate.value = formatToLocalISODate(date)
+			} else {
+				currentDate.value = new Date()
+				tempSelectedDate.value = null
+			}
 		}
 	}
-})
+)
 </script>
 
 <style scoped>
@@ -257,11 +260,11 @@ watch(() => props.show, (newVal) => {
 }
 
 .confirm-btn {
-	color: #1989fa;
+	color: var(--accent-orange);
 }
 
 .confirm-btn:active {
-	background: rgba(25, 137, 250, 0.1);
+	background: rgba(255, 138, 91, 0.1);
 }
 
 /* 月份选择器 */
@@ -364,7 +367,7 @@ watch(() => props.show, (newVal) => {
 }
 
 .day-cell.today {
-	color: #1989fa;
+	color: var(--accent-orange);
 	font-weight: 600;
 }
 
@@ -378,7 +381,7 @@ watch(() => props.show, (newVal) => {
 }
 
 .day-cell.selected {
-	background: #1989fa;
+	background: var(--accent-orange);
 	color: #fff;
 	font-weight: 600;
 }
@@ -401,12 +404,12 @@ watch(() => props.show, (newVal) => {
 	}
 
 	.day-cell.selected {
-		background: #4dabf7;
+		background: var(--accent-orange);
 		color: #fff;
 	}
 
 	.confirm-btn {
-		color: #4dabf7;
+		color: var(--accent-orange);
 	}
 }
 

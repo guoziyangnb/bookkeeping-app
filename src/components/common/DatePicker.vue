@@ -31,7 +31,16 @@ const emit = defineEmits(['update:modelValue', 'confirm'])
 
 const inputRef = ref(null)
 const showCalendar = ref(false)
-const selectedDate = ref(props.modelValue)
+
+// 使用 computed 实现双向绑定
+const selectedDate = computed({
+	get() {
+		return props.modelValue
+	},
+	set(value) {
+		emit('update:modelValue', value)
+	}
+})
 
 // 显示格式化后的日期
 const displayValue = computed({
@@ -46,7 +55,6 @@ const displayValue = computed({
 
 // 打开日历
 function openCalendar() {
-	selectedDate.value = props.modelValue
 	showCalendar.value = true
 }
 
