@@ -1,7 +1,10 @@
 <template>
 	<div class="transaction-item" @click="handleClick">
-		<div class="transaction-icon" :style="{ background: categoryColor }">
-			<svg v-html="categoryIcon"></svg>
+		<div class="transaction-icon" :style="{ background: hasImage ? 'transparent' : categoryColor }">
+			<!-- 优先展示图片 -->
+			<img v-if="record.image" :src="record.image" class="transaction-image" alt="记录图片" />
+			<!-- 降级展示分类图标 -->
+			<svg v-else v-html="categoryIcon"></svg>
 		</div>
 		<div class="transaction-details">
 			<!-- 第一行：种类（左）+ 时间（右） -->
@@ -59,6 +62,7 @@ const categoryIcons = {
 
 const categoryColor = computed(() => categoryColors[props.record.category] || 'var(--text-secondary)')
 const categoryIcon = computed(() => categoryIcons[props.record.category] || categoryIcons['其他'])
+const hasImage = computed(() => !!props.record.image)
 
 function handleClick() {
 	uiStore.openEditModal(props.record)
@@ -74,5 +78,16 @@ function handleClick() {
 .transaction-item:hover {
 	opacity: 0.8;
 	transform: translateX(4px);
+}
+
+.transaction-icon {
+	/* 保持原有样式 */
+}
+
+.transaction-image {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border-radius: 14px;
 }
 </style>

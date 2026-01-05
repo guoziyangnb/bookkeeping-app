@@ -49,6 +49,41 @@
 					<DatePicker v-model="formData.date" />
 				</div>
 
+				<div class="form-group">
+					<label class="form-label">记录图片（可选）</label>
+					<van-uploader
+						v-model="imageFileList"
+						:after-read="handleImageRead"
+						:before-read="beforeImageRead"
+						:max-size="5 * 1024 * 1024"
+						@oversize="handleImageOversize"
+						:max-count="1"
+						:preview-full-image="false"
+						:show-upload="false"
+						accept=".jpg, .jpeg, .png"
+						class="record-image-uploader">
+						<!-- 上传按钮 -->
+						<div class="upload-button" v-if="!formData.image">
+							<svg viewBox="0 0 24 24">
+								<path
+									d="M19 3H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.96-2.36L6.5 17h11l-3.54-4.71z" />
+							</svg>
+							<span>添加图片</span>
+						</div>
+
+						<!-- 图片预览 -->
+						<div class="image-preview" v-else>
+							<img :src="formData.image" alt="记录图片" />
+							<button class="delete-image-btn" @click.stop="handleDeleteImage(e)">
+								<svg viewBox="0 0 24 24">
+									<path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+								</svg>
+							</button>
+						</div>
+					</van-uploader>
+					<p class="upload-hint">支持 JPG、PNG 格式，最大 5MB</p>
+				</div>
+
 				<div class="modal-actions">
 					<button v-if="isEditMode" class="delete-btn" @click="handleDelete">删除记录</button>
 					<button class="submit-btn" @click="handleSubmit">
@@ -64,6 +99,8 @@
 import { ref, reactive, computed, watch, nextTick } from 'vue'
 import { useUIStore } from '@/stores/ui'
 import { useRecordsStore } from '@/stores/records'
+import { Uploader as VanUploader } from 'vant'
+import 'vant/lib/uploader/style'
 import DatePicker from '@/components/common/DatePicker.vue'
 import { formatToLocalISODate } from '@/utils/date'
 import { message } from '@/utils/message'
@@ -71,6 +108,7 @@ import { message } from '@/utils/message'
 const uiStore = useUIStore()
 const recordsStore = useRecordsStore()
 const amountInput = ref(null)
+const imageFileList = ref([])
 
 // 是否为编辑模式
 const isEditMode = computed(() => uiStore.editingRecord !== null)
@@ -132,7 +170,8 @@ const formData = reactive({
 	amount: '',
 	category: '餐饮',
 	note: '',
-	date: formatToLocalISODate(new Date())
+	date: formatToLocalISODate(new Date()),
+	image: ''
 })
 
 // 根据类型显示不同的分类
@@ -153,6 +192,7 @@ watch(
 				formData.amount = Math.abs(record.amount)
 				formData.note = record.note || ''
 				formData.date = record.date.split('T')[0]
+				formData.image = record.image || ''
 			} else {
 				// 添加模式：重置表单
 				formData.type = uiStore.modalType
@@ -166,6 +206,7 @@ watch(
 				formData.amount = ''
 				formData.note = ''
 				formData.date = formatToLocalISODate(new Date())
+				formData.image = ''
 			}
 			// ? 不要一打开就触发焦点事件
 			// nextTick(() => {
@@ -188,6 +229,74 @@ function selectCategory(categoryName) {
 	formData.category = categoryName
 }
 
+// 图片上传前校验
+const beforeImageRead = file => {
+	const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg']
+	if (!allowedTypes.includes(file.type)) {
+		message.warning('只支持 JPG、PNG 格式的图片')
+		return false
+	}
+	return true
+}
+
+// 图片读取与压缩
+const handleImageRead = async file => {
+	if (file instanceof Array) file = file[0]
+
+	try {
+		const compressedImage = await compressImage(file.file, 800, 0.8)
+		formData.image = compressedImage
+		imageFileList.value = []
+		message.success('图片添加成功')
+	} catch (error) {
+		message.error('图片处理失败')
+		console.error(error)
+	}
+}
+
+// 图片压缩函数
+const compressImage = (file, maxWidth, quality) => {
+	return new Promise((resolve, reject) => {
+		const reader = new FileReader()
+		reader.onload = e => {
+			const img = new Image()
+			img.onload = () => {
+				const canvas = document.createElement('canvas')
+				let width = img.width
+				let height = img.height
+
+				if (width > maxWidth) {
+					height = (maxWidth / width) * height
+					width = maxWidth
+				}
+
+				canvas.width = width
+				canvas.height = height
+				const ctx = canvas.getContext('2d')
+				ctx.drawImage(img, 0, 0, width, height)
+
+				resolve(canvas.toDataURL('image/jpeg', quality))
+			}
+			img.onerror = reject
+			img.src = e.target.result
+		}
+		reader.onerror = reject
+		reader.readAsDataURL(file)
+	})
+}
+
+// 文件过大处理
+const handleImageOversize = () => {
+	message.error('图片大小不能超过 5MB')
+}
+
+// 删除图片
+const handleDeleteImage = e => {
+	e.preventDefault()
+	formData.image = ''
+	message.success('图片已删除')
+}
+
 function handleSubmit() {
 	if (!formData.amount || formData.amount <= 0) {
 		// alert('请输入有效金额')
@@ -203,7 +312,8 @@ function handleSubmit() {
 			amount: formData.amount,
 			category: formData.category,
 			note: formData.note,
-			date: `${formData.date}T${originalTime}`
+			date: `${formData.date}T${originalTime}`,
+			image: formData.image
 		})
 	} else {
 		// 添加模式：创建新记录，使用当前时间
@@ -212,7 +322,8 @@ function handleSubmit() {
 			amount: formData.amount,
 			category: formData.category,
 			note: formData.note,
-			date: new Date().toISOString()
+			date: new Date().toISOString(),
+			image: formData.image
 		})
 	}
 
@@ -526,5 +637,95 @@ function handleDelete() {
 	.category-option {
 		padding: 12px;
 	}
+}
+
+/* 图片上传区域 */
+.record-image-uploader {
+	width: 120px;
+	display: block;
+}
+
+.record-image-uploader :deep(.van-uploader__preview) {
+	display: none !important;
+}
+
+.upload-button {
+	width: 100%;
+	height: 120px;
+	border-radius: 16px;
+	border: 2px dashed var(--bg-glass-border);
+	background: rgba(0, 0, 0, 0.02);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+.upload-button:hover {
+	background: rgba(0, 0, 0, 0.04);
+	border-color: var(--accent-orange);
+}
+
+.upload-button svg {
+	width: 32px;
+	height: 32px;
+	fill: var(--text-secondary);
+}
+
+.upload-button span {
+	font-size: 14px;
+	color: var(--text-secondary);
+}
+
+.image-preview {
+	position: relative;
+	width: 100%;
+	height: 120px;
+	border-radius: 16px;
+	overflow: hidden;
+	background: var(--bg-glass);
+}
+
+.image-preview img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.delete-image-btn {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	background: rgba(0, 0, 0, 0.6);
+	border: none;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+.delete-image-btn:hover {
+	background: rgba(255, 71, 87, 0.9);
+	transform: scale(1.1);
+}
+
+.delete-image-btn svg {
+	width: 18px;
+	height: 18px;
+	fill: white;
+}
+
+.upload-hint {
+	font-size: 12px;
+	color: var(--text-tertiary);
+	margin-top: 8px;
+	text-align: center;
 }
 </style>

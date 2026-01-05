@@ -103,7 +103,8 @@ export const useRecordsStore = defineStore('records', {
 				...record,
 				id: this.idCounter.toString(),
 				amount: record.type === 'expense' ? -Math.abs(record.amount) : Math.abs(record.amount),
-				createdAt: new Date().toISOString()
+				createdAt: new Date().toISOString(),
+				image: record.image || ''
 			}
 			this.records.push(newRecord)
 			this.saveToStorage()
@@ -129,7 +130,8 @@ export const useRecordsStore = defineStore('records', {
 				const updatedRecord = {
 					...record,
 					...data,
-					amount: data.type === 'expense' ? -Math.abs(data.amount || record.amount) : Math.abs(data.amount || record.amount)
+					amount: data.type === 'expense' ? -Math.abs(data.amount || record.amount) : Math.abs(data.amount || record.amount),
+					image: data.image !== undefined ? data.image : record.image
 				}
 				this.records[index] = updatedRecord
 				this.saveToStorage()
