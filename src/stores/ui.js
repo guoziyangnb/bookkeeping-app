@@ -2,14 +2,19 @@ import { defineStore } from 'pinia'
 import { getStorage, setStorage } from '@/utils/storage'
 
 export const useUIStore = defineStore('ui', {
-	state: () => ({
-		theme: getStorage('theme', 'light'),
-		currentTab: 'home',
-		isModalOpen: false,
-		modalType: 'expense', // 'expense' | 'income'
-		editingRecord: null, // 正在编辑的记录对象
-		defaultCategory: null // 打开弹窗时的默认分类
-	}),
+	state: () => {
+		// 加载用户资料
+		const savedProfile = getStorage('userProfile', {})
+		return {
+			theme: getStorage('theme', 'light'),
+			currentTab: 'home',
+			isModalOpen: false,
+			modalType: 'expense', // 'expense' | 'income'
+			editingRecord: null, // 正在编辑的记录对象
+			defaultCategory: null, // 打开弹窗时的默认分类
+			userAvatar: savedProfile.avatar || '' // 用户头像
+		}
+	},
 
 	getters: {
 		// 当前是否是暗黑主题
@@ -66,6 +71,11 @@ export const useUIStore = defineStore('ui', {
 			this.isModalOpen = false
 			this.editingRecord = null
 			this.defaultCategory = null
+		},
+
+		// 更新用户头像
+		updateUserAvatar(avatarUrl) {
+			this.userAvatar = avatarUrl
 		}
 	}
 })

@@ -90,8 +90,10 @@ import { useRouter } from 'vue-router'
 import { Uploader as VanUploader } from 'vant'
 import 'vant/lib/uploader/style'
 import { message } from '@/utils/message'
+import { useUIStore } from '@/stores/ui'
 
 const router = useRouter()
+const uiStore = useUIStore()
 
 // 文件列表
 const fileList = ref([])
@@ -140,6 +142,7 @@ const afterRead = file => {
 
 	// 更新头像URL
 	avatarUrl.value = file.content
+	console.log('🚀 ~ afterRead ~ avatarUrl:', avatarUrl.value)
 
 	// 保存到 localStorage
 	const savedProfile = localStorage.getItem('userProfile')
@@ -147,6 +150,9 @@ const afterRead = file => {
 	profile.avatar = file.content
 	console.log('🚀 ~ afterRead ~ profile.avatar:', profile.avatar)
 	localStorage.setItem('userProfile', JSON.stringify(profile))
+
+	// 更新 store 中的头像
+	uiStore.updateUserAvatar(profile.avatar)
 
 	// 清空文件列表，允许重复上传，避免直接显示预览图bug（不想显示预览图，fileList必须为空）
 	fileList.value = []
