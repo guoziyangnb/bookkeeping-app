@@ -51,36 +51,33 @@
 
 				<div class="form-group">
 					<label class="form-label">记录图片（可选）</label>
-					<van-uploader
-						v-model="imageFileList"
-						:after-read="handleImageRead"
-						:before-read="beforeImageRead"
-						:max-size="5 * 1024 * 1024"
-						@oversize="handleImageOversize"
-						:max-count="1"
-						:preview-full-image="false"
-						:show-upload="false"
-						accept=".jpg, .jpeg, .png"
-						class="record-image-uploader">
-						<!-- 上传按钮 -->
-						<div class="upload-button" v-if="!formData.image">
-							<svg viewBox="0 0 24 24">
-								<path
-									d="M19 3H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.96-2.36L6.5 17h11l-3.54-4.71z" />
-							</svg>
-							<span>添加图片</span>
-						</div>
-
-						<!-- 图片预览 -->
-						<div class="image-preview" v-else>
-							<img :src="formData.image" alt="记录图片" />
-							<button class="delete-image-btn" @click.stop="handleDeleteImage(e)">
+					<div class="image-upload-container">
+						<!-- 隐藏的文件输入 -->
+						<van-uploader
+							v-model="imageFileList"
+							:after-read="handleImageRead"
+							:before-read="beforeImageRead"
+							:max-size="5 * 1024 * 1024"
+							@oversize="handleImageOversize"
+							:max-count="1"
+							:preview-full-image="true"
+							accept=".jpg, .jpeg, .png"
+							class="hidden-uploader">
+							<!-- 上传按钮 -->
+							<div class="upload-button">
 								<svg viewBox="0 0 24 24">
-									<path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+									<path
+										d="M19 3H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.96-2.36L6.5 17h11l-3.54-4.71z" />
 								</svg>
-							</button>
+								<span>添加图片</span>
+							</div>
+						</van-uploader>
+
+						<!-- 删除按钮 -->
+						<div v-if="formData.image" class="image-preview-wrapper">
+							<van-button type="warning" size="small" icon="delete" class="delete-image-btn" @click="handleDeleteImage"></van-button>
 						</div>
-					</van-uploader>
+					</div>
 					<p class="upload-hint">支持 JPG、PNG 格式，最大 5MB</p>
 				</div>
 
@@ -99,8 +96,9 @@
 import { ref, reactive, computed, watch, nextTick } from 'vue'
 import { useUIStore } from '@/stores/ui'
 import { useRecordsStore } from '@/stores/records'
-import { Uploader as VanUploader } from 'vant'
+import { Uploader as VanUploader, Button as VanButton } from 'vant'
 import 'vant/lib/uploader/style'
+import 'vant/lib/button/style'
 import DatePicker from '@/components/common/DatePicker.vue'
 import { formatToLocalISODate } from '@/utils/date'
 import { message } from '@/utils/message'
@@ -246,7 +244,9 @@ const handleImageRead = async file => {
 	try {
 		const compressedImage = await compressImage(file.file, 800, 0.8)
 		formData.image = compressedImage
-		imageFileList.value = []
+		imageFileList.push({
+			url: compressedImage
+		})
 		message.success('图片添加成功')
 	} catch (error) {
 		message.error('图片处理失败')
@@ -291,8 +291,7 @@ const handleImageOversize = () => {
 }
 
 // 删除图片
-const handleDeleteImage = e => {
-	e.preventDefault()
+const handleDeleteImage = () => {
 	formData.image = ''
 	message.success('图片已删除')
 }
@@ -640,13 +639,19 @@ function handleDelete() {
 }
 
 /* 图片上传区域 */
-.record-image-uploader {
+.image-upload-container {
 	width: 120px;
-	display: block;
+	height: 120px;
+	position: relative;
 }
 
-.record-image-uploader :deep(.van-uploader__preview) {
-	display: none !important;
+.hidden-uploader {
+	width: 100%;
+	height: 100%;
+}
+
+.hidden-uploader :deep(.van-uploader__wrapper) {
+	display: block !important;
 }
 
 .upload-button {
@@ -680,46 +685,18 @@ function handleDelete() {
 	color: var(--text-secondary);
 }
 
-.image-preview {
+.image-preview-wrapper {
 	position: relative;
-	width: 100%;
-	height: 120px;
-	border-radius: 16px;
-	overflow: hidden;
-	background: var(--bg-glass);
-}
-
-.image-preview img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
 }
 
 .delete-image-btn {
 	position: absolute;
-	top: 8px;
-	right: 8px;
-	width: 32px;
-	height: 32px;
-	border-radius: 50%;
-	background: rgba(0, 0, 0, 0.6);
-	border: none;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	cursor: pointer;
-	transition: all 0.3s ease;
-}
-
-.delete-image-btn:hover {
-	background: rgba(255, 71, 87, 0.9);
-	transform: scale(1.1);
-}
-
-.delete-image-btn svg {
-	width: 18px;
-	height: 18px;
-	fill: white;
+	top: 2px;
+	right: 2px;
+	z-index: 10;
+	min-width: 15px;
+	border-radius: 15px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .upload-hint {
