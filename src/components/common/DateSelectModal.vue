@@ -366,11 +366,6 @@ watch(
 	cursor: default;
 }
 
-.day-cell.today {
-	color: var(--accent-orange);
-	font-weight: 600;
-}
-
 .day-cell.today::after {
 	content: '今';
 	position: absolute;
@@ -400,7 +395,7 @@ watch(
 	}
 
 	.day-cell.today {
-		color: #4dabf7;
+		color: var(--accent-orange);
 	}
 
 	.day-cell.selected {
