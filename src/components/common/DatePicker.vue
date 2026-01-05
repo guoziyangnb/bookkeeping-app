@@ -1,36 +1,60 @@
 <template>
 	<div class="date-picker-wrapper">
-		<input ref="inputRef" v-model="inputValue" type="date" class="date-picker-input" />
-		<svg class="calendar-icon" viewBox="0 0 24 24" @click="inputRef?.showPicker?.() || inputRef?.click()">
+		<input ref="inputRef" v-model="displayValue" readonly class="date-picker-input" @click="openCalendar" />
+		<svg class="calendar-icon" viewBox="0 0 24 24" @click="openCalendar">
 			<path
-				d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm-8 4H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"
-			/>
+				d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm-8 4H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z" />
 		</svg>
+
+		<!-- 日历选择弹窗 -->
+		<DateSelectModal v-model:show="showCalendar" v-model="selectedDate" :max-date="maxDate" @confirm="handleConfirm" />
 	</div>
 </template>
 
 <script setup>
 import { computed, ref } from 'vue'
+import DateSelectModal from './DateSelectModal.vue'
 
 const props = defineProps({
 	modelValue: {
 		type: String,
 		default: ''
+	},
+	// 最大可选择日期，默认为今天
+	maxDate: {
+		type: [String, Date],
+		default: () => new Date()
 	}
 })
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'confirm'])
 
 const inputRef = ref(null)
+const showCalendar = ref(false)
+const selectedDate = ref(props.modelValue)
 
-const inputValue = computed({
+// 显示格式化后的日期
+const displayValue = computed({
 	get() {
+		if (!props.modelValue) return ''
 		return props.modelValue
 	},
-	set(value) {
-		emit('update:modelValue', value)
+	set() {
+		// 只读，不需要实现
 	}
 })
+
+// 打开日历
+function openCalendar() {
+	selectedDate.value = props.modelValue
+	showCalendar.value = true
+}
+
+// 确认选择
+function handleConfirm(value) {
+	emit('update:modelValue', value)
+	emit('confirm', value)
+}
 </script>
 
 <style scoped>
