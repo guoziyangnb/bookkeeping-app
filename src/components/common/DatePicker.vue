@@ -7,7 +7,12 @@
 		</svg>
 
 		<!-- 日历选择弹窗 -->
-		<DateSelectModal v-model:show="showCalendar" v-model="selectedDate" :max-date="maxDate" @confirm="handleConfirm" />
+		<DateSelectModal
+			v-model:show="showCalendar"
+			:model-value="modelValue"
+			:max-date="maxDate"
+			@update:model-value="handleDateUpdate"
+			@confirm="handleConfirm" />
 	</div>
 </template>
 
@@ -32,16 +37,6 @@ const emit = defineEmits(['update:modelValue', 'confirm'])
 const inputRef = ref(null)
 const showCalendar = ref(false)
 
-// 使用 computed 实现双向绑定
-const selectedDate = computed({
-	get() {
-		return props.modelValue
-	},
-	set(value) {
-		emit('update:modelValue', value)
-	}
-})
-
 // 显示格式化后的日期
 const displayValue = computed({
 	get() {
@@ -56,6 +51,11 @@ const displayValue = computed({
 // 打开日历
 function openCalendar() {
 	showCalendar.value = true
+}
+
+// 处理日期更新（实时更新）
+function handleDateUpdate(value) {
+	emit('update:modelValue', value)
 }
 
 // 确认选择

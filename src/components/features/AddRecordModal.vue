@@ -216,13 +216,13 @@ function handleSubmit() {
 			image: formData.image
 		})
 	} else {
-		// 添加模式：创建新记录，使用当前时间
+		// 添加模式：创建新记录，使用用户选择的日期
 		recordsStore.addRecord({
 			type: formData.type,
 			amount: formData.amount,
 			category: formData.category,
 			note: formData.note,
-			date: new Date().toISOString(),
+			date: `${formData.date}T${new Date().toISOString().split('T')[1]}`,
 			image: formData.image
 		})
 	}

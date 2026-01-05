@@ -133,6 +133,8 @@ function nextMonth() {
 function handleDateClick(cell) {
 	if (cell.type === 'day' && !isDisabled(cell)) {
 		tempSelectedDate.value = formatToLocalISODate(cell.date)
+		// 立即更新父组件的值
+		emit('update:modelValue', tempSelectedDate.value)
 	}
 }
 
