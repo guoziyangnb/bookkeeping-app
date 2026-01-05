@@ -122,6 +122,7 @@ button {
 	--text-tertiary: #b8b8b8;
 	--text-on-primary: #ffffff;
 	--text-on-accent: #ffffff;
+	--text-on-income: #52c41a;
 
 	/* 主题色 */
 	--accent-orange: #ff8a5b;
@@ -170,6 +171,7 @@ button {
 	--text-tertiary: #6b6b6b;
 	--text-on-primary: #ffffff;
 	--text-on-accent: #ffffff;
+	--text-on-income: #52c41a;
 
 	/* 主题色（保持不变） */
 	--accent-orange: #ff8a5b;

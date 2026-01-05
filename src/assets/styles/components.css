@@ -288,7 +288,7 @@
 .transaction-item {
 	display: flex;
 	align-items: center;
-	padding: 16px;
+	padding: 8px 16px 8px 8px;
 	background: var(--bg-glass);
 	backdrop-filter: blur(20px);
 	border: 1.5px solid var(--bg-glass-border);
@@ -332,7 +332,7 @@
 .transaction-row-first {
 	display: flex;
 	justify-content: space-between;
-	align-items: center;
+	align-items: flex-start;
 	gap: 8px;
 	min-width: 0;
 }
@@ -376,7 +376,7 @@
 }
 
 .transaction-amount.income {
-	color: var(--accent-green);
+	color: var(--text-on-income);
 }
 
 .transaction-amount.expense {
