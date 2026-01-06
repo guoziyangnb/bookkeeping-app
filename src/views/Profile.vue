@@ -125,10 +125,12 @@ const afterRead = file => {
 	avatarUrl.value = file.content
 
 	// 保存到 localStorage
-	const savedProfile = getStorage('userProfile', {})
-	const profile = savedProfile ? savedProfile : {}
+	let savedProfile = getStorage('userProfile', {})
+	// ? 处理可能存在的双重序列化问题
+	// savedProfile = safeParse(savedProfile,{})
+	const profile = savedProfile && typeof savedProfile === 'object' ? savedProfile : {}
 	profile.avatar = file.content
-	setStorage('userProfile', JSON.stringify(profile))
+	setStorage('userProfile', profile)
 
 	// 更新 store 中的头像
 	uiStore.updateUserAvatar(profile.avatar)
@@ -146,13 +148,14 @@ const onOversize = () => {
 
 // 加载用户数据
 const loadUserProfile = () => {
-	const savedProfile = getStorage('userProfile', {})
-	if (savedProfile) {
-		const profile = JSON.stringify(savedProfile)
-		avatarUrl.value = profile.avatar || ''
-		formData.username = profile?.username || ''
-		formData.email = profile?.email || ''
-		formData.phone = profile?.phone || ''
+	let savedProfile = getStorage('userProfile', {})
+	// ? 处理可能存在的双重序列化问题
+	// savedProfile = safeParse(savedProfile,{})
+	if (savedProfile && typeof savedProfile === 'object') {
+		avatarUrl.value = savedProfile.avatar || ''
+		formData.username = savedProfile.username || ''
+		formData.email = savedProfile.email || ''
+		formData.phone = savedProfile.phone || ''
 	}
 }
 

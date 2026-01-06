@@ -70,3 +70,27 @@ export function clearStorage() {
 		return false
 	}
 }
+
+/**
+ * 安全解析 JSON 字符串，处理双重序列化或格式错误问题
+ * @param {any} data 需要解析的数据（可能是对象，也可能是字符串）
+ * @param {any} [defaultValue={}] 解析失败时的默认返回值
+ * @returns {any} 解析后的对象或默认值
+ */
+export function safeParse(data, defaultValue = {}) {
+	// 如果不是字符串，说明已经是对象或其它格式，直接返回
+	if (typeof data !== 'string') {
+		return data
+	}
+
+	try {
+		const parsed = JSON.parse(data)
+
+		// 处理双重序列化问题：如果解析出来还是字符串，尝试再次解析
+		// 例如: '{"a":1}' -> parse -> '{"a":1}' (string) -> parse -> {a:1} (object)
+		return typeof parsed === 'string' ? JSON.parse(parsed) : parsed
+	} catch (e) {
+		// 如果解析失败（如 JSON 格式错误），返回默认值
+		return defaultValue
+	}
+}
