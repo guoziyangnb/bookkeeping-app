@@ -100,10 +100,12 @@ const handleBackup = () => {
 	// 获取当前数据
 	const records = getStorage('records', [])
 	const userProfile = getStorage('userProfile', {})
+	const users = getStorage('users', {})
 
 	const backupData = {
 		records: records,
 		userProfile: userProfile,
+		users: users,
 		backupTime: new Date().toISOString()
 	}
 
@@ -138,6 +140,11 @@ const handleRestore = () => {
 		// 恢复用户资料
 		if (backupData.userProfile) {
 			setStorage('userProfile', backupData.userProfile)
+		}
+
+		// 恢复用户数据
+		if (backupData.users) {
+			setStorage('users', backupData.users)
 		}
 
 		message.success('数据恢复成功，页面将刷新')
