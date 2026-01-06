@@ -5,6 +5,7 @@ export const useUIStore = defineStore('ui', {
 	state: () => {
 		// 加载用户资料
 		const savedProfile = getStorage('userProfile', {})
+		// const profile = JSON.parse(savedProfile)
 		return {
 			theme: getStorage('theme', 'light'),
 			currentTab: 'home',
@@ -12,7 +13,7 @@ export const useUIStore = defineStore('ui', {
 			modalType: 'expense', // 'expense' | 'income'
 			editingRecord: null, // 正在编辑的记录对象
 			defaultCategory: null, // 打开弹窗时的默认分类
-			userAvatar: savedProfile.avatar || '' // 用户头像
+			userAvatar: savedProfile?.avatar || '' // 用户头像
 		}
 	},
 

@@ -54,6 +54,7 @@ import { message } from '@/utils/message'
 import { useUIStore } from '@/stores/ui'
 import FormSection from '@/components/common/FormSection.vue'
 import BackNavBar from '@/components/common/BackNavBar.vue'
+import { getStorage, setStorage } from '@/utils/storage'
 
 const router = useRouter()
 const uiStore = useUIStore()
@@ -122,14 +123,12 @@ const afterRead = file => {
 
 	// 更新头像URL
 	avatarUrl.value = file.content
-	console.log('🚀 ~ afterRead ~ avatarUrl:', avatarUrl.value)
 
 	// 保存到 localStorage
-	const savedProfile = localStorage.getItem('userProfile')
-	const profile = savedProfile ? JSON.parse(savedProfile) : {}
+	const savedProfile = getStorage('userProfile', {})
+	const profile = savedProfile ? savedProfile : {}
 	profile.avatar = file.content
-	console.log('🚀 ~ afterRead ~ profile.avatar:', profile.avatar)
-	localStorage.setItem('userProfile', JSON.stringify(profile))
+	setStorage('userProfile', JSON.stringify(profile))
 
 	// 更新 store 中的头像
 	uiStore.updateUserAvatar(profile.avatar)
@@ -147,9 +146,9 @@ const onOversize = () => {
 
 // 加载用户数据
 const loadUserProfile = () => {
-	const savedProfile = localStorage.getItem('userProfile')
+	const savedProfile = getStorage('userProfile', {})
 	if (savedProfile) {
-		const profile = JSON.parse(savedProfile)
+		const profile = JSON.stringify(savedProfile)
 		avatarUrl.value = profile.avatar || ''
 		formData.username = profile?.username || ''
 		formData.email = profile?.email || ''

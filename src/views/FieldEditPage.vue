@@ -57,6 +57,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { Field as VanField } from 'vant'
 import 'vant/lib/field/style'
 import { message } from '@/utils/message'
+import { getStorage, setStorage } from '@/utils/storage'
 
 const router = useRouter()
 const route = useRoute()
@@ -135,11 +136,11 @@ const handleSave = () => {
 	}
 
 	// 更新 localStorage
-	const savedProfile = localStorage.getItem('userProfile')
-	const profile = savedProfile ? JSON.parse(savedProfile) : {}
+	const savedProfile = getStorage('userProfile', {})
+	const profile = savedProfile ? savedProfile : {}
 
 	profile[fieldType] = inputValue.value.trim()
-	localStorage.setItem('userProfile', JSON.stringify(profile))
+	setStorage('userProfile', profile)
 
 	message.success('保存成功')
 
@@ -151,9 +152,9 @@ const handleSave = () => {
 
 // 加载当前值
 onMounted(() => {
-	const savedProfile = localStorage.getItem('userProfile')
+	const savedProfile = getStorage('userProfile', {})
 	if (savedProfile) {
-		const profile = JSON.parse(savedProfile)
+		const profile = savedProfile
 		inputValue.value = profile[fieldType] || ''
 	}
 
