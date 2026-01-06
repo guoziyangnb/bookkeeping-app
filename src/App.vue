@@ -30,7 +30,7 @@ const { state: toastState } = useToast()
 
 // 判断是否是子页面（不需要显示 TabBar 的页面）
 const isSubPage = computed(() => {
-	return route.path.startsWith('/settings/')
+	return route.meta?.isSubPage
 })
 
 onMounted(() => {

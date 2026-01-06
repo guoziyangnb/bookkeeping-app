@@ -95,6 +95,14 @@ button {
 	right: -50px;
 }
 
+.bg-decoration-4 {
+	width: 300px;
+	height: 200px;
+	background: var(--accent-orange);
+	top: -100px;
+	right: -100px;
+}
+
 /* 暗黑主题下背景装饰圆透明度降低 */
 [data-theme='dark'] .bg-decoration {
 	opacity: 0.2;

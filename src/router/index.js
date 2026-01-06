@@ -2,6 +2,24 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 
 const routes = [
 	{
+		path: '/welcome',
+		name: 'welcome',
+		component: () => import('@/views/Welcome.vue'),
+		meta: { title: '欢迎使用 阳阳记账', isSubPage: true }
+	},
+	{
+		path: '/login',
+		name: 'login',
+		component: () => import('@/views/Auth.vue'),
+		meta: { title: '登录', isSubPage: true }
+	},
+	{
+		path: '/register',
+		name: 'register',
+		component: () => import('@/views/Auth.vue'),
+		meta: { title: '注册', isSubPage: true }
+	},
+	{
 		path: '/',
 		name: 'home',
 		component: () => import('@/views/Home.vue'),
@@ -29,19 +47,19 @@ const routes = [
 		path: '/settings/profile',
 		name: 'profile',
 		component: () => import('@/views/Profile.vue'),
-		meta: { title: '个人资料' }
+		meta: { title: '个人资料', isSubPage: true }
 	},
 	{
 		path: '/settings/edit-field',
 		name: 'editField',
 		component: () => import('@/views/FieldEditPage.vue'),
-		meta: { title: '编辑资料' }
+		meta: { title: '编辑资料', isSubPage: true }
 	},
 	{
 		path: '/settings/backup',
 		name: 'backup',
 		component: () => import('@/views/Backup.vue'),
-		meta: { title: '数据备份' }
+		meta: { title: '数据备份', isSubPage: true }
 	}
 ]
 
