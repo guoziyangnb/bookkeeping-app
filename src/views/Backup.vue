@@ -19,18 +19,22 @@
 
 			<!-- 备份操作 -->
 			<div class="backup-actions">
-				<button class="action-btn primary" @click="handleBackup">
-					<svg viewBox="0 0 24 24">
-						<path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z" />
-					</svg>
+				<van-button type="primary" block :loading="isBackingUp" :disabled="isRestoring" loading-text="备份中..." @click="handleBackup">
+					<template #icon>
+						<svg viewBox="0 0 24 24" class="btn-icon">
+							<path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z" />
+						</svg>
+					</template>
 					立即备份
-				</button>
-				<button class="action-btn secondary" @click="handleRestore">
-					<svg viewBox="0 0 24 24">
-						<path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z" />
-					</svg>
+				</van-button>
+				<van-button type="default" block :loading="isRestoring" :disabled="isBackingUp" loading-text="恢复中..." @click="handleRestore">
+					<template #icon>
+						<svg viewBox="0 0 24 24" class="btn-icon">
+							<path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z" />
+						</svg>
+					</template>
 					恢复数据
-				</button>
+				</van-button>
 			</div>
 		</div>
 	</div>
@@ -42,12 +46,18 @@ import FormSection from '@/components/common/FormSection.vue'
 import BackNavBar from '@/components/common/BackNavBar.vue'
 import { message } from '@/utils/message'
 import { getStorage, setStorage } from '@/utils/storage'
+import { Button as VanButton } from 'vant'
+import 'vant/lib/button/style'
 
 // 备份设置数据
 const backupSettings = reactive({
 	localBackup: true, // 本地存储，默认打开
 	cloudBackup: false // 云端存储，默认关闭
 })
+
+// Loading 状态
+const isBackingUp = ref(false)
+const isRestoring = ref(false)
 
 // 表单项配置
 const backupItems = computed(() => [
@@ -91,47 +101,65 @@ const handleSwitchChange = (field, newValue, item) => {
 }
 
 // 立即备份
-const handleBackup = () => {
+const handleBackup = async () => {
 	if (!backupSettings.localBackup && !backupSettings.cloudBackup) {
 		message.warning('请先开启至少一种备份方式')
 		return
 	}
 
-	// 获取当前数据
-	const records = getStorage('records', [])
-	const userProfile = getStorage('userProfile', {})
-	const users = getStorage('users', {})
+	isBackingUp.value = true
 
-	const backupData = {
-		records: records,
-		userProfile: userProfile,
-		users: users,
-		backupTime: new Date().toISOString()
-	}
+	try {
+		// 模拟异步操作
+		await new Promise(resolve => setTimeout(resolve, 1000))
 
-	// 本地备份
-	if (backupSettings.localBackup) {
-		setStorage('backupData', backupData)
-		message.success('本地备份成功')
-	}
+		// 获取当前数据
+		const records = getStorage('records', [])
+		const userProfile = getStorage('userProfile', {})
+		const users = getStorage('users', {})
 
-	// 云端备份（模拟）
-	if (backupSettings.cloudBackup) {
-		// TODO: 实现云端备份逻辑
-		message.info('云端备份功能开发中...')
+		const backupData = {
+			records: records,
+			userProfile: userProfile,
+			users: users,
+			backupTime: new Date().toISOString()
+		}
+
+		// 本地备份
+		if (backupSettings.localBackup) {
+			setStorage('backupData', backupData)
+			message.success('本地备份成功')
+		}
+		// 模拟异步操作
+		await new Promise(resolve => setTimeout(resolve, 1000))
+
+		// 云端备份（模拟）
+		if (backupSettings.cloudBackup) {
+			// TODO: 实现云端备份逻辑
+			message.warning('云端备份功能开发中...')
+		}
+	} catch (error) {
+		message.error('备份失败：' + error.message)
+	} finally {
+		isBackingUp.value = false
 	}
 }
 
 // 恢复数据
-const handleRestore = () => {
+const handleRestore = async () => {
 	const backupData = getStorage('backupData', null)
 	if (!backupData) {
 		message.warning('没有找到备份数据')
 		return
 	}
 
-	// TODO: 添加确认对话框
+	isRestoring.value = true
+
 	try {
+		// 模拟异步操作
+		await new Promise(resolve => setTimeout(resolve, 1000))
+
+		// TODO: 添加确认对话框
 		// 恢复记账数据
 		if (backupData.records && backupData.records.length > 0) {
 			setStorage('records', backupData.records)
@@ -153,6 +181,7 @@ const handleRestore = () => {
 		}, 1500)
 	} catch (error) {
 		message.error('数据恢复失败：' + error.message)
+		isRestoring.value = false
 	}
 }
 
@@ -236,43 +265,24 @@ onMounted(() => {
 	margin-top: 32px;
 }
 
-.action-btn {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 8px;
-	width: 100%;
-	padding: 16px;
+.backup-actions :deep(.van-button) {
+	height: 50px;
 	border-radius: var(--radius-md);
 	font-size: 16px;
 	font-weight: 600;
-	cursor: pointer;
-	transition: all 0.3s ease;
-	border: none;
 }
 
-.action-btn svg {
-	width: 20px;
-	height: 20px;
-}
-
-.action-btn.primary {
+.backup-actions :deep(.van-button--primary) {
 	background: var(--accent-orange);
-	color: white;
+	border: none;
 	box-shadow: 0 4px 16px rgba(255, 138, 91, 0.3);
 }
 
-.action-btn.primary:hover {
+.backup-actions :deep(.van-button--primary:active) {
 	background: var(--accent-orange-hover);
-	transform: translateY(-2px);
-	box-shadow: 0 6px 20px rgba(255, 138, 91, 0.4);
 }
 
-.action-btn.primary:active {
-	transform: translateY(0);
-}
-
-.action-btn.secondary {
+.backup-actions :deep(.van-button--default) {
 	background: var(--bg-glass);
 	backdrop-filter: blur(20px);
 	-webkit-backdrop-filter: blur(20px);
@@ -280,12 +290,22 @@ onMounted(() => {
 	color: var(--text-primary);
 }
 
-.action-btn.secondary:hover {
+.backup-actions :deep(.van-button--default:active) {
 	background: var(--bg-glass-hover);
 	border-color: var(--accent-orange);
 }
 
-.action-btn svg {
+.backup-actions :deep(.van-button__disabled) {
+	opacity: 0.5;
+}
+
+.backup-actions :deep(.van-button--disabled) {
+	opacity: 0.5;
+}
+
+.btn-icon {
+	width: 20px;
+	height: 20px;
 	fill: currentColor;
 }
 
@@ -309,8 +329,8 @@ onMounted(() => {
 		font-size: 13px;
 	}
 
-	.action-btn {
-		padding: 14px;
+	.backup-actions :deep(.van-button) {
+		height: 46px;
 		font-size: 15px;
 	}
 }
