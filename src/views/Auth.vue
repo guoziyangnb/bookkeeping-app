@@ -122,7 +122,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-// import { useUserStore } from '@/stores/user'
+import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
 const route = useRoute()
@@ -203,8 +203,8 @@ const goBack = () => {
 	position: absolute;
 	top: 20px;
 	left: 20px;
-	width: 44px;
-	height: 44px;
+	width: 38px;
+	height: 38px;
 	background: #f5f5f5;
 	border: none;
 	border-radius: 12px;
