@@ -9,7 +9,7 @@
 
 		<!-- 中心插画 -->
 		<div class="illustration-section">
-			<van-image src="/images/bg.png" alt="阳阳记账小店" class="main-illustration" />
+			<img src="/images/bg.png" alt="阳阳记账小店" class="main-illustration" />
 		</div>
 
 		<!-- 按钮区域 -->
@@ -39,11 +39,16 @@ import { useRouter } from 'vue-router'
 import { Image as VanImage, Checkbox as VanCheckbox } from 'vant'
 import 'vant/lib/image/style'
 import 'vant/lib/checkbox/style'
+import { message } from '@/utils/message'
 
 const router = useRouter()
 const hasAgreed = ref(false)
 
 const goToLogin = () => {
+	if (!hasAgreed.value) {
+		message.warning('请先勾选用户协议')
+		return
+	}
 	router.push('/login')
 }
 
@@ -92,7 +97,7 @@ const goToRegister = () => {
 }
 
 .main-illustration {
-	max-width: 100%;
+	max-width: 350px;
 	max-height: 300px;
 	object-fit: contain;
 	filter: drop-shadow(0 8px 24px rgba(255, 122, 69, 0.15));
@@ -138,7 +143,7 @@ const goToRegister = () => {
 	transform: translateY(0);
 }
 
-.btn-secondary {
+/* .btn-secondary {
 	background: #ff7a45;
 	color: #ffffff;
 	box-shadow: 0 4px 12px rgba(255, 122, 69, 0.3);
@@ -152,7 +157,7 @@ const goToRegister = () => {
 
 .btn-secondary:active {
 	transform: translateY(0);
-}
+} */
 
 /* 用户协议 */
 .agreement-section {
@@ -250,8 +255,12 @@ const goToRegister = () => {
 		font-size: 18px;
 	}
 
+	.illustration-section {
+		margin-bottom: 40px;
+	}
+
 	.main-illustration {
-		max-height: 300px;
+		max-width: 500px;
 	}
 
 	.btn {
