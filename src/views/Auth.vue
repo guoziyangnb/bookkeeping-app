@@ -412,11 +412,12 @@ const goBack = () => {
 /* 底部装饰 */
 .bottom-decoration {
 	position: absolute;
-	bottom: -100px;
-	right: -100px;
+	bottom: -50px;
+	right: -90px;
 	width: 200px;
 	height: 200px;
-	opacity: 0.05;
+	opacity: 0.3;
+	filter: blur(30px);
 }
 
 .decoration-circle {
