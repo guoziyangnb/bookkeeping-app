@@ -8,34 +8,26 @@
 			<div class="backup-info">
 				<div class="info-icon">
 					<svg viewBox="0 0 24 24">
-						<path
-							d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+						<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
 					</svg>
 				</div>
-				<p class="info-text">
-					开启备份功能后，您的记账数据将自动保存到指定的存储位置，确保数据安全。
-				</p>
+				<p class="info-text">开启备份功能后，您的记账数据将自动保存到指定的存储位置，确保数据安全。</p>
 			</div>
 
 			<!-- 备份设置 -->
-			<FormSection
-				title="备份设置"
-				:items="backupItems"
-				@switch-change="handleSwitchChange" />
+			<FormSection title="备份设置" :items="backupItems" @switch-change="handleSwitchChange" />
 
 			<!-- 备份操作 -->
 			<div class="backup-actions">
 				<button class="action-btn primary" @click="handleBackup">
 					<svg viewBox="0 0 24 24">
-						<path
-							d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z" />
+						<path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z" />
 					</svg>
 					立即备份
 				</button>
 				<button class="action-btn secondary" @click="handleRestore">
 					<svg viewBox="0 0 24 24">
-						<path
-							d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z" />
+						<path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z" />
 					</svg>
 					恢复数据
 				</button>
@@ -49,6 +41,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import FormSection from '@/components/common/FormSection.vue'
 import BackNavBar from '@/components/common/BackNavBar.vue'
 import { message } from '@/utils/message'
+import { getStorage, setStorage } from '@/utils/storage'
 
 // 备份设置数据
 const backupSettings = reactive({
@@ -80,10 +73,9 @@ const handleSwitchChange = (field, newValue, item) => {
 	console.log(`${item.label} ${newValue ? '已开启' : '已关闭'}`)
 
 	// 保存到 localStorage
-	const savedSettings = localStorage.getItem('backupSettings') || '{}'
-	const settings = JSON.parse(savedSettings)
+	const settings = getStorage('backupSettings', {})
 	settings[field] = newValue
-	localStorage.setItem('backupSettings', JSON.stringify(settings))
+	setStorage('backupSettings', settings)
 
 	// 显示提示
 	if (newValue) {
@@ -106,18 +98,18 @@ const handleBackup = () => {
 	}
 
 	// 获取当前数据
-	const records = localStorage.getItem('records')
-	const userProfile = localStorage.getItem('userProfile')
+	const records = getStorage('records', [])
+	const userProfile = getStorage('userProfile', {})
 
 	const backupData = {
-		records: records ? JSON.parse(records) : [],
-		userProfile: userProfile ? JSON.parse(userProfile) : {},
+		records: records,
+		userProfile: userProfile,
 		backupTime: new Date().toISOString()
 	}
 
 	// 本地备份
 	if (backupSettings.localBackup) {
-		localStorage.setItem('backupData', JSON.stringify(backupData))
+		setStorage('backupData', backupData)
 		message.success('本地备份成功')
 	}
 
@@ -130,7 +122,7 @@ const handleBackup = () => {
 
 // 恢复数据
 const handleRestore = () => {
-	const backupData = localStorage.getItem('backupData')
+	const backupData = getStorage('backupData', null)
 	if (!backupData) {
 		message.warning('没有找到备份数据')
 		return
@@ -138,16 +130,14 @@ const handleRestore = () => {
 
 	// TODO: 添加确认对话框
 	try {
-		const data = JSON.parse(backupData)
-
 		// 恢复记账数据
-		if (data.records && data.records.length > 0) {
-			localStorage.setItem('records', JSON.stringify(data.records))
+		if (backupData.records && backupData.records.length > 0) {
+			setStorage('records', backupData.records)
 		}
 
 		// 恢复用户资料
-		if (data.userProfile) {
-			localStorage.setItem('userProfile', JSON.stringify(data.userProfile))
+		if (backupData.userProfile) {
+			setStorage('userProfile', backupData.userProfile)
 		}
 
 		message.success('数据恢复成功，页面将刷新')
@@ -161,19 +151,12 @@ const handleRestore = () => {
 
 // 加载备份设置
 const loadBackupSettings = () => {
-	const savedSettings = localStorage.getItem('backupSettings')
-	if (savedSettings) {
-		try {
-			const settings = JSON.parse(savedSettings)
-			if (settings.localBackup !== undefined) {
-				backupSettings.localBackup = settings.localBackup
-			}
-			if (settings.cloudBackup !== undefined) {
-				backupSettings.cloudBackup = settings.cloudBackup
-			}
-		} catch (error) {
-			console.error('加载备份设置失败:', error)
-		}
+	const settings = getStorage('backupSettings', {})
+	if (settings.localBackup !== undefined) {
+		backupSettings.localBackup = settings.localBackup
+	}
+	if (settings.cloudBackup !== undefined) {
+		backupSettings.cloudBackup = settings.cloudBackup
 	}
 }
 

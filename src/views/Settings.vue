@@ -76,7 +76,7 @@
 				</div>
 			</div>
 
-			<div class="settings-group">
+			<!-- <div class="settings-group">
 				<div class="settings-item" @click="goToAttenion">
 					<div class="settings-item-left">
 						<div class="settings-icon" style="background: var(--accent-purple)">
@@ -92,7 +92,7 @@
 					</div>
 					<div class="settings-arrow">›</div>
 				</div>
-			</div>
+			</div> -->
 
 			<!-- 清除数据 -->
 			<div class="settings-group">
@@ -134,16 +134,16 @@ const goToProfile = () => {
 }
 
 const goToCategory = () => {
-	message.warning('功能开发中，敬请期待~')
+	message.warning('分类管理功能开发中...')
 }
 
 const goToBackup = () => {
 	router.push('/settings/backup')
 }
 
-const goToAttenion = () => {
-	message.warning('功能开发中，敬请期待~')
-}
+// const goToAttenion = () => {
+// 	message.warning('提醒功能开发中...')
+// }
 
 const handleClearData = () => {
 	showConfirmDialog({
