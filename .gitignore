@@ -40,3 +40,7 @@ npm-shrinkwrap.json
 apk/*
 
 glassmorphism-bookkeeping.html
+
+.mcp.json
+
+.claude/
