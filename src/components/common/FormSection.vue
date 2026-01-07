@@ -16,16 +16,13 @@
 				<path :d="item.icon" />
 			</svg>
 			<span class="form-label-text">{{ item.label }}</span>
-			<span v-if="!item.switchable" class="form-value">{{
-				item.value || item.emptyText || '未设置'
-			}}</span>
+			<span v-if="!item.switchable" class="form-value">{{ item.value || item.emptyText || '未设置' }}</span>
 			<van-switch
 				v-if="item.switchable"
 				:model-value="item.switchValue"
 				size="20px"
 				active-color="var(--accent-orange)"
 				inactive-color="var(--van-gray-5)"
-				@click.stop="handleSwitchChange(item)"
 				@change="handleSwitchChange(item)" />
 			<div v-else-if="item.clickable !== false" class="arrow-icon">›</div>
 		</div>
@@ -50,6 +47,7 @@ const props = defineProps({
 	}
 })
 
+// 定义子传父有哪些事件
 const emit = defineEmits(['click', 'switchChange'])
 
 const handleClick = item => {

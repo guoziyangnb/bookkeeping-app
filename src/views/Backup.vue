@@ -11,8 +11,13 @@
 						<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
 					</svg>
 				</div>
-				<p class="info-text">开启备份功能后，您的记账数据将自动保存到指定的存储位置，确保数据安全。</p>
+				<p class="info-text">
+					开启备份功能后，您的记账数据将自动保存到指定的存储位置，确保数据安全<br /><span style="color: red">
+						<strong>*</strong> 推荐数据保存在<strong>云端</strong>，而不是本地，对手机占用空间小。如果担忧数据安全以及隐私，可以打开本地存储</span
+					>
+				</p>
 			</div>
+			<p class="info-text" style="color: red"></p>
 
 			<!-- 备份设置 -->
 			<FormSection title="备份设置" :items="backupItems" @switch-change="handleSwitchChange" />
@@ -51,8 +56,8 @@ import 'vant/lib/button/style'
 
 // 备份设置数据
 const backupSettings = reactive({
-	localBackup: true, // 本地存储，默认打开
-	cloudBackup: false // 云端存储，默认关闭
+	localBackup: false, // 本地存储，默认打开
+	cloudBackup: true // 云端存储，默认关闭
 })
 
 // Loading 状态
@@ -79,10 +84,15 @@ const backupItems = computed(() => [
 
 // 处理开关变化
 const handleSwitchChange = (field, newValue, item) => {
+	// console.log('🚀 ~ handleSwitchChange ~ item:', item) //backupItems的元素
+	// console.log('🚀 ~ handleSwitchChange ~ newValue:', newValue) //值是true还是false
+	// console.log('🚀 ~ handleSwitchChange ~ field:', field) //值是localBackup还是cloudBackup
 	backupSettings[field] = newValue
 	console.log(`${item.label} ${newValue ? '已开启' : '已关闭'}`)
 
-	// 保存到 localStorage
+	/**
+	 * ! 这个可以保存到 localStorage,保存按钮的状态
+	 */
 	const settings = getStorage('backupSettings', {})
 	settings[field] = newValue
 	setStorage('backupSettings', settings)
@@ -91,12 +101,20 @@ const handleSwitchChange = (field, newValue, item) => {
 	if (newValue) {
 		message.success(`${item.label}已开启`)
 	} else {
-		message.info(`${item.label}已关闭`)
+		message.success(`${item.label}已关闭`)
 	}
 
 	// 如果关闭本地存储，提示用户
+	// if (field === 'localBackup' && !newValue) {
+	// 	message.warning('关闭本地存储可能导致数据丢失')
+	// }
 	if (field === 'localBackup' && !newValue) {
-		message.warning('关闭本地存储可能导致数据丢失')
+		message.warning('关闭本地存储新数据将不再存储在本地！', 3000)
+	}
+
+	// 如果关闭云端存储，提示用户
+	if (field === 'cloudBackup' && !newValue) {
+		message.warning('关闭云端存储本地数据会越来越大导致卡顿！', 3000)
 	}
 }
 
@@ -113,6 +131,9 @@ const handleBackup = async () => {
 		// 模拟异步操作
 		await new Promise(resolve => setTimeout(resolve, 1000))
 
+		/**
+		 * TODO 如果开了云端备份，则调用接口下载数据，并导出文件下载；如果只开了本地备份，则识别本地的localStorage数据并导出文件下载
+		 */
 		// 获取当前数据
 		const records = getStorage('records', [])
 		const userProfile = getStorage('userProfile', {})
@@ -146,10 +167,17 @@ const handleBackup = async () => {
 }
 
 // 恢复数据
+/**
+ * TODO: 恢复数据时，需要先判断本地是否有备份数据，如果没有，则提示用户没有备份数据，如果有；则弹出一个对话框，让用户确认是否恢复数据
+ */
 const handleRestore = async () => {
+	if (!backupSettings.localBackup) {
+		message.warning('恢复数据仅支持本地存储，请先开启')
+		return
+	}
 	const backupData = getStorage('backupData', null)
 	if (!backupData) {
-		message.warning('没有找到备份数据')
+		message.warning('本地没有找到备份数据')
 		return
 	}
 
@@ -286,6 +314,7 @@ onMounted(() => {
 	background: var(--bg-glass);
 	backdrop-filter: blur(20px);
 	-webkit-backdrop-filter: blur(20px);
+	box-shadow: 0 4px 16px rgba(255, 138, 91, 0.3);
 	border: 1.5px solid var(--bg-glass-border);
 	color: var(--text-primary);
 }
