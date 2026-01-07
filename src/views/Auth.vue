@@ -116,9 +116,10 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'
+import { message } from '@/utils/message'
 
 const router = useRouter()
 const route = useRoute()
@@ -128,7 +129,7 @@ const userStore = useUserStore()
 const isLogin = computed(() => route.path === '/login')
 
 // 表单数据
-const formData = ref({
+const formData = reactive({
 	username: '',
 	email: '',
 	password: ''
@@ -136,6 +137,7 @@ const formData = ref({
 
 // UI状态
 const showPassword = ref(false)
+
 const isLoading = ref(false)
 
 // 切换登录/注册模式
@@ -153,26 +155,46 @@ const handleSubmit = async () => {
 	try {
 		if (isLogin.value) {
 			// 登录逻辑
-			await userStore.login({
-				email: formData.value.email,
-				password: formData.value.password
+			const userInfo = await userStore.login({
+				email: formData.email,
+				password: formData.password
 			})
-			router.push('/')
+			resetFormData()
+			if (userInfo?.session?.access_token) {
+				router.push('/')
+				message.success('登录成功')
+			} else {
+				message.error('登录失败，请查看邮件里的链接是否已点击，或者检查邮箱和密码是否正确', 6000)
+			}
 		} else {
 			// 注册逻辑
-			await userStore.register({
-				username: formData.value.username,
-				email: formData.value.email,
-				password: formData.value.password
+			const userInfo = await userStore.register({
+				username: formData.username,
+				email: formData.email,
+				password: formData.password
 			})
-			router.push('/')
+			resetFormData()
+			console.log('🚀 ~ handleSubmit ~ formData:', formData)
+			if (userInfo?.user?.id) {
+				router.push('/login')
+				message.success('注册成功，你会收到一封邮件，请先点击邮件中的链接进行验证才能登录！', 6000)
+			} else {
+				message.error('注册失败，请重试')
+			}
 		}
 	} catch (error) {
 		console.error('认证失败:', error)
-		alert(error.message || '操作失败，请重试')
+		message.error(error.message || '登录注册操作失败，请重试')
 	} finally {
 		isLoading.value = false
 	}
+}
+
+// 定义重置表单的函数
+const resetFormData = () => {
+	formData.username = ''
+	formData.email = ''
+	formData.password = ''
 }
 
 // 返回

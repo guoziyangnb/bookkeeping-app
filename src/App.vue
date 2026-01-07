@@ -15,7 +15,7 @@
 
 <script setup>
 import { onMounted, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useUIStore } from '@/stores/ui'
 import { useRecordsStore } from '@/stores/records'
 import { useUserStore } from '@/stores/user'
@@ -23,8 +23,10 @@ import TabBar from '@/components/layout/TabBar.vue'
 import AddRecordModal from '@/components/features/AddRecordModal.vue'
 import Toast from '@/components/common/Toast.vue'
 import { useToast } from '@/utils/message'
+import { getStorage } from '@/utils/storage'
 
 const route = useRoute()
+const router = useRouter()
 const uiStore = useUIStore()
 const recordsStore = useRecordsStore()
 const userStore = useUserStore()
@@ -40,7 +42,15 @@ onMounted(async () => {
 	uiStore.initTheme()
 
 	// 初始化用户认证状态
-	await userStore.initializeAuth()
+	const user = await userStore.initializeAuth()
+	console.log('🚀 ~ user:', user)
+	const settings = getStorage('backupSettings', {})
+	const isCloud = settings['cloudBackup']
+	console.log('🚀 ~ isCloud:', isCloud)
+	// 开启了云存储且本地没有用户数据，跳转到登录页
+	if (!user && isCloud) {
+		router.push('/welcome')
+	}
 
 	// 如果没有数据，添加示例数据
 	// （数据已经在 store 初始化时自动从 localStorage 加载）

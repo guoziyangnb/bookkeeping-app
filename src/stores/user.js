@@ -67,8 +67,8 @@ export const useUserStore = defineStore('user', {
 				// 存储用户元数据（包含username）
 				if (user) {
 					this.currentUser = user
-					this.isAuthenticated = true
-					setStorage('currentUser', user)
+					// this.isAuthenticated = true
+					// setStorage('currentUser', user)
 				}
 
 				return user
