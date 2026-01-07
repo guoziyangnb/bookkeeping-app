@@ -22,7 +22,7 @@ export const useUserStore = defineStore('user', {
 		isLoggedIn: state => state.isAuthenticated,
 
 		// 获取用户头像
-		userAvatar: state => state.userProfile?.user?.user_metadata?.avatar || '',
+		userAvatar: state => state.userProfile?.user?.user_metadata?.avatar?.avatar || '',
 
 		// 获取用户名
 		userName: state => state.userProfile?.user?.user_metadata?.username || state.userProfile?.user?.email?.split('@')[0] || '游客',

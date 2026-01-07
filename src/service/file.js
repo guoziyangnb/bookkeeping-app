@@ -2,38 +2,73 @@
  * 文件相关的接口
  */
 import supabase from '.'
+import { supabaseUrl } from './index'
+import { useUserStore } from '@/stores/user'
+
+const userStore = useUserStore()
 
 // 上传头像(上传文件也走这个接口) —— 反正基本上都是上传图片
-const updateFile = async fileData => {
+/**
+ * 上传文件到Supabase存储的异步函数
+ * @param {File} fileData - 需要上传的文件对象
+ * @returns {string} 返回文件的签名URL路径，如果上传失败则返回空字符串
+ */
+export const uploadFile = async fileData => {
+	// 检查参数有效性，如果fileData不存在或不是File实例，则返回空字符串
 	if (!fileData || !(fileData instanceof File)) {
 		return ''
 	}
-	// 获取文件名
-	const file_path = `${Date().now()}-${fileData.name}`.replaceAll('/', '').replaceAll('%', '')
-	// 上传文件
-	const { data, error } = await supabase.storage.from('products').upload(file_path, fileData)
+
+	// 获取用户ID作为存储文件夹的名称(配置了策略)
+	const folder = userStore.userId // 用户所在的文件夹 == 用户id
+	const rawName = fileData.name // 获取原始文件名，eg：上传的文件名时123.png,那么rawName就是123.png
+	// 获取文件名（不带扩展名），如果没有扩展名则使用原始文件名
+	const fileName = rawName.split(/[/\\]/).pop() ?? rawName
+	// console.log('🚀 ~ uploadFile ~ fileName:', fileName)
+
+	// 构建文件路径，移除所有斜杠和百分号字符
+	const file_path = folder ? `${folder}/${fileName}` : fileName
+
+	/**
+	 * ! folder参数因为我给gzynb这个存储桶设置——用户只能访问自己id的文件夹
+	 */
+	const { data, error } = await supabase.storage.from('gzynb').upload(file_path, fileData, {
+		cacheControl: '3600',
+		upsert: true
+	})
+	console.log('🚀 ~ uploadFile ~ data:', data)
+	if (data && !error) {
+		return `${supabaseUrl}/storage/v1/object/public/${data.fullPath}`
+	}
 	// 处理失败
 	if (error) {
 		throw new Error(error.message)
-	}
-	if (data.fullPath) {
-		return `${supabaseUrl}/storage/v1/object/public/${data.fullPath}`
 	}
 	return ''
 }
 
 // 增
+/**
+ * 创建产品函数
+ * @param {Object} createProduct - 包含产品信息的对象
+ * @returns {Promise} 返回插入数据库的产品数据
+ */
 export const createProduct = async createProduct => {
 	// 第一步先判断是否有文件，如果有先上传文件得到文件地址
 	if (createProduct.pictureFile) {
+		// 调用updateFile函数上传文件并获取文件URL
 		const pictureUrl = await updateFile(createProduct.pictureFile)
+		// 将获取到的图片URL添加到产品对象中
 		createProduct.pictureUrl = pictureUrl
 	}
+	// 删除不需要保存到数据库的pictureFile属性
 	delete createProduct.pictureFile
 	// 第二步将数据插入数据库
 	const { data, error } = await supabase.from('products').insert([createProduct]).select().single()
+	// 如果插入数据时发生错误，抛出错误信息
 	if (error) {
 		throw new Error(error.message)
 	}
+	// 返回插入的产品数据
 	return data
 }

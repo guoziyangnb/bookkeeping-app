@@ -55,6 +55,7 @@ import { useUserStore } from '@/stores/user'
 import FormSection from '@/components/common/FormSection.vue'
 import BackNavBar from '@/components/common/BackNavBar.vue'
 import { getStorage, setStorage } from '@/utils/storage'
+import { uploadFile } from '@/service/file'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -114,31 +115,41 @@ const beforeRead = file => {
 }
 
 // 文件上传回调
-const afterRead = file => {
+const afterRead = async file => {
+	// console.log('🚀 ~ afterRead ~ file:', file)
 	// 这里应该上传到服务器
+
 	// 暂时使用本地预览
-	if (file instanceof Array) {
-		file = file[0]
-	}
+	// if (file instanceof Array) {
+	// 	file = file[0]
+	// }
+	fileList.value = [{ status: 'uploading', file: file.file, content: file.content }]
+	// file.status = 'uploading'
 
 	// 更新头像URL
-	avatarUrl.value = file.content
+	// avatarUrl.value = file.content
+	try {
+		const result = await uploadFile(file.file)
+		avatarUrl.value = result
 
+		// 更新 store 中的头像
+		await userStore.updateAvatar({ avatar: avatarUrl.value })
+
+		// 清空文件列表，允许重复上传，避免直接显示预览图bug（不想显示预览图，fileList必须为空）
+		fileList.value = []
+		message.success('头像上传成功！')
+		file.status = 'done'
+	} catch (error) {
+		file.status = 'failed'
+		console.log('🚀 ~ afterRead ~ error:', error)
+	}
 	// 保存到 localStorage
-	let savedProfile = getStorage('userProfile', {})
+	// let savedProfile = getStorage('userProfile', {})
 	// ? 处理可能存在的双重序列化问题
 	// savedProfile = safeParse(savedProfile,{})
-	const profile = savedProfile && typeof savedProfile === 'object' ? savedProfile : {}
-	profile.avatar = file.content
-	setStorage('userProfile', profile)
-
-	// 更新 store 中的头像
-	userStore.updateUserAvatar(profile.avatar)
-
-	// 清空文件列表，允许重复上传，避免直接显示预览图bug（不想显示预览图，fileList必须为空）
-	fileList.value = []
-
-	message.success('头像上传成功！')
+	// const profile = savedProfile && typeof savedProfile === 'object' ? savedProfile : {}
+	// profile.avatar = file.content
+	// setStorage('userProfile', profile)
 }
 
 // 文件过大

@@ -5,16 +5,16 @@
 			<div class="header-title">{{ title }}</div>
 		</div>
 		<div class="header-avatar" v-if="showAvatar">
-			<img :src="uiStore.userAvatar || defaultAvatar" alt="头像" />
+			<img :src="userStore.userAvatar || defaultAvatar" alt="头像" />
 		</div>
 	</header>
 </template>
 
 <script setup>
 import { computed } from 'vue'
-import { useUIStore } from '@/stores/ui'
+import { useUserStore } from '@/stores/user'
 
-const uiStore = useUIStore()
+const userStore = useUserStore()
 
 // 默认头像
 const defaultAvatar = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop&crop=face'
