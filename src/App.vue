@@ -18,6 +18,7 @@ import { onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useUIStore } from '@/stores/ui'
 import { useRecordsStore } from '@/stores/records'
+import { useUserStore } from '@/stores/user'
 import TabBar from '@/components/layout/TabBar.vue'
 import AddRecordModal from '@/components/features/AddRecordModal.vue'
 import Toast from '@/components/common/Toast.vue'
@@ -26,6 +27,7 @@ import { useToast } from '@/utils/message'
 const route = useRoute()
 const uiStore = useUIStore()
 const recordsStore = useRecordsStore()
+const userStore = useUserStore()
 const { state: toastState } = useToast()
 
 // 判断是否是子页面（不需要显示 TabBar 的页面）
@@ -33,9 +35,12 @@ const isSubPage = computed(() => {
 	return route.meta?.isSubPage
 })
 
-onMounted(() => {
+onMounted(async () => {
 	// 初始化主题
 	uiStore.initTheme()
+
+	// 初始化用户认证状态
+	await userStore.initializeAuth()
 
 	// 如果没有数据，添加示例数据
 	// （数据已经在 store 初始化时自动从 localStorage 加载）

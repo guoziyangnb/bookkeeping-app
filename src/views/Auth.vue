@@ -90,10 +90,6 @@
 
 				<!-- 登录时的额外选项 -->
 				<div v-if="isLogin" class="form-options">
-					<label class="checkbox-label">
-						<input type="checkbox" v-model="formData.rememberMe" />
-						<span>记住我</span>
-					</label>
 					<a href="#" class="forgot-link">忘记密码？</a>
 				</div>
 
@@ -135,8 +131,7 @@ const isLogin = computed(() => route.path === '/login')
 const formData = ref({
 	username: '',
 	email: '',
-	password: '',
-	rememberMe: false
+	password: ''
 })
 
 // UI状态
@@ -160,8 +155,7 @@ const handleSubmit = async () => {
 			// 登录逻辑
 			await userStore.login({
 				email: formData.value.email,
-				password: formData.value.password,
-				rememberMe: formData.value.rememberMe
+				password: formData.value.password
 			})
 			router.push('/')
 		} else {
@@ -322,26 +316,10 @@ const goBack = () => {
 /* 表单选项 */
 .form-options {
 	display: flex;
-	justify-content: space-between;
+	justify-content: flex-end;
 	align-items: center;
 	margin-bottom: 24px;
 	font-size: 14px;
-}
-
-.checkbox-label {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	color: #666666;
-	cursor: pointer;
-	user-select: none;
-}
-
-.checkbox-label input[type='checkbox'] {
-	width: 18px;
-	height: 18px;
-	cursor: pointer;
-	accent-color: #ff7a45;
 }
 
 .forgot-link {

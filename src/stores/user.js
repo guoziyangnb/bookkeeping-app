@@ -1,16 +1,15 @@
 import { defineStore } from 'pinia'
 import { getStorage, setStorage, removeStorage } from '@/utils/storage'
 import router from '@/router'
+import { signUp, signIn, logout, getCurrentUser } from '@/service/user'
 
 export const useUserStore = defineStore('user', {
 	state: () => {
 		// 在初始化时从 localStorage 加载用户数据
 		const savedUser = getStorage('currentUser', null)
-		const savedUsers = getStorage('users', [])
 
 		return {
 			currentUser: savedUser,
-			users: savedUsers, // 存储所有注册用户
 			isAuthenticated: !!savedUser
 		}
 	},
@@ -23,127 +22,141 @@ export const useUserStore = defineStore('user', {
 		isLoggedIn: state => state.isAuthenticated,
 
 		// 获取用户头像
-		userAvatar: state => state.currentUser?.avatar || '',
+		userAvatar: state => state.currentUser?.user_metadata?.avatar || '',
 
 		// 获取用户名
-		userName: state => state.currentUser?.username || '游客'
+		userName: state => state.currentUser?.user_metadata?.username || state.currentUser?.email?.split('@')[0] || '游客',
+
+		// 获取用户ID
+		userId: state => state.currentUser?.id || '',
+
+		// 获取用户邮箱
+		userEmail: state => state.currentUser?.email || ''
 	},
 
 	actions: {
+		// 初始化：检查用户登录状态
+		async initializeAuth() {
+			try {
+				// 先检查本地是否有用户信息
+				if (this.currentUser) {
+					this.isAuthenticated = true
+					return this.currentUser
+				}
+
+				// 尝试从supabase获取当前用户
+				const user = await getCurrentUser()
+				if (user) {
+					this.currentUser = user
+					this.isAuthenticated = true
+					setStorage('currentUser', user)
+				}
+				return user
+			} catch (error) {
+				console.error('初始化认证状态失败:', error)
+				return null
+			}
+		},
+
 		// 注册
 		async register({ username, email, password }) {
-			// 检查邮箱是否已存在
-			const existingUser = this.users.find(u => u.email === email)
-			if (existingUser) {
-				throw new Error('该邮箱已被注册')
+			try {
+				// 调用supabase注册接口，并传递username
+				const user = await signUp({ email, password, username })
+
+				// 存储用户元数据（包含username）
+				if (user) {
+					this.currentUser = user
+					this.isAuthenticated = true
+					setStorage('currentUser', user)
+				}
+
+				return user
+			} catch (error) {
+				throw error
 			}
-
-			// 检查用户名是否已存在
-			const existingUsername = this.users.find(u => u.username === username)
-			if (existingUsername) {
-				throw new Error('该用户名已被使用')
-			}
-
-			// 创建新用户
-			const newUser = {
-				id: Date.now().toString(),
-				username,
-				email,
-				password, // 在实际应用中应该加密
-				avatar: '',
-				createdAt: new Date().toISOString()
-			}
-
-			// 保存用户列表
-			this.users.push(newUser)
-			setStorage('users', this.users)
-
-			// 自动登录
-			this.currentUser = newUser
-			this.isAuthenticated = true
-			setStorage('currentUser', newUser)
-
-			return newUser
 		},
 
 		// 登录
-		async login({ email, password, rememberMe }) {
-			// 查找用户
-			const user = this.users.find(u => u.email === email)
+		async login({ email, password }) {
+			try {
+				// 调用supabase登录接口
+				const user = await signIn({ email, password })
 
-			if (!user) {
-				throw new Error('用户不存在')
+				// 设置当前用户
+				this.currentUser = user
+				this.isAuthenticated = true
+				setStorage('currentUser', user)
+
+				return user
+			} catch (error) {
+				throw error
 			}
-
-			if (user.password !== password) {
-				throw new Error('密码错误')
-			}
-
-			// 设置当前用户
-			this.currentUser = user
-			this.isAuthenticated = true
-			setStorage('currentUser', user)
-
-			return user
 		},
 
 		// 登出
-		logout() {
-			this.currentUser = null
-			this.isAuthenticated = false
-			removeStorage('currentUser')
-			router.push('/welcome')
-		},
-
-		// 更新用户信息
-		updateProfile(data) {
-			if (!this.currentUser) return
-
-			// 更新当前用户信息
-			this.currentUser = {
-				...this.currentUser,
-				...data
+		async logout() {
+			try {
+				// 调用supabase登出接口
+				await logout()
+			} catch (error) {
+				console.error('退出登录失败:', error)
+			} finally {
+				// 清除本地状态
+				this.currentUser = null
+				this.isAuthenticated = false
+				removeStorage('currentUser')
+				router.push('/welcome')
 			}
-
-			// 更新用户列表中的信息
-			const userIndex = this.users.findIndex(u => u.id === this.currentUser.id)
-			if (userIndex !== -1) {
-				this.users[userIndex] = this.currentUser
-			}
-
-			// 保存到localStorage
-			setStorage('currentUser', this.currentUser)
-			setStorage('users', this.users)
 		},
 
-		// 更新头像
-		updateAvatar(avatarUrl) {
-			this.updateProfile({ avatar: avatarUrl })
-		},
-
-		// 修改密码
-		changePassword(oldPassword, newPassword) {
+		// 更新用户信息（Supabase需要通过updateUser方法更新user_metadata）
+		async updateProfile(data) {
 			if (!this.currentUser) {
 				throw new Error('未登录')
 			}
 
-			if (this.currentUser.password !== oldPassword) {
-				throw new Error('原密码错误')
-			}
+			try {
+				// 更新本地状态
+				this.currentUser = {
+					...this.currentUser,
+					user_metadata: {
+						...this.currentUser.user_metadata,
+						...data
+					}
+				}
 
-			this.updateProfile({ password: newPassword })
+				// 保存到localStorage
+				setStorage('currentUser', this.currentUser)
+
+				return this.currentUser
+			} catch (error) {
+				console.error('更新用户信息失败:', error)
+				throw error
+			}
 		},
 
-		// 删除账户
-		deleteAccount() {
+		// 更新头像
+		async updateAvatar(avatarUrl) {
+			await this.updateProfile({ avatar: avatarUrl })
+		},
+
+		// 修改密码（需要通过supabase的updateUser方法）
+		async changePassword(newPassword) {
+			// Supabase的密码修改需要在用户已登录状态下调用
+			// 这里可以后续添加supabase的updateUser调用
+			throw new Error('此功能需要集成Supabase的updateUser方法')
+		},
+
+		// 删除账户（需要通过supabase的admin API）
+		async deleteAccount() {
 			if (!this.currentUser) return
 
-			// 从用户列表中删除
-			this.users = this.users.filter(u => u.id !== this.currentUser.id)
-			setStorage('users', this.users)
+			// 先登出
+			await this.logout()
 
-			// 登出
-			this.logout()
+			// Supabase的账户删除需要使用admin API，这里需要后续添加
+			throw new Error('此功能需要集成Supabase的admin API')
 		}
 	}
 })

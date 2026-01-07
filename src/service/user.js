@@ -4,11 +4,17 @@
 import supabase from '.' // 引入supabase实例
 
 // 账户注册
-export const signUp = async ({ email, phone, password }) => {
+export const signUp = async ({ email, phone, password, username }) => {
 	const { data: user, error } = await supabase.auth.signUp({
 		email,
 		phone,
-		password
+		password,
+		options: {
+			data: {
+				username: username || '',
+				avatar: ''
+			}
+		}
 	})
 	if (error) throw new Error(error.message)
 	return user
