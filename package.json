@@ -9,6 +9,7 @@
 		"format": "prettier --write . --ignore-path .prettierignore"
 	},
 	"dependencies": {
+		"@supabase/supabase-js": "^2.89.0",
 		"echarts": "^6.0.0",
 		"pinia": "^3.0.4",
 		"vant": "^4.9.22",
