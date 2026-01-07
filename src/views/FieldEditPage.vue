@@ -152,16 +152,21 @@ const handleSave = async () => {
 	// profile[fieldType] = inputValue.value.trim()
 	// setStorage('userProfile', profile)
 	try {
-		await userStore.updateProfile({ [fieldType]: inputValue.value.trim() })
-		message.success('保存成功')
+		const result = await userStore.updateProfile({ [fieldType]: inputValue.value.trim() })
+		if (result && !result.error) {
+			message.success('个人信息更新成功')
+			// 仅在成功时延迟返回
+			setTimeout(() => {
+				router.back()
+			}, 500)
+		} else {
+			message.error('个人信息更新失败' + result.error)
+		}
 	} catch (error) {
 		message.error('个人信息更新失败' + error)
+	} finally {
+		loading.value = false
 	}
-	loading.value = false
-	// 延迟返回
-	setTimeout(() => {
-		router.back()
-	}, 500)
 }
 
 // 加载当前值
