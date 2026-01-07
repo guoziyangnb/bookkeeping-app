@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { getStorage, setStorage, removeStorage } from '@/utils/storage'
 import router from '@/router'
-import { signUp, signIn, logout, getCurrentUser } from '@/service/user'
+import { signUp, signIn, logout, getCurrentUser, updateUser } from '@/service/user'
 
 export const useUserStore = defineStore('user', {
 	state: () => {
@@ -22,16 +22,19 @@ export const useUserStore = defineStore('user', {
 		isLoggedIn: state => state.isAuthenticated,
 
 		// 获取用户头像
-		userAvatar: state => state.userProfile?.user_metadata?.avatar || '',
+		userAvatar: state => state.userProfile?.user?.user_metadata?.avatar || '',
 
 		// 获取用户名
-		userName: state => state.userProfile?.user_metadata?.username || state.userProfile?.email?.split('@')[0] || '游客',
+		userName: state => state.userProfile?.user?.user_metadata?.username || state.userProfile?.user?.email?.split('@')[0] || '游客',
 
 		// 获取用户ID
-		userId: state => state.userProfile?.id || '',
+		userId: state => state.userProfile?.user?.id || '',
 
 		// 获取用户邮箱
-		userEmail: state => state.userProfile?.email || ''
+		userEmail: state => state.userProfile?.user?.user_metadata?.email || '',
+
+		// 获取用户电话
+		userPhone: state => state.userProfile?.user?.user_metadata?.phone || ''
 	},
 
 	actions: {
@@ -73,6 +76,7 @@ export const useUserStore = defineStore('user', {
 
 				return user
 			} catch (error) {
+				console.error('注册失败:', error)
 				throw error
 			}
 		},
@@ -90,6 +94,7 @@ export const useUserStore = defineStore('user', {
 
 				return user
 			} catch (error) {
+				console.error('登录失败:', error)
 				throw error
 			}
 		},
@@ -117,19 +122,17 @@ export const useUserStore = defineStore('user', {
 			}
 
 			try {
-				// 更新本地状态
-				this.userProfile = {
-					...this.userProfile,
-					user_metadata: {
-						...this.userProfile.user_metadata,
-						...data
-					}
+				// 调用supabase更新用户信息接口
+				const user = await updateUser({ ...data })
+				if (user) {
+					this.userProfile = user
+					this.isAuthenticated = true
 				}
 
 				// 保存到localStorage
-				setStorage('userProfile', this.userProfile)
+				setStorage('userProfile', user)
 
-				return this.userProfile
+				return user
 			} catch (error) {
 				console.error('更新用户信息失败:', error)
 				throw error
@@ -143,9 +146,23 @@ export const useUserStore = defineStore('user', {
 
 		// 修改密码（需要通过supabase的updateUser方法）
 		async changePassword(newPassword) {
-			// Supabase的密码修改需要在用户已登录状态下调用
-			// 这里可以后续添加supabase的updateUser调用
-			throw new Error('此功能需要集成Supabase的updateUser方法')
+			if (!this.userProfile) return
+
+			// 调用supabase更新用户信息接口
+			try {
+				const user = await updateUser({ password: newPassword })
+				if (user) {
+					this.userProfile = user
+					this.isAuthenticated = true
+				}
+
+				// 保存到localStorage
+				setStorage('userProfile', user)
+				return user
+			} catch (error) {
+				console.error('修改密码失败:', error)
+				throw error
+			}
 		},
 
 		// 删除账户（需要通过supabase的admin API）

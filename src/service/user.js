@@ -12,7 +12,8 @@ export const signUp = async ({ email, phone, password, username }) => {
 		options: {
 			data: {
 				username: username || '',
-				avatar: ''
+				avatar: '',
+				phone: ''
 			}
 		}
 	})
@@ -45,4 +46,20 @@ export const getCurrentUser = async () => {
 	const { data, error } = await supabase.auth.getUser()
 	if (error) throw new Error(error.message)
 	return data?.user
+}
+
+// 更新用户信息
+export const updateUser = async data => {
+	const { username, avatar, phone, email, password } = data
+	const { data: user, error } = await supabase.auth.updateUser({
+		email: email,
+		password: password,
+		data: {
+			username: username,
+			avatar: avatar,
+			phone: phone
+		}
+	})
+	if (error) throw new Error(error.message)
+	return user
 }

@@ -8,9 +8,9 @@
 				</svg>
 			</button>
 			<h1 class="edit-title">{{ fieldConfig.title }}</h1>
-			<button class="nav-save-btn" @click="handleSave">
+			<van-button :loading="loading" class="nav-save-btn" @click="handleSave">
 				<span>保存</span>
-			</button>
+			</van-button>
 		</div>
 
 		<div class="edit-container">
@@ -52,15 +52,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { Field as VanField } from 'vant'
 import 'vant/lib/field/style'
 import { message } from '@/utils/message'
-import { getStorage, setStorage } from '@/utils/storage'
+import { Button as VanButton } from 'vant'
+import 'vant/lib/button/style'
+import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
 const route = useRoute()
+const userStore = useUserStore()
 
 // 字段配置
 const fieldConfigs = {
@@ -117,9 +120,16 @@ const fieldConfigs = {
 	}
 }
 
+const loading = ref(false)
 const fieldType = route.query.field
 const fieldConfig = fieldConfigs[fieldType] || fieldConfigs.username
 const inputValue = ref('')
+// 枚举项
+const fieldMap = {
+	username: userStore.userName,
+	email: userStore.userEmail,
+	phone: userStore.userPhone
+}
 
 // 返回上一页
 const goBack = () => {
@@ -127,23 +137,27 @@ const goBack = () => {
 }
 
 // 保存修改
-const handleSave = () => {
+const handleSave = async () => {
 	// 验证输入
 	const error = fieldConfig.validate(inputValue.value)
 	if (error) {
 		message.warning(error)
 		return
 	}
-
+	loading.value = true
 	// 更新 localStorage
-	const savedProfile = getStorage('userProfile', {})
-	const profile = savedProfile ? savedProfile : {}
+	// const savedProfile = userStore.userProfile
+	// const profile = savedProfile ? savedProfile : {}
 
-	profile[fieldType] = inputValue.value.trim()
-	setStorage('userProfile', profile)
-
-	message.success('保存成功')
-
+	// profile[fieldType] = inputValue.value.trim()
+	// setStorage('userProfile', profile)
+	try {
+		await userStore.updateProfile({ [fieldType]: inputValue.value.trim() })
+		message.success('保存成功')
+	} catch (error) {
+		message.error('个人信息更新失败' + error)
+	}
+	loading.value = false
 	// 延迟返回
 	setTimeout(() => {
 		router.back()
@@ -152,10 +166,14 @@ const handleSave = () => {
 
 // 加载当前值
 onMounted(() => {
-	const savedProfile = getStorage('userProfile', {})
+	// 确保登录了
+	const savedProfile = userStore.userProfile
 	if (savedProfile) {
-		const profile = savedProfile
-		inputValue.value = profile[fieldType] || ''
+		/**
+		 * ! 现在全部改用pinia状态变量
+		 */
+		// const profile = savedProfile
+		inputValue.value = fieldMap[fieldType]
 	}
 
 	// // 自动聚焦输入框

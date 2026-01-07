@@ -43,7 +43,6 @@ onMounted(async () => {
 
 	// 初始化用户认证状态
 	const user = await userStore.initializeAuth()
-	console.log('🚀 ~ user:', user)
 	const settings = getStorage('backupSettings', {})
 	const isCloud = settings['cloudBackup']
 	console.log('🚀 ~ isCloud:', isCloud)

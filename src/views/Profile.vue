@@ -51,13 +51,13 @@ import { useRouter } from 'vue-router'
 import { Uploader as VanUploader } from 'vant'
 import 'vant/lib/uploader/style'
 import { message } from '@/utils/message'
-import { useUIStore } from '@/stores/ui'
+import { useUserStore } from '@/stores/user'
 import FormSection from '@/components/common/FormSection.vue'
 import BackNavBar from '@/components/common/BackNavBar.vue'
 import { getStorage, setStorage } from '@/utils/storage'
 
 const router = useRouter()
-const uiStore = useUIStore()
+const userStore = useUserStore()
 
 // 文件列表
 const fileList = ref([])
@@ -133,7 +133,7 @@ const afterRead = file => {
 	setStorage('userProfile', profile)
 
 	// 更新 store 中的头像
-	uiStore.updateUserAvatar(profile.avatar)
+	userStore.updateUserAvatar(profile.avatar)
 
 	// 清空文件列表，允许重复上传，避免直接显示预览图bug（不想显示预览图，fileList必须为空）
 	fileList.value = []
@@ -148,15 +148,22 @@ const onOversize = () => {
 
 // 加载用户数据
 const loadUserProfile = () => {
-	let savedProfile = getStorage('userProfile', {})
-	// ? 处理可能存在的双重序列化问题
-	// savedProfile = safeParse(savedProfile,{})
-	if (savedProfile && typeof savedProfile === 'object') {
-		avatarUrl.value = savedProfile.avatar || ''
-		formData.username = savedProfile.username || ''
-		formData.email = savedProfile.email || ''
-		formData.phone = savedProfile.phone || ''
-	}
+	/**
+	 * ? 本地舍弃，改成云
+	 */
+	// let savedProfile = getStorage('userProfile', {})
+	// // ? 处理可能存在的双重序列化问题
+	// // savedProfile = safeParse(savedProfile,{})
+	// if (savedProfile && typeof savedProfile === 'object') {
+	// 	avatarUrl.value = savedProfile.avatar || ''
+	// 	formData.username = savedProfile.username || ''
+	// 	formData.email = savedProfile.email || ''
+	// 	formData.phone = savedProfile.phone || ''
+	// }
+	avatarUrl.value = userStore.userAvatar
+	formData.username = userStore.userName
+	formData.email = userStore.userEmail
+	formData.phone = userStore.userPhone
 }
 
 // 初始化时加载数据
