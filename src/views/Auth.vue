@@ -142,6 +142,7 @@ const isLoading = ref(false)
 
 // 切换登录/注册模式
 const toggleMode = () => {
+	resetFormData()
 	if (isLogin.value) {
 		router.push('/register')
 	} else {
@@ -159,7 +160,6 @@ const handleSubmit = async () => {
 				email: formData.email,
 				password: formData.password
 			})
-			resetFormData()
 			if (userInfo?.session?.access_token) {
 				router.push('/')
 				message.success('登录成功')

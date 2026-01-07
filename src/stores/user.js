@@ -6,32 +6,32 @@ import { signUp, signIn, logout, getCurrentUser } from '@/service/user'
 export const useUserStore = defineStore('user', {
 	state: () => {
 		// 在初始化时从 localStorage 加载用户数据
-		const savedUser = getStorage('currentUser', null)
+		const savedUser = getStorage('userProfile', null)
 
 		return {
-			currentUser: savedUser,
+			userProfile: savedUser,
 			isAuthenticated: !!savedUser
 		}
 	},
 
 	getters: {
 		// 获取当前用户信息
-		userInfo: state => state.currentUser,
+		userInfo: state => state.userProfile,
 
 		// 检查是否已登录
 		isLoggedIn: state => state.isAuthenticated,
 
 		// 获取用户头像
-		userAvatar: state => state.currentUser?.user_metadata?.avatar || '',
+		userAvatar: state => state.userProfile?.user_metadata?.avatar || '',
 
 		// 获取用户名
-		userName: state => state.currentUser?.user_metadata?.username || state.currentUser?.email?.split('@')[0] || '游客',
+		userName: state => state.userProfile?.user_metadata?.username || state.userProfile?.email?.split('@')[0] || '游客',
 
 		// 获取用户ID
-		userId: state => state.currentUser?.id || '',
+		userId: state => state.userProfile?.id || '',
 
 		// 获取用户邮箱
-		userEmail: state => state.currentUser?.email || ''
+		userEmail: state => state.userProfile?.email || ''
 	},
 
 	actions: {
@@ -39,17 +39,17 @@ export const useUserStore = defineStore('user', {
 		async initializeAuth() {
 			try {
 				// 先检查本地是否有用户信息
-				if (this.currentUser) {
+				if (this.userProfile) {
 					this.isAuthenticated = true
-					return this.currentUser
+					return this.userProfile
 				}
 
 				// 尝试从supabase获取当前用户
 				const user = await getCurrentUser()
 				if (user) {
-					this.currentUser = user
+					this.userProfile = user
 					this.isAuthenticated = true
-					setStorage('currentUser', user)
+					setStorage('userProfile', user)
 				}
 				return user
 			} catch (error) {
@@ -66,9 +66,9 @@ export const useUserStore = defineStore('user', {
 
 				// 存储用户元数据（包含username）
 				if (user) {
-					this.currentUser = user
+					this.userProfile = user
 					// this.isAuthenticated = true
-					// setStorage('currentUser', user)
+					// setStorage('userProfile', user)
 				}
 
 				return user
@@ -84,9 +84,9 @@ export const useUserStore = defineStore('user', {
 				const user = await signIn({ email, password })
 
 				// 设置当前用户
-				this.currentUser = user
+				this.userProfile = user
 				this.isAuthenticated = true
-				setStorage('currentUser', user)
+				setStorage('userProfile', user)
 
 				return user
 			} catch (error) {
@@ -103,33 +103,33 @@ export const useUserStore = defineStore('user', {
 				console.error('退出登录失败:', error)
 			} finally {
 				// 清除本地状态
-				this.currentUser = null
+				this.userProfile = null
 				this.isAuthenticated = false
-				removeStorage('currentUser')
+				removeStorage('userProfile')
 				router.push('/welcome')
 			}
 		},
 
 		// 更新用户信息（Supabase需要通过updateUser方法更新user_metadata）
 		async updateProfile(data) {
-			if (!this.currentUser) {
+			if (!this.userProfile) {
 				throw new Error('未登录')
 			}
 
 			try {
 				// 更新本地状态
-				this.currentUser = {
-					...this.currentUser,
+				this.userProfile = {
+					...this.userProfile,
 					user_metadata: {
-						...this.currentUser.user_metadata,
+						...this.userProfile.user_metadata,
 						...data
 					}
 				}
 
 				// 保存到localStorage
-				setStorage('currentUser', this.currentUser)
+				setStorage('userProfile', this.userProfile)
 
-				return this.currentUser
+				return this.userProfile
 			} catch (error) {
 				console.error('更新用户信息失败:', error)
 				throw error
@@ -150,7 +150,7 @@ export const useUserStore = defineStore('user', {
 
 		// 删除账户（需要通过supabase的admin API）
 		async deleteAccount() {
-			if (!this.currentUser) return
+			if (!this.userProfile) return
 
 			// 先登出
 			await this.logout()
