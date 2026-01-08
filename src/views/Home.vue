@@ -38,8 +38,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRecordsStore } from '@/stores/records'
+import { useUserStore } from '@/stores/user'
 import { useUIStore } from '@/stores/ui'
 import Header from '@/components/layout/Header.vue'
 import BalanceCard from '@/components/features/BalanceCard.vue'
@@ -48,11 +49,23 @@ import QuickActions from '@/components/features/QuickActions.vue'
 import TransactionItem from '@/components/features/TransactionItem.vue'
 
 const recordsStore = useRecordsStore()
+const userStore = useUserStore()
 const uiStore = useUIStore()
 
-const recentRecords = computed(() => recordsStore.recentRecords.slice(0, 30))
+const recentRecords = computed(() => recordsStore.records.slice(0, 30))
 
-const hasMoreRecords = computed(() => recordsStore.recentRecords.length > 30)
+const hasMoreRecords = computed(() => recordsStore.records.length > 30)
+
+// 加载最近记录
+onMounted(async () => {
+	if (userStore.userId) {
+		try {
+			await recordsStore.fetchRecentRecords(userStore.userId, 30)
+		} catch (error) {
+			console.error('加载记录失败:', error)
+		}
+	}
+})
 
 function handleQuickAction(action) {
 	uiStore.openModal(action.type, action.category)

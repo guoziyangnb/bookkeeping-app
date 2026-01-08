@@ -60,13 +60,15 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRecordsStore } from '@/stores/records'
+import { useUserStore } from '@/stores/user'
 import { generateCalendar, formatToLocalISODate } from '@/utils/date'
 import Header from '@/components/layout/Header.vue'
 import TransactionItem from '@/components/features/TransactionItem.vue'
 
 const recordsStore = useRecordsStore()
+const userStore = useUserStore()
 
 const currentYear = ref(new Date().getFullYear())
 const currentMonth = ref(new Date().getMonth())
@@ -92,8 +94,7 @@ const calendar = computed(() => {
 	const cal = generateCalendar(currentYear.value, currentMonth.value)
 
 	// 标记有记录的日期
-	const monthlyRecords = recordsStore.getMonthlyRecords(currentYear.value, currentMonth.value)
-	const datesWithRecords = new Set(monthlyRecords.map(r => formatToLocalISODate(r.date)))
+	const datesWithRecords = new Set(recordsStore.records.map(r => formatToLocalISODate(r.date)))
 
 	return cal.map(cell => {
 		if (cell.type === 'day') {
@@ -110,7 +111,28 @@ const calendar = computed(() => {
 
 // 获取选中日期的记录
 const selectedDateRecords = computed(() => {
-	return recordsStore.getRecordsByDate(selectedDate.value)
+	return recordsStore.records.filter(r => formatToLocalISODate(r.date) === selectedDate.value)
+})
+
+// 加载月度数据
+async function loadMonthlyData() {
+	if (userStore.userId) {
+		try {
+			await recordsStore.fetchMonthlyRecords(userStore.userId, currentYear.value, currentMonth.value)
+		} catch (error) {
+			console.error('加载月度记录失败:', error)
+		}
+	}
+}
+
+// 监听月份变化
+watch([currentYear, currentMonth], () => {
+	loadMonthlyData()
+})
+
+// 初始化加载数据
+onMounted(() => {
+	loadMonthlyData()
 })
 
 // 上个月

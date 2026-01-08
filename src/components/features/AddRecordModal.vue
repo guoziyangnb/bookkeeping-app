@@ -68,6 +68,7 @@
 <script setup>
 import { ref, reactive, computed, watch, nextTick } from 'vue'
 import { useUIStore } from '@/stores/ui'
+import { useUserStore } from '@/stores/user'
 import { useRecordsStore } from '@/stores/records'
 import DatePicker from '@/components/common/DatePicker.vue'
 import ImageUpload from '@/components/common/ImageUpload.vue'
@@ -75,6 +76,7 @@ import { formatToLocalISODate } from '@/utils/date'
 import { message } from '@/utils/message'
 
 const uiStore = useUIStore()
+const userStore = useUserStore()
 const recordsStore = useRecordsStore()
 const amountInput = ref(null)
 
@@ -197,45 +199,57 @@ function selectCategory(categoryName) {
 	formData.category = categoryName
 }
 
-function handleSubmit() {
+async function handleSubmit() {
 	if (!formData.amount || formData.amount <= 0) {
-		// alert('请输入有效金额')
 		message.warning('请输入有效金额')
 		return
 	}
 
-	if (isEditMode.value) {
-		// 编辑模式：更新记录，保留原有时间
-		const originalTime = uiStore.editingRecord.date.split('T')[1]
-		recordsStore.updateRecord(uiStore.editingRecord.id, {
-			type: formData.type,
-			amount: formData.amount,
-			category: formData.category,
-			note: formData.note,
-			date: `${formData.date}T${originalTime}`,
-			image: formData.image
-		})
-	} else {
-		// 添加模式：创建新记录，使用用户选择的日期
-		recordsStore.addRecord({
-			type: formData.type,
-			amount: formData.amount,
-			category: formData.category,
-			note: formData.note,
-			date: `${formData.date}T${new Date().toISOString().split('T')[1]}`,
-			image: formData.image
-		})
-	}
+	try {
+		if (isEditMode.value) {
+			// 编辑模式：更新记录，保留原有时间
+			const originalTime = uiStore.editingRecord.date.split('T')[1]
+			await recordsStore.updateRecord(uiStore.editingRecord.id, {
+				type: formData.type,
+				amount: formData.amount,
+				category: formData.category,
+				note: formData.note,
+				date: `${formData.date}T${originalTime}`,
+				image_url: formData.image
+			})
+			message.success('记录更新成功')
+		} else {
+			// 添加模式：创建新记录，使用用户选择的日期
+			await recordsStore.addRecord(userStore.userId, {
+				type: formData.type,
+				amount: formData.amount,
+				category: formData.category,
+				note: formData.note,
+				date: `${formData.date}T${new Date().toISOString().split('T')[1]}`,
+				image_url: formData.image
+			})
+			message.success('记录添加成功')
+		}
 
-	uiStore.closeModal()
+		uiStore.closeModal()
+	} catch (error) {
+		message.error('操作失败: ' + error.message)
+		console.error('提交记录失败:', error)
+	}
 }
 
 // 删除记录
-function handleDelete() {
+async function handleDelete() {
 	if (isEditMode.value) {
 		if (confirm('确定要删除这条记录吗？')) {
-			recordsStore.deleteRecord(uiStore.editingRecord.id)
-			uiStore.closeModal()
+			try {
+				await recordsStore.deleteRecord(uiStore.editingRecord.id)
+				message.success('记录删除成功')
+				uiStore.closeModal()
+			} catch (error) {
+				message.error('删除失败: ' + error.message)
+				console.error('删除记录失败:', error)
+			}
 		}
 	}
 }

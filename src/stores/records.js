@@ -1,21 +1,22 @@
 import { defineStore } from 'pinia'
-import { getStorage, setStorage } from '@/utils/storage'
 import { formatAmount } from '@/utils/format'
 import { formatToLocalISODate } from '@/utils/date'
+import * as recordsApi from '@/service/records'
 
 export const useRecordsStore = defineStore('records', {
 	state: () => {
-		// 在初始化时从 localStorage 加载数据
-		const savedRecords = getStorage('records', [])
-		const savedIdCounter = getStorage('idCounter', Date.now())
-
 		return {
-			records: savedRecords,
+			// 临时缓存，从 Supabase 获取的数据
+			records: [],
+			// 分类配置
 			categories: {
 				expense: ['餐饮', '交通', '购物', '娱乐', '医疗', '其他'],
 				income: ['工资', '投资', '礼金', '其他']
 			},
-			idCounter: savedIdCounter
+			// 加载状态
+			loading: false,
+			// 错误信息
+			error: null
 		}
 	},
 
@@ -96,82 +97,208 @@ export const useRecordsStore = defineStore('records', {
 	},
 
 	actions: {
-		// 添加记录
-		addRecord(record) {
-			this.idCounter++
-			const newRecord = {
-				...record,
-				id: this.idCounter.toString(),
-				amount: record.type === 'expense' ? -Math.abs(record.amount) : Math.abs(record.amount),
-				createdAt: new Date().toISOString(),
-				image: record.image || ''
+		// ==========================================
+		// 数据获取方法（从 Supabase）
+		// ==========================================
+
+		/**
+		 * 获取用户所有记录并缓存到本地
+		 * @param {string} userId - 用户ID
+		 * @param {Object} options - 查询选项
+		 */
+		async fetchRecords(userId, options = {}) {
+			try {
+				this.loading = true
+				this.error = null
+				this.records = await recordsApi.getRecords(userId, options)
+			} catch (error) {
+				this.error = error.message
+				throw error
+			} finally {
+				this.loading = false
 			}
-			this.records.push(newRecord)
-			this.saveToStorage()
-			return newRecord
 		},
 
-		// 删除记录
-		deleteRecord(id) {
-			const index = this.records.findIndex(r => r.id === id)
-			if (index !== -1) {
-				this.records.splice(index, 1)
-				this.saveToStorage()
-				return true
+		/**
+		 * 获取指定日期的记录
+		 * @param {string} userId - 用户ID
+		 * @param {string} date - 日期
+		 */
+		async fetchRecordsByDate(userId, date) {
+			try {
+				this.loading = true
+				this.error = null
+				this.records = await recordsApi.getRecordsByDate(userId, date)
+			} catch (error) {
+				this.error = error.message
+				throw error
+			} finally {
+				this.loading = false
 			}
-			return false
 		},
 
-		// 更新记录
-		updateRecord(id, data) {
-			const index = this.records.findIndex(r => r.id === id)
-			if (index !== -1) {
-				const record = this.records[index]
-				const updatedRecord = {
-					...record,
-					...data,
-					amount: data.type === 'expense' ? -Math.abs(data.amount || record.amount) : Math.abs(data.amount || record.amount),
-					image: data.image !== undefined ? data.image : record.image
+		/**
+		 * 获取日期范围内的记录
+		 * @param {string} userId - 用户ID
+		 * @param {string} startDate - 开始日期
+		 * @param {string} endDate - 结束日期
+		 */
+		async fetchRecordsByDateRange(userId, startDate, endDate) {
+			try {
+				this.loading = true
+				this.error = null
+				this.records = await recordsApi.getRecordsByDateRange(userId, startDate, endDate)
+			} catch (error) {
+				this.error = error.message
+				throw error
+			} finally {
+				this.loading = false
+			}
+		},
+
+		/**
+		 * 获取月度记录
+		 * @param {string} userId - 用户ID
+		 * @param {number} year - 年份
+		 * @param {number} month - 月份
+		 */
+		async fetchMonthlyRecords(userId, year, month) {
+			try {
+				this.loading = true
+				this.error = null
+				this.records = await recordsApi.getMonthlyRecords(userId, year, month)
+			} catch (error) {
+				this.error = error.message
+				throw error
+			} finally {
+				this.loading = false
+			}
+		},
+
+		/**
+		 * 获取本周记录
+		 * @param {string} userId - 用户ID
+		 */
+		async fetchThisWeekRecords(userId) {
+			try {
+				this.loading = true
+				this.error = null
+				this.records = await recordsApi.getThisWeekRecords(userId)
+			} catch (error) {
+				this.error = error.message
+				throw error
+			} finally {
+				this.loading = false
+			}
+		},
+
+		/**
+		 * 获取最近的记录
+		 * @param {string} userId - 用户ID
+		 * @param {number} limit - 返回数量
+		 */
+		async fetchRecentRecords(userId, limit = 20) {
+			try {
+				this.loading = true
+				this.error = null
+				this.records = await recordsApi.getRecentRecords(userId, limit)
+			} catch (error) {
+				this.error = error.message
+				throw error
+			} finally {
+				this.loading = false
+			}
+		},
+
+		// ==========================================
+		// CRUD 操作（调用 Supabase API）
+		// ==========================================
+
+		/**
+		 * 添加记录
+		 * @param {string} userId - 用户ID
+		 * @param {Object} record - 记录对象
+		 * @returns {Promise<Object>} 新创建的记录
+		 */
+		async addRecord(userId, record) {
+			try {
+				this.error = null
+				const newRecord = await recordsApi.addRecord({ ...record, user_id: userId })
+				// 添加到本地缓存
+				this.records.unshift(newRecord)
+				return newRecord
+			} catch (error) {
+				this.error = error.message
+				throw error
+			}
+		},
+
+		/**
+		 * 删除记录
+		 * @param {string} id - 记录ID
+		 * @returns {Promise<boolean>}
+		 */
+		async deleteRecord(id) {
+			try {
+				this.error = null
+				await recordsApi.deleteRecord(id)
+				// 从本地缓存移除
+				const index = this.records.findIndex(r => r.id === id)
+				if (index !== -1) {
+					this.records.splice(index, 1)
 				}
-				this.records[index] = updatedRecord
-				this.saveToStorage()
-				return updatedRecord
+				return true
+			} catch (error) {
+				this.error = error.message
+				throw error
 			}
-			return null
 		},
 
-		// 从localStorage加载
-		loadFromStorage() {
-			const data = getStorage('records', [])
-			this.records = data
+		/**
+		 * 更新记录
+		 * @param {string} id - 记录ID
+		 * @param {Object} data - 更新数据
+		 * @returns {Promise<Object>}
+		 */
+		async updateRecord(id, data) {
+			try {
+				this.error = null
+				const updatedRecord = await recordsApi.updateRecord(id, data)
+				// 更新本地缓存
+				const index = this.records.findIndex(r => r.id === id)
+				if (index !== -1) {
+					this.records[index] = updatedRecord
+				}
+				return updatedRecord
+			} catch (error) {
+				this.error = error.message
+				throw error
+			}
 		},
 
-		// 保存到localStorage
-		saveToStorage() {
-			setStorage('records', this.records)
-			setStorage('idCounter', this.idCounter)
+		// ==========================================
+		// 辅助方法
+		// ==========================================
+
+		/**
+		 * 清空本地缓存
+		 */
+		clearCache() {
+			this.records = []
+			this.error = null
 		},
 
-		// 获取指定日期的记录
-		getRecordsByDate(date) {
-			const dateStr = formatToLocalISODate(date)
-			return this.records.filter(r => formatToLocalISODate(r.date) === dateStr)
-		},
-
-		// 获取日期范围内的记录
-		getRecordsByDateRange(startDate, endDate) {
-			return this.records.filter(r => {
-				const recordDate = new Date(r.date)
-				return recordDate >= new Date(startDate) && recordDate <= new Date(endDate)
-			})
-		},
-
-		// 获取月度记录
-		getMonthlyRecords(year, month) {
-			return this.records.filter(r => {
-				const date = new Date(r.date)
-				return date.getFullYear() === year && date.getMonth() === month
-			})
+		/**
+		 * 获取统计概览
+		 * @param {string} userId - 用户ID
+		 */
+		async fetchStats(userId) {
+			try {
+				return await recordsApi.getRecordsStats(userId)
+			} catch (error) {
+				this.error = error.message
+				throw error
+			}
 		}
 	}
 })

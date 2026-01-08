@@ -154,12 +154,12 @@ const handleClearData = () => {
 	})
 		.then(() => {
 			clearStorage()
-			recordsStore.records = []
+			recordsStore.clearCache()
 			message.success('数据已清除')
 		})
 		.catch(e => {
 			console.log('数据清除失败', e)
-			// message.error('数据清除失败', e)
+			message.error('数据清除失败', e)
 		})
 }
 </script>
