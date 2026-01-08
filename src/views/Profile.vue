@@ -249,6 +249,61 @@ onMounted(() => {
 	display: block;
 }
 
+.my-upload {
+	width: 160px;
+	height: 160px;
+	border-radius: 50%;
+	border: 3px solid var(--accent-orange);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	background: var(--bg-glass);
+	cursor: pointer;
+	transition: all 0.3s ease;
+	position: relative;
+	overflow: hidden;
+}
+
+.my-upload:hover {
+	border-color: var(--accent-orange);
+	transform: scale(1.05);
+	box-shadow: 0 8px 24px rgba(255, 138, 91, 0.3);
+}
+
+.my-upload svg {
+	width: 48px;
+	height: 48px;
+	fill: var(--accent-orange);
+	opacity: 0.6;
+}
+
+.my-upload div {
+	font-size: 14px;
+	color: var(--accent-orange);
+	margin-top: 8px;
+	font-weight: 500;
+}
+
+/* 覆盖 vant uploader 的预览图样式 */
+.avatar-uploader :deep(.van-uploader__preview-image) {
+	width: 160px;
+	height: 160px;
+	border-radius: 50%;
+	border: 3px solid var(--accent-orange);
+	object-fit: cover;
+}
+
+.avatar-uploader :deep(.van-uploader__preview) {
+	margin: 0;
+	border-radius: 50%;
+	overflow: hidden;
+}
+
+.avatar-uploader :deep(.van-uploader__mask) {
+	border-radius: 50%;
+}
+
 .avatar-image {
 	width: 100%;
 	height: 100%;
