@@ -127,3 +127,26 @@ export function formatToLocalISODate(date) {
 export function localDateToISO(dateStr) {
 	return new Date(dateStr + 'T00:00:00').toISOString()
 }
+
+/**
+ * 生成当前本地时间的ISO字符串（保留本地时区信息）
+ * @returns {string} 本地时间的ISO字符串
+ */
+export function getLocalISOTime() {
+	const now = new Date()
+	const year = now.getFullYear()
+	const month = String(now.getMonth() + 1).padStart(2, '0')
+	const day = String(now.getDate()).padStart(2, '0')
+	const hours = String(now.getHours()).padStart(2, '0')
+	const minutes = String(now.getMinutes()).padStart(2, '0')
+	const seconds = String(now.getSeconds()).padStart(2, '0')
+	const milliseconds = String(now.getMilliseconds()).padStart(3, '0')
+
+	// 获取时区偏移（分钟），转换为小时和分钟
+	const offset = -now.getTimezoneOffset()
+	const offsetHours = Math.abs(Math.floor(offset / 60)).toString().padStart(2, '0')
+	const offsetMinutes = Math.abs(offset % 60).toString().padStart(2, '0')
+	const offsetSign = offset >= 0 ? '+' : '-'
+
+	return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}${offsetSign}${offsetHours}:${offsetMinutes}`
+}

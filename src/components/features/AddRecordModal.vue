@@ -224,13 +224,17 @@ async function handleSubmit() {
 			})
 			message.success('记录更新成功')
 		} else {
-			// 添加模式：创建新记录，使用用户选择的日期
+			// 添加模式：创建新记录，使用用户选择的日期和当前时间
+			const now = new Date()
+			const dateTime = new Date(formData.date)
+			dateTime.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds())
+
 			await recordsStore.addRecord(userStore.userId, {
 				type: formData.type,
 				amount: formData.amount,
 				category: formData.category,
 				note: formData.note,
-				date: `${formData.date}T${new Date().toISOString().split('T')[1]}`,
+				date: dateTime.toISOString(),
 				image_url: formData.image
 			})
 			message.success('记录添加成功')
