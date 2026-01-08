@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import { formatAmount } from '@/utils/format'
 import { formatToLocalISODate } from '@/utils/date'
 import * as recordsApi from '@/service/records'
 

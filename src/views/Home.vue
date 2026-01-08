@@ -35,10 +35,11 @@
 			</div>
 		</div>
 	</div>
+	<Overlay :show="isLoading" />
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRecordsStore } from '@/stores/records'
 import { useUserStore } from '@/stores/user'
 import { useUIStore } from '@/stores/ui'
@@ -47,10 +48,12 @@ import BalanceCard from '@/components/features/BalanceCard.vue'
 import LineChart from '@/components/features/LineChart.vue'
 import QuickActions from '@/components/features/QuickActions.vue'
 import TransactionItem from '@/components/features/TransactionItem.vue'
+import Overlay from '@/components/common/Overlay.vue'
 
 const recordsStore = useRecordsStore()
 const userStore = useUserStore()
 const uiStore = useUIStore()
+const isLoading = ref(false)
 
 const recentRecords = computed(() => recordsStore.records.slice(0, 30))
 
@@ -59,11 +62,14 @@ const hasMoreRecords = computed(() => recordsStore.records.length > 30)
 // 加载最近记录
 onMounted(async () => {
 	if (userStore.userId) {
+		isLoading.value = true
 		try {
 			await recordsStore.fetchRecentRecords(userStore.userId, 30)
 		} catch (error) {
+			isLoading.value = false
 			console.error('加载记录失败:', error)
 		}
+		isLoading.value = false
 	}
 })
 
