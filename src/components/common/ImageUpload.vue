@@ -32,7 +32,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { Uploader as VanUploader, Button as VanButton, showLoadingToast, showSuccessToast, showFailToast } from 'vant'
 import 'vant/lib/uploader/style'
 import 'vant/lib/button/style'
@@ -54,7 +54,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
-const fileList = ref([])
+const fileList = computed(() => (props.modelValue ? [{ url: props.modelValue, isImage: true }] : []))
 const uploaderRef = ref(null)
 
 // 图片上传前校验
