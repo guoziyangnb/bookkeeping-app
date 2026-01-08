@@ -23,15 +23,6 @@
 			</template>
 		</van-uploader>
 
-		<!-- 上传按钮 -->
-		<!-- <div v-if="!modelValue" class="upload-button" @click="triggerUpload">
-			<svg viewBox="0 0 24 24">
-				<path
-					d="M19 3H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.96-2.36L6.5 17h11l-3.54-4.71z" />
-			</svg>
-			<span>添加图片</span>
-		</div> -->
-
 		<!-- 删除按钮（当有图片时显示） -->
 		<div v-if="modelValue" class="image-preview-wrapper">
 			<van-button type="warning" size="small" icon="delete" class="delete-image-btn" @click.stop="handleDeleteImage"> </van-button>
@@ -41,7 +32,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { Uploader as VanUploader, Button as VanButton } from 'vant'
 import 'vant/lib/uploader/style'
 import 'vant/lib/button/style'
@@ -64,22 +55,6 @@ const emit = defineEmits(['update:modelValue'])
 
 const fileList = ref([])
 const uploaderRef = ref(null)
-
-// 监听 modelValue 变化，同步更新 fileList
-watch(
-	() => props.modelValue,
-	newVal => {
-		if (newVal && fileList.value.length === 0) {
-			fileList.value.push({
-				url: newVal,
-				isImage: true
-			})
-		} else if (!newVal && fileList.value.length > 0) {
-			fileList.value = []
-		}
-	},
-	{ immediate: true }
-)
 
 // 图片上传前校验
 const beforeImageRead = file => {
@@ -151,21 +126,6 @@ const handleDeleteImage = () => {
 	fileList.value = []
 	message.success('图片已删除')
 }
-
-// 触发文件选择
-// const triggerUpload = () => {
-// 	const inputElement = uploaderRef.value?.$el?.querySelector('input[type="file"]')
-// 	if (inputElement) {
-// 		inputElement.click()
-// 	}
-// }
-
-// 预览图片
-// const previewImage = () => {
-// 	// vant 的 ImagePreview 会自动处理
-// 	// 这里我们让点击预览图也可以重新上传
-// 	triggerUpload()
-// }
 </script>
 
 <style scoped>
@@ -176,11 +136,14 @@ const handleDeleteImage = () => {
 }
 
 .hidden-uploader {
-	position: absolute;
-	width: 0;
-	height: 0;
+	width: 100%;
+	height: 100%;
 	overflow: hidden;
-	opacity: 0;
+}
+
+.van-uploader :deep(.van-uploader__input-wrapper) {
+	width: 100%;
+	height: 100%;
 }
 
 .upload-button {
@@ -224,13 +187,6 @@ const handleDeleteImage = () => {
 	border-radius: 16px;
 	overflow: hidden;
 	cursor: pointer;
-}
-
-.preview-img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	border-radius: 16px;
 }
 
 .delete-image-btn {
