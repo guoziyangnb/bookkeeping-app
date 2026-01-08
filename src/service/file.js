@@ -73,3 +73,33 @@ export const createProduct = async createProduct => {
 	// 返回插入的产品数据
 	return data
 }
+
+/**
+ * 从 Supabase 存储桶中删除指定文件
+ *
+ * @param {string} file_path - 要删除的文件路径，包括文件名
+ * @returns {Promise<void>} 成功时返回 Promise，失败时抛出错误
+ * @throws {Error} 当删除操作失败时抛出包含错误信息的 Error 对象
+ *
+ * @example
+ * // 删除文件
+ * try {
+ *   await deleteFile('uploads/example.txt');
+ *   console.log('文件删除成功');
+ * } catch (error) {
+ *   console.error('删除失败:', error.message);
+ * }
+ */
+export const deleteFile = async file_path => {
+	// 替换为实际的路径
+	file_path = file_path.replace(`${supabaseUrl}/storage/v1/object/public/`, '')
+	const userStore = useUserStore()
+	const folder = userStore?.userId
+	if (folder) {
+		file_path = file_path.replace(folder + '/', '')
+	}
+	const { error } = await supabase.storage.from('gzynb').remove([file_path])
+	if (error) {
+		throw new Error(error.message)
+	}
+}
