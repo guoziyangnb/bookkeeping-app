@@ -1,8 +1,8 @@
 <template>
 	<div class="custom-overlay">
-		<van-overlay :show="show">
+		<van-overlay :show="show" duration="0.8">
 			<div class="wrapper">
-				<Vue3Lottie :animationData="AstronautJSON" :height="400" :width="400" />
+				<Vue3Lottie :animationData="AstronautJSON" :height="200" :width="200" />
 			</div>
 		</van-overlay>
 	</div>
