@@ -36,8 +36,11 @@
 				<p class="avatar-hint">点击上传头像，支持 JPG、PNG 格式，最大 5MB</p>
 			</div>
 
-			<!-- 表单区域 -->
+			<!-- 个人资料表单区域 -->
 			<FormSection :items="formItems" title="个人资料设置" @click="goToEdit" />
+
+			<!-- 退出登录区域 -->
+			<FormSection :items="loginOutItems" title="退出登录" @click="handleLogout" />
 		</div>
 	</div>
 </template>
@@ -92,6 +95,14 @@ const formItems = computed(() => [
 		label: '手机号码',
 		value: formData.phone,
 		field: 'phone'
+	}
+])
+// 退出登录配置
+const loginOutItems = computed(() => [
+	{
+		icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z',
+		label: '退出登录',
+		field: 'logout'
 	}
 ])
 
@@ -224,6 +235,47 @@ const compressImage = async file => {
 			}
 		})
 	})
+}
+
+// 退出登录
+const handleLogout = async () => {
+	try {
+		const result = await showConfirmDialog({
+			title: '退出登录',
+			message: '确定要退出登录吗？',
+			confirmButtonColor: '#ff8a5b',
+			cancelButtonColor: '#8a8a8a'
+		})
+		if (result) {
+			// 清空本地文件列表
+			fileList.value = []
+			avatarUrl.value = ''
+			const loadingToast = showLoadingToast({
+				message: '退出中...',
+				forbidClick: true
+			})
+
+			try {
+				// 2. 执行退出登录的异步操作
+				await userStore.logout()
+				// 3. 关闭加载提示
+				loadingToast.close()
+				// 4. 显示成功提示
+				showSuccessToast('退出登录成功')
+			} catch (updateError) {
+				// 5. 操作失败时关闭加载提示并显示错误
+				loadingToast.close()
+				console.error('退出登录失败:', updateError)
+				showFailToast('退出登录失败')
+			}
+		}
+	} catch (error) {
+		// 用户取消操作不显示错误提示
+		if (error !== 'cancel') {
+			console.error('退出登录失败:', error)
+			showFailToast('退出登录失败')
+		}
+	}
 }
 
 // 加载用户数据

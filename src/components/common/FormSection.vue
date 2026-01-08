@@ -16,7 +16,7 @@
 				<path :d="item.icon" />
 			</svg>
 			<span class="form-label-text">{{ item.label }}</span>
-			<span v-if="!item.switchable" class="form-value">{{ item.value || item.emptyText || '未设置' }}</span>
+			<span v-if="!item.switchable" class="form-value">{{ item.field != 'logout' ? item.value || item.emptyText || '未设置' : '' }}</span>
 			<van-switch
 				v-if="item.switchable"
 				:model-value="item.switchValue"
@@ -159,6 +159,7 @@ const handleSwitchChange = item => {
 
 /* 箭头图标 */
 .arrow-icon {
+	width: 16px;
 	font-size: 24px;
 	color: var(--text-tertiary);
 	font-weight: 300;
