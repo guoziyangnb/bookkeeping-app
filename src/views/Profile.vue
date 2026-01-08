@@ -16,24 +16,15 @@
 						@oversize="onOversize"
 						class="avatar-uploader"
 						:max-count="1"
-						:preview-full-image="false"
-						:show-upload="false"
-						accept=".jpg, .jpeg, .png">
-						<div class="avatar-circle" :class="{ 'has-image': avatarUrl }">
-							<img v-if="avatarUrl" :src="avatarUrl" class="avatar-image" alt="头像" />
-							<div v-else class="avatar-placeholder">
+						accept="image/*">
+						<template #default>
+							<div class="my-upload">
 								<svg class="avatar-icon" viewBox="0 0 24 24">
 									<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
 								</svg>
+								<div>点击上传</div>
 							</div>
-							<div class="avatar-edit-overlay">
-								<svg viewBox="0 0 24 24">
-									<path
-										d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
-								</svg>
-								<span>更换头像</span>
-							</div>
-						</div>
+						</template>
 					</van-uploader>
 				</div>
 				<p class="avatar-hint">点击上传头像，支持 JPG、PNG 格式，最大 5MB</p>
@@ -48,14 +39,15 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { Uploader as VanUploader } from 'vant'
+import { Uploader as VanUploader, Loading as VanLoading } from 'vant'
 import 'vant/lib/uploader/style'
+import 'vant/lib/loading/style'
 import { message } from '@/utils/message'
 import { useUserStore } from '@/stores/user'
 import FormSection from '@/components/common/FormSection.vue'
 import BackNavBar from '@/components/common/BackNavBar.vue'
-import { getStorage, setStorage } from '@/utils/storage'
 import { uploadFile } from '@/service/file'
+import Compressor from 'compressorjs'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -116,45 +108,66 @@ const beforeRead = file => {
 
 // 文件上传回调
 const afterRead = async file => {
-	// console.log('🚀 ~ afterRead ~ file:', file)
-	// 这里应该上传到服务器
+	// 如果是数组，取第一个文件
+	if (file instanceof Array) {
+		file = file[0]
+	}
+	file.status = 'uploading' // file.status 需要配合预览功能才能显示
 
-	// 暂时使用本地预览
-	// if (file instanceof Array) {
-	// 	file = file[0]
-	// }
-	fileList.value = [{ status: 'uploading', file: file.file, content: file.content }]
-	// file.status = 'uploading'
-
-	// 更新头像URL
-	// avatarUrl.value = file.content
 	try {
-		const result = await uploadFile(file.file)
+		// 1.压缩图片
+		const compressedFile = await compressImage(file.file)
+		if (!compressedFile) {
+			message.error('图片压缩失败')
+			file.status = 'failed'
+			throw new Error('图片压缩失败，未生成有效文件')
+		}
+
+		// 2.上传压缩后的文件
+		const result = await uploadFile(compressedFile)
 		avatarUrl.value = result
 
-		// 更新 store 中的头像
-		await userStore.updateAvatar({ avatar: avatarUrl.value })
-
-		// 清空文件列表，允许重复上传，避免直接显示预览图bug（不想显示预览图，fileList必须为空）
-		fileList.value = []
+		// 3.更新 store 中的头像（不等待，避免阻塞）
+		const avatarResult = await userStore.updateAvatar({ avatar: avatarUrl.value })
 		message.success('头像上传成功！')
-		file.status = 'done'
+		file.status = 'success'
+		file.data = result
+		fileList.value = []
 	} catch (error) {
 		file.status = 'failed'
 		console.log('🚀 ~ afterRead ~ error:', error)
+		message.error(`头像上传失败：${error.message}`)
 	}
-	// 保存到 localStorage
-	// let savedProfile = getStorage('userProfile', {})
-	// ? 处理可能存在的双重序列化问题
-	// savedProfile = safeParse(savedProfile,{})
-	// const profile = savedProfile && typeof savedProfile === 'object' ? savedProfile : {}
-	// profile.avatar = file.content
-	// setStorage('userProfile', profile)
 }
 
 // 文件过大
 const onOversize = () => {
 	message.error('图片大小不能超过 5MB')
+}
+
+// 压缩图片并将图片修正
+const compressImage = async file => {
+	if (!file) {
+		return
+	}
+	return new Promise((reslove, reject) => {
+		// compressorjs 默认开启 checkOrientation 选项
+		// 会将图片修正为正确方向
+		new Compressor(file, {
+			quality: 0.6, // 设置压缩质量，范围从 0 到 1，默认0.8
+			maxWidth: 800,
+			maxHeight: 800,
+			convertSize: 1000000, // 超过1MB的图片才转换格式
+			checkOrientation: true, // 启用 EXIF 方向修正
+			success(result) {
+				const compressedImage = new File([result], result.name, { type: result.type })
+				reslove(compressedImage)
+			},
+			error(err) {
+				reject(new Error(`图片压缩失败: ${err.message}`))
+			}
+		})
+	})
 }
 
 // 加载用户数据
@@ -163,14 +176,6 @@ const loadUserProfile = () => {
 	 * ? 本地舍弃，改成云
 	 */
 	// let savedProfile = getStorage('userProfile', {})
-	// // ? 处理可能存在的双重序列化问题
-	// // savedProfile = safeParse(savedProfile,{})
-	// if (savedProfile && typeof savedProfile === 'object') {
-	// 	avatarUrl.value = savedProfile.avatar || ''
-	// 	formData.username = savedProfile.username || ''
-	// 	formData.email = savedProfile.email || ''
-	// 	formData.phone = savedProfile.phone || ''
-	// }
 	avatarUrl.value = userStore.userAvatar
 	formData.username = userStore.userName
 	formData.email = userStore.userEmail
@@ -243,40 +248,6 @@ onMounted(() => {
 	display: block;
 }
 
-/* 隐藏 Vant Uploader 的默认预览 */
-.avatar-uploader :deep(.van-uploader__preview) {
-	display: none !important;
-}
-
-.avatar-uploader :deep(.van-uploader__preview-image) {
-	display: none !important;
-}
-
-.avatar-circle {
-	width: 120px;
-	height: 120px;
-	border-radius: var(--radius-full);
-	background: var(--bg-glass);
-	backdrop-filter: blur(20px);
-	-webkit-backdrop-filter: blur(20px);
-	border: 3px solid var(--bg-glass-border);
-	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-	position: relative;
-	overflow: hidden;
-	cursor: pointer;
-	transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.avatar-circle:hover {
-	transform: scale(1.05);
-	border-color: var(--accent-orange);
-	box-shadow: 0 12px 40px rgba(255, 138, 91, 0.3);
-}
-
-.avatar-circle.has-image {
-	border-color: var(--accent-orange);
-}
-
 .avatar-image {
 	width: 100%;
 	height: 100%;
@@ -314,10 +285,6 @@ onMounted(() => {
 	transition: opacity 0.3s ease;
 }
 
-.avatar-circle:hover .avatar-edit-overlay {
-	opacity: 1;
-}
-
 .avatar-edit-overlay svg {
 	width: 16px;
 	height: 16px;
@@ -339,11 +306,6 @@ onMounted(() => {
 
 /* ==================== 响应式设计 ==================== */
 @media (max-width: 480px) {
-	.avatar-circle {
-		width: 100px;
-		height: 100px;
-	}
-
 	.avatar-glow {
 		width: 120px;
 		height: 120px;

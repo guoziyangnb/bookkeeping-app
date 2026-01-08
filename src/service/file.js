@@ -14,37 +14,39 @@ const userStore = useUserStore()
  * @returns {string} 返回文件的签名URL路径，如果上传失败则返回空字符串
  */
 export const uploadFile = async fileData => {
+	if (!userStore.userId) {
+		throw new Error('用户未登录，无法上传文件')
+	}
+
 	// 检查参数有效性，如果fileData不存在或不是File实例，则返回空字符串
 	if (!fileData || !(fileData instanceof File)) {
 		return ''
 	}
 
-	// 获取用户ID作为存储文件夹的名称(配置了策略)
+	// 获取用户ID作为存储文件夹的名称
 	const folder = userStore.userId // 用户所在的文件夹 == 用户id
 	const rawName = fileData.name // 获取原始文件名，eg：上传的文件名时123.png,那么rawName就是123.png
 	// 获取文件名（不带扩展名），如果没有扩展名则使用原始文件名
 	const fileName = rawName.split(/[/\\]/).pop() ?? rawName
-	// console.log('🚀 ~ uploadFile ~ fileName:', fileName)
 
 	// 构建文件路径，移除所有斜杠和百分号字符
-	const file_path = folder ? `${folder}/${fileName}` : fileName
-
-	/**
-	 * ! folder参数因为我给gzynb这个存储桶设置——用户只能访问自己id的文件夹
-	 */
+	const file_path = `${folder}/${Date.now()}_${fileName}`
 	const { data, error } = await supabase.storage.from('gzynb').upload(file_path, fileData, {
-		cacheControl: '3600',
-		upsert: true
+		cacheControl: '3600', // 缓存多少秒
+		upsert: false // 覆盖同名文件
 	})
-	console.log('🚀 ~ uploadFile ~ data:', data)
-	if (data && !error) {
-		return `${supabaseUrl}/storage/v1/object/public/${data.fullPath}`
-	}
+
 	// 处理失败
 	if (error) {
+		console.error('文件上传失败：', error)
 		throw new Error(error.message)
 	}
-	return ''
+	if (!data) {
+		throw new Error('文件上传成功，但未返回文件路径')
+	}
+
+	const fileUrl = `${supabaseUrl}/storage/v1/object/public/${data.fullPath}`
+	return fileUrl
 }
 
 // 增
