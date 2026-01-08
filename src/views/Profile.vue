@@ -26,6 +26,12 @@
 							</div>
 						</template>
 					</van-uploader>
+					<!-- 自定义删除按钮 -->
+					<div v-if="fileList.length > 0" class="custom-delete-btn" @click="handleDeleteAvatar">
+						<svg viewBox="0 0 24 24">
+							<path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+						</svg>
+					</div>
 				</div>
 				<p class="avatar-hint">点击上传头像，支持 JPG、PNG 格式，最大 5MB</p>
 			</div>
@@ -39,9 +45,11 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { Uploader as VanUploader, Loading as VanLoading } from 'vant'
+import { Uploader as VanUploader, showConfirmDialog, showLoadingToast, showSuccessToast, showFailToast } from 'vant'
 import 'vant/lib/uploader/style'
 import 'vant/lib/loading/style'
+import 'vant/lib/dialog/style'
+import 'vant/lib/toast/style'
 import { message } from '@/utils/message'
 import { useUserStore } from '@/stores/user'
 import FormSection from '@/components/common/FormSection.vue'
@@ -104,6 +112,12 @@ const beforeRead = file => {
 		return false
 	}
 	return true
+	// image/*
+	// if (!file.type || !file.type.startsWith('image/')) {
+	// 	message.warning('只支持图片格式的文件')
+	// 	return false
+	// }
+	// return true
 }
 
 // 文件上传回调
@@ -135,6 +149,7 @@ const afterRead = async file => {
 		// fileList.value = []
 	} catch (error) {
 		file.status = 'failed'
+		fileList.value = []
 		console.log('🚀 ~ afterRead ~ error:', error)
 		message.error(`头像上传失败：${error.message}`)
 	}
@@ -143,6 +158,47 @@ const afterRead = async file => {
 // 文件过大
 const onOversize = () => {
 	message.error('图片大小不能超过 5MB')
+}
+
+// 删除头像
+const handleDeleteAvatar = async () => {
+	try {
+		const result = await showConfirmDialog({
+			title: '删除头像',
+			message: '确定要删除头像吗？',
+			confirmButtonColor: '#ff8a5b',
+			cancelButtonColor: '#8a8a8a'
+		})
+		if (result) {
+			// 清空本地文件列表
+			fileList.value = []
+			avatarUrl.value = ''
+			const loadingToast = showLoadingToast({
+				message: '删除中...',
+				forbidClick: true
+			})
+
+			try {
+				// 2. 执行删除头像的异步操作
+				await userStore.updateAvatar({ avatar: '' })
+				// 3. 关闭加载提示
+				loadingToast.close()
+				// 4. 显示成功提示
+				showSuccessToast('头像删除成功')
+			} catch (updateError) {
+				// 5. 操作失败时关闭加载提示并显示错误
+				loadingToast.close()
+				console.error('删除头像失败:', updateError)
+				showFailToast('删除头像失败')
+			}
+		}
+	} catch (error) {
+		// 用户取消操作不显示错误提示
+		if (error !== 'cancel') {
+			console.error('删除头像失败:', error)
+			showFailToast('删除头像失败')
+		}
+	}
 }
 
 // 压缩图片并将图片修正
@@ -217,6 +273,41 @@ onMounted(() => {
 .avatar-wrapper {
 	position: relative;
 	margin-bottom: 16px;
+	display: inline-block;
+}
+
+/* 自定义删除按钮 */
+.custom-delete-btn {
+	position: absolute;
+	bottom: 5px;
+	right: 5px;
+	width: 36px;
+	height: 36px;
+	background: var(--accent-orange);
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	z-index: 10;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+	transition: all 0.3s ease;
+	border: 2px solid var(--bg-glass);
+}
+
+.custom-delete-btn:hover {
+	transform: scale(1.1);
+	box-shadow: 0 4px 12px rgba(255, 138, 91, 0.4);
+}
+
+.custom-delete-btn:active {
+	transform: scale(0.95);
+}
+
+.custom-delete-btn svg {
+	width: 20px;
+	height: 20px;
+	fill: #fff;
 }
 
 .avatar-glow {
@@ -302,6 +393,11 @@ onMounted(() => {
 
 .avatar-uploader :deep(.van-uploader__mask) {
 	border-radius: 50%;
+}
+
+/* 隐藏 vant 自带的删除按钮 */
+.avatar-uploader :deep(.van-uploader__preview-delete) {
+	display: none;
 }
 
 .avatar-image {
