@@ -9,23 +9,31 @@
 			:max-size="maxSize * 1024 * 1024"
 			@oversize="handleImageOversize"
 			:max-count="1"
-			:preview-full-image="true"
 			accept=".jpg, .jpeg, .png"
 			class="hidden-uploader">
+			<template #default>
+				<!-- 上传按钮 -->
+				<div class="upload-button">
+					<svg viewBox="0 0 24 24">
+						<path
+							d="M19 3H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.96-2.36L6.5 17h11l-3.54-4.71z" />
+					</svg>
+					<span>添加图片</span>
+				</div>
+			</template>
 		</van-uploader>
 
 		<!-- 上传按钮 -->
-		<div v-if="!modelValue" class="upload-button" @click="triggerUpload">
+		<!-- <div v-if="!modelValue" class="upload-button" @click="triggerUpload">
 			<svg viewBox="0 0 24 24">
 				<path
 					d="M19 3H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.96-2.36L6.5 17h11l-3.54-4.71z" />
 			</svg>
 			<span>添加图片</span>
-		</div>
+		</div> -->
 
 		<!-- 删除按钮（当有图片时显示） -->
-		<div v-if="modelValue" class="image-preview-wrapper" @click="previewImage">
-			<img :src="modelValue" class="preview-img" alt="上传图片" />
+		<div v-if="modelValue" class="image-preview-wrapper">
 			<van-button type="warning" size="small" icon="delete" class="delete-image-btn" @click.stop="handleDeleteImage"> </van-button>
 		</div>
 	</div>
@@ -38,6 +46,8 @@ import { Uploader as VanUploader, Button as VanButton } from 'vant'
 import 'vant/lib/uploader/style'
 import 'vant/lib/button/style'
 import { message } from '@/utils/message'
+import { uploadFile } from '@/service/file'
+import Compressor from 'compressorjs'
 
 const props = defineProps({
 	modelValue: {
@@ -84,51 +94,49 @@ const beforeImageRead = file => {
 // 图片读取与压缩
 const handleImageRead = async file => {
 	if (file instanceof Array) file = file[0]
-
+	file.status = 'uploading'
 	try {
-		const compressedImage = await compressImage(file.file, 800, 0.8)
-		emit('update:modelValue', compressedImage)
-		fileList.value = [
-			{
-				url: compressedImage,
-				isImage: true
-			}
-		]
+		const compressedImage = await compressImage(file.file, 800, 0.6)
+		if (!compressedImage) {
+			message.error('图片压缩失败')
+			file.status = 'failed'
+			throw new Error('图片压缩失败，未生成有效文件')
+		}
+		const result = await uploadFile(compressedImage)
+		emit('update:modelValue', result)
+		file.status = 'success'
+		file.data = result
 		message.success('图片添加成功')
 	} catch (error) {
-		message.error('图片处理失败')
-		console.error(error)
+		file.status = 'failed'
+		fileList.value = []
+		console.error('图片上传失败:', error)
+		message.error(`图片上传失败：${error.message}`)
 	}
 }
 
 // 图片压缩函数
 const compressImage = (file, maxWidth, quality) => {
-	return new Promise((resolve, reject) => {
-		const reader = new FileReader()
-		reader.onload = e => {
-			const img = new Image()
-			img.onload = () => {
-				const canvas = document.createElement('canvas')
-				let width = img.width
-				let height = img.height
-
-				if (width > maxWidth) {
-					height = (maxWidth / width) * height
-					width = maxWidth
-				}
-
-				canvas.width = width
-				canvas.height = height
-				const ctx = canvas.getContext('2d')
-				ctx.drawImage(img, 0, 0, width, height)
-
-				resolve(canvas.toDataURL('image/jpeg', quality))
+	if (!file) {
+		return
+	}
+	return new Promise((reslove, reject) => {
+		// compressorjs 默认开启 checkOrientation 选项
+		// 会将图片修正为正确方向
+		new Compressor(file, {
+			quality: quality, // 设置压缩质量，范围从 0 到 1，默认0.8
+			maxWidth: maxWidth,
+			maxHeight: 800,
+			convertSize: 1000000, // 超过1MB的图片才转换格式
+			checkOrientation: true, // 启用 EXIF 方向修正
+			success(result) {
+				const compressedImage = new File([result], result.name, { type: result.type })
+				reslove(compressedImage)
+			},
+			error(err) {
+				reject(new Error(`图片压缩失败: ${err.message}`))
 			}
-			img.onerror = reject
-			img.src = e.target.result
-		}
-		reader.onerror = reject
-		reader.readAsDataURL(file)
+		})
 	})
 }
 
@@ -145,19 +153,19 @@ const handleDeleteImage = () => {
 }
 
 // 触发文件选择
-const triggerUpload = () => {
-	const inputElement = uploaderRef.value?.$el?.querySelector('input[type="file"]')
-	if (inputElement) {
-		inputElement.click()
-	}
-}
+// const triggerUpload = () => {
+// 	const inputElement = uploaderRef.value?.$el?.querySelector('input[type="file"]')
+// 	if (inputElement) {
+// 		inputElement.click()
+// 	}
+// }
 
 // 预览图片
-const previewImage = () => {
-	// vant 的 ImagePreview 会自动处理
-	// 这里我们让点击预览图也可以重新上传
-	triggerUpload()
-}
+// const previewImage = () => {
+// 	// vant 的 ImagePreview 会自动处理
+// 	// 这里我们让点击预览图也可以重新上传
+// 	triggerUpload()
+// }
 </script>
 
 <style scoped>

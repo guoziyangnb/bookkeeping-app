@@ -167,7 +167,7 @@ watch(
 				formData.amount = Math.abs(record.amount)
 				formData.note = record.note || ''
 				formData.date = record.date.split('T')[0]
-				formData.image = record.image || ''
+				formData.image = record.image_url || ''
 			} else {
 				// 添加模式：重置表单
 				formData.type = uiStore.modalType
