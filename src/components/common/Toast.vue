@@ -41,8 +41,8 @@ defineProps({
 	top: 80px;
 	left: 50%;
 	transform: translateX(-50%);
-	min-width: 200px;
-	max-width: 300px;
+	min-width: 240px;
+	max-width: 380px;
 	padding: 14px 20px;
 	border-radius: 16px;
 	display: flex;
@@ -102,8 +102,8 @@ defineProps({
 /* 移动端适配 */
 @media (max-width: 768px) {
 	.toast-container {
-		min-width: 160px;
-		max-width: calc(100vw - 40px);
+		min-width: 180px;
+		max-width: calc(100vw - 20px);
 		padding: 12px 16px;
 		font-size: 14px;
 	}
