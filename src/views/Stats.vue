@@ -55,14 +55,31 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRecordsStore } from '@/stores/records'
+import { useUserStore } from '@/stores/user'
 import Header from '@/components/layout/Header.vue'
 import PieChart from '@/components/features/PieChart.vue'
 import Overlay from '@/components/common/Overlay.vue'
+import { message } from '@/utils/message'
 
 const recordsStore = useRecordsStore()
+const userStore = useUserStore()
 const isLoading = computed(() => recordsStore.loading)
+
+// 加载当前月份的记录数据
+onMounted(async () => {
+	const now = new Date()
+	const year = now.getFullYear()
+	const month = now.getMonth() // 0-11
+
+	try {
+		await recordsStore.fetchMonthlyRecords(userStore.userId, year, month)
+	} catch (error) {
+		console.error('加载本月统计数据失败:', error)
+		message.error('加载记录失败', error.message)
+	}
+})
 
 // 总支出
 const totalExpense = computed(() => recordsStore.totalExpense)
