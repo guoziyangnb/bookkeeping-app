@@ -4,7 +4,7 @@
 			<div class="header-greeting">{{ greeting }}</div>
 			<div class="header-title">{{ title }}</div>
 		</div>
-		<div class="header-avatar" v-if="showAvatar">
+		<div class="header-avatar" v-if="showAvatar" @click="goToProfile()">
 			<img :src="userStore.userAvatar || defaultAvatar" alt="头像" />
 		</div>
 	</header>
@@ -13,6 +13,9 @@
 <script setup>
 import { computed } from 'vue'
 import { useUserStore } from '@/stores/user'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const userStore = useUserStore()
 
@@ -36,4 +39,8 @@ const greeting = computed(() => {
 	if (hour < 18) return '下午好'
 	return '晚上好'
 })
+
+const goToProfile = () => {
+	router.push('/settings/profile')
+}
 </script>
