@@ -92,12 +92,7 @@ export const createProduct = async createProduct => {
  */
 export const deleteFile = async file_path => {
 	// 替换为实际的路径
-	file_path = file_path.replace(`${supabaseUrl}/storage/v1/object/public/`, '')
-	const userStore = useUserStore()
-	const folder = userStore?.userId
-	if (folder) {
-		file_path = file_path.replace(folder + '/', '')
-	}
+	file_path = file_path.replace(`${supabaseUrl}/storage/v1/object/public/gzynb/`, '')
 	const { error } = await supabase.storage.from('gzynb').remove([file_path])
 	if (error) {
 		throw new Error(error.message)

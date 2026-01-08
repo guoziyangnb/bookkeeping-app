@@ -129,8 +129,6 @@ const handleImageOversize = () => {
 
 // 删除图片
 const handleDeleteImage = async () => {
-	emit('update:modelValue', '')
-	fileList.value = []
 	const loadingToast = showLoadingToast({
 		message: '删除中...',
 		forbidClick: true
@@ -138,7 +136,9 @@ const handleDeleteImage = async () => {
 
 	try {
 		// 2. 执行删除图片的异步操作
-		// await userStore.updateAvatar({ avatar: '' })
+		await deleteFile(fileList.value[0]['url'])
+		emit('update:modelValue', '')
+		fileList.value = []
 		// 3. 关闭加载提示
 		loadingToast.close()
 		// 4. 显示成功提示
