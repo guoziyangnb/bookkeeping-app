@@ -65,7 +65,7 @@ export function formatRelativeTime(date) {
 	} else if (days === 1) {
 		return `昨天 ${formatDate(date, 'time')}`
 	} else if (days < 7) {
-		return `${days}天前`
+		return `${Math.abs(days)}天前`
 	} else {
 		return formatDate(date, 'date')
 	}
