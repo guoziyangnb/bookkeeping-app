@@ -33,11 +33,12 @@
 
 <script setup>
 import { ref } from 'vue'
-import { Uploader as VanUploader, Button as VanButton } from 'vant'
+import { Uploader as VanUploader, Button as VanButton, showLoadingToast, showSuccessToast, showFailToast } from 'vant'
 import 'vant/lib/uploader/style'
 import 'vant/lib/button/style'
+import 'vant/lib/toast/style'
 import { message } from '@/utils/message'
-import { uploadFile } from '@/service/file'
+import { uploadFile, deleteFile } from '@/service/file'
 import Compressor from 'compressorjs'
 
 const props = defineProps({
@@ -81,6 +82,12 @@ const handleImageRead = async file => {
 		emit('update:modelValue', result)
 		file.status = 'success'
 		file.data = result
+		fileList.value = [
+			{
+				url: result,
+				isImage: true
+			}
+		]
 		message.success('图片添加成功')
 	} catch (error) {
 		file.status = 'failed'
@@ -121,10 +128,27 @@ const handleImageOversize = () => {
 }
 
 // 删除图片
-const handleDeleteImage = () => {
+const handleDeleteImage = async () => {
 	emit('update:modelValue', '')
 	fileList.value = []
-	message.success('图片已删除')
+	const loadingToast = showLoadingToast({
+		message: '删除中...',
+		forbidClick: true
+	})
+
+	try {
+		// 2. 执行删除图片的异步操作
+		// await userStore.updateAvatar({ avatar: '' })
+		// 3. 关闭加载提示
+		loadingToast.close()
+		// 4. 显示成功提示
+		showSuccessToast('图片已删除')
+	} catch (updateError) {
+		// 5. 操作失败时关闭加载提示并显示错误
+		loadingToast.close()
+		console.error('删除图片失败:', updateError)
+		showFailToast('删除图片失败')
+	}
 }
 </script>
 
@@ -138,7 +162,6 @@ const handleDeleteImage = () => {
 .hidden-uploader {
 	width: 100%;
 	height: 100%;
-	overflow: hidden;
 }
 
 .van-uploader :deep(.van-uploader__input-wrapper) {
@@ -161,7 +184,8 @@ const handleDeleteImage = () => {
 	transition: all 0.3s ease;
 }
 
-.upload-button:hover {
+/* 通过父容器触发 hover，因为 van-uploader 的 input 元素会覆盖 */
+.hidden-uploader:hover .upload-button {
 	background: rgba(0, 0, 0, 0.04);
 	border-color: var(--accent-orange);
 }
@@ -175,6 +199,30 @@ const handleDeleteImage = () => {
 .upload-button span {
 	font-size: 14px;
 	color: var(--text-secondary);
+}
+
+/* 覆盖 vant uploader 的预览图样式 */
+.hidden-uploader :deep(.van-uploader__preview-image) {
+	width: 120px;
+	height: 120px;
+	border-radius: 16px;
+	border: 2px solid var(--accent-orange);
+	object-fit: cover;
+}
+
+.hidden-uploader :deep(.van-uploader__preview) {
+	margin: 0;
+	border-radius: 16px;
+	overflow: hidden;
+}
+
+.hidden-uploader :deep(.van-uploader__mask) {
+	border-radius: 16px;
+}
+
+/* 隐藏 vant 自带的删除按钮 */
+.hidden-uploader :deep(.van-uploader__preview-delete) {
+	display: none;
 }
 
 .image-preview-wrapper {
