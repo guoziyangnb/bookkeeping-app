@@ -51,6 +51,7 @@
 			</div>
 		</div>
 	</div>
+	<Overlay :show="isLoading" />
 </template>
 
 <script setup>
@@ -58,8 +59,10 @@ import { computed } from 'vue'
 import { useRecordsStore } from '@/stores/records'
 import Header from '@/components/layout/Header.vue'
 import PieChart from '@/components/features/PieChart.vue'
+import Overlay from '@/components/common/Overlay.vue'
 
 const recordsStore = useRecordsStore()
+const isLoading = computed(() => recordsStore.loading)
 
 // 总支出
 const totalExpense = computed(() => recordsStore.totalExpense)

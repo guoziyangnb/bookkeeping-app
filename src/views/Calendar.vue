@@ -57,6 +57,7 @@
 			</div>
 		</div>
 	</div>
+	<Overlay :show="isLoading" />
 </template>
 
 <script setup>
@@ -66,9 +67,12 @@ import { useUserStore } from '@/stores/user'
 import { generateCalendar, formatToLocalISODate } from '@/utils/date'
 import Header from '@/components/layout/Header.vue'
 import TransactionItem from '@/components/features/TransactionItem.vue'
+import Overlay from '@/components/common/Overlay.vue'
+import { message } from '@/utils/message'
 
 const recordsStore = useRecordsStore()
 const userStore = useUserStore()
+const isLoading = computed(() => recordsStore.loading)
 
 const currentYear = ref(new Date().getFullYear())
 const currentMonth = ref(new Date().getMonth())
@@ -121,6 +125,7 @@ async function loadMonthlyData() {
 			await recordsStore.fetchMonthlyRecords(userStore.userId, currentYear.value, currentMonth.value)
 		} catch (error) {
 			console.error('加载月度记录失败:', error)
+			message.error('加载记录失败', error.message)
 		}
 	}
 }

@@ -221,6 +221,7 @@ export const useRecordsStore = defineStore('records', {
 		 */
 		async addRecord(userId, record) {
 			try {
+				this.loading = true
 				this.error = null
 				const newRecord = await recordsApi.addRecord({ ...record, user_id: userId })
 				// 添加到本地缓存
@@ -229,6 +230,8 @@ export const useRecordsStore = defineStore('records', {
 			} catch (error) {
 				this.error = error.message
 				throw error
+			} finally {
+				this.loading = false
 			}
 		},
 
@@ -239,6 +242,7 @@ export const useRecordsStore = defineStore('records', {
 		 */
 		async deleteRecord(id) {
 			try {
+				this.loading = true
 				this.error = null
 				await recordsApi.deleteRecord(id)
 				// 从本地缓存移除
@@ -250,6 +254,8 @@ export const useRecordsStore = defineStore('records', {
 			} catch (error) {
 				this.error = error.message
 				throw error
+			} finally {
+				this.loading = false
 			}
 		},
 
@@ -261,6 +267,7 @@ export const useRecordsStore = defineStore('records', {
 		 */
 		async updateRecord(id, data) {
 			try {
+				this.loading = true
 				this.error = null
 				const updatedRecord = await recordsApi.updateRecord(id, data)
 				// 更新本地缓存
@@ -272,6 +279,8 @@ export const useRecordsStore = defineStore('records', {
 			} catch (error) {
 				this.error = error.message
 				throw error
+			} finally {
+				this.loading = false
 			}
 		},
 
@@ -293,10 +302,13 @@ export const useRecordsStore = defineStore('records', {
 		 */
 		async fetchStats(userId) {
 			try {
+				this.loading = true
 				return await recordsApi.getRecordsStats(userId)
 			} catch (error) {
 				this.error = error.message
 				throw error
+			} finally {
+				this.loading = false
 			}
 		}
 	}
