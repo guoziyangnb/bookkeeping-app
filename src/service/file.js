@@ -5,8 +5,6 @@ import supabase from '.'
 import { supabaseUrl } from './index'
 import { useUserStore } from '@/stores/user'
 
-const userStore = useUserStore()
-
 // 上传头像(上传文件也走这个接口) —— 反正基本上都是上传图片
 /**
  * 上传文件到Supabase存储的异步函数
@@ -14,6 +12,7 @@ const userStore = useUserStore()
  * @returns {string} 返回文件的签名URL路径，如果上传失败则返回空字符串
  */
 export const uploadFile = async fileData => {
+	const userStore = useUserStore()
 	if (!userStore.userId) {
 		throw new Error('用户未登录，无法上传文件')
 	}
