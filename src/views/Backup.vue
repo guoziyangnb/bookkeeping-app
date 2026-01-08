@@ -130,6 +130,8 @@ const handleBackup = async () => {
 	try {
 		// 模拟异步操作
 		await new Promise(resolve => setTimeout(resolve, 1000))
+		message.warning('Sorry, 备份功能其实还在开发中,后续会上线哦')
+		return
 
 		/**
 		 * TODO 如果开了云端备份，则调用接口下载数据，并导出文件下载；如果只开了本地备份，则识别本地的localStorage数据并导出文件下载
@@ -175,6 +177,9 @@ const handleRestore = async () => {
 		message.warning('恢复数据仅支持本地存储，请先开启')
 		return
 	}
+	message.warning('Sorry, 恢复数据功能其实还在开发中,后续会上线哦')
+	return
+
 	const backupData = getStorage('backupData', null)
 	if (!backupData) {
 		message.warning('本地没有找到备份数据')
