@@ -132,7 +132,7 @@ const afterRead = async file => {
 		message.success('头像上传成功！')
 		file.status = 'success'
 		file.data = result
-		fileList.value = []
+		// fileList.value = []
 	} catch (error) {
 		file.status = 'failed'
 		console.log('🚀 ~ afterRead ~ error:', error)
@@ -176,6 +176,7 @@ const loadUserProfile = () => {
 	 * ? 本地舍弃，改成云
 	 */
 	// let savedProfile = getStorage('userProfile', {})
+	fileList.value = userStore.userAvatar ? [{ url: userStore.userAvatar }] : []
 	avatarUrl.value = userStore.userAvatar
 	formData.username = userStore.userName
 	formData.email = userStore.userEmail
@@ -223,8 +224,8 @@ onMounted(() => {
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-	width: 140px;
-	height: 140px;
+	width: 200px;
+	height: 200px;
 	background: var(--accent-orange);
 	border-radius: var(--radius-full);
 	filter: blur(40px);
@@ -239,8 +240,8 @@ onMounted(() => {
 		transform: translate(-50%, -50%) scale(1);
 	}
 	50% {
-		opacity: 0.4;
-		transform: translate(-50%, -50%) scale(1.05);
+		opacity: 0.9;
+		transform: translate(-50%, -50%) scale(2);
 	}
 }
 
@@ -268,34 +269,6 @@ onMounted(() => {
 	height: 48px;
 	fill: var(--text-secondary);
 	opacity: 0.5;
-}
-
-.avatar-edit-overlay {
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	height: 40px;
-	background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	opacity: 0;
-	transition: opacity 0.3s ease;
-}
-
-.avatar-edit-overlay svg {
-	width: 16px;
-	height: 16px;
-	fill: white;
-}
-
-.avatar-edit-overlay span {
-	font-size: 10px;
-	color: white;
-	margin-top: 2px;
-	font-weight: 500;
 }
 
 .avatar-hint {
