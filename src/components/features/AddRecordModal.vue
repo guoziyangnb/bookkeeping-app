@@ -55,10 +55,10 @@
 				</div>
 
 				<div class="modal-actions">
-					<button v-if="isEditMode" class="delete-btn" @click="handleDelete">删除记录</button>
-					<button class="submit-btn" @click="handleSubmit">
+					<van-button v-if="isEditMode" :loading="isDelLoading" :disabled="isSaveLoading" class="delete-btn" @click="handleDelete">删除记录</van-button>
+					<van-button :loading="isSaveLoading" :disabled="isDelLoading" class="submit-btn" @click="handleSubmit">
 						{{ isEditMode ? '保存修改' : '保存记录' }}
-					</button>
+					</van-button>
 				</div>
 			</div>
 		</div>
@@ -74,11 +74,16 @@ import DatePicker from '@/components/common/DatePicker.vue'
 import ImageUpload from '@/components/common/ImageUpload.vue'
 import { formatToLocalISODate } from '@/utils/date'
 import { message } from '@/utils/message'
+import { Button as VanButton, showConfirmDialog } from 'vant'
+import 'vant/lib/button/style'
+import 'vant/lib/dialog/style'
 
 const uiStore = useUIStore()
 const userStore = useUserStore()
 const recordsStore = useRecordsStore()
 const amountInput = ref(null)
+const isSaveLoading = ref(false)
+const isDelLoading = ref(false)
 
 // 是否为编辑模式
 const isEditMode = computed(() => uiStore.editingRecord !== null)
@@ -204,7 +209,7 @@ async function handleSubmit() {
 		message.warning('请输入有效金额')
 		return
 	}
-
+	isSaveLoading.value = true
 	try {
 		if (isEditMode.value) {
 			// 编辑模式：更新记录，保留原有时间
@@ -235,22 +240,45 @@ async function handleSubmit() {
 	} catch (error) {
 		message.error('操作失败: ' + error.message)
 		console.error('提交记录失败:', error)
+	} finally {
+		isSaveLoading.value = false
 	}
 }
 
 // 删除记录
 async function handleDelete() {
 	if (isEditMode.value) {
-		if (confirm('确定要删除这条记录吗？')) {
-			try {
+		isDelLoading.value = true
+		showConfirmDialog({
+			title: '删除记录',
+			message: '确定要清除记录吗？',
+			confirmButtonColor: '#ff8a5b',
+			cancelButtonColor: '#8a8a8a'
+		})
+			.then(async () => {
 				await recordsStore.deleteRecord(uiStore.editingRecord.id)
 				message.success('记录删除成功')
+				isDelLoading.value = false
 				uiStore.closeModal()
-			} catch (error) {
-				message.error('删除失败: ' + error.message)
-				console.error('删除记录失败:', error)
-			}
-		}
+			})
+			.catch(error => {
+				isDelLoading.value = false
+				// 用户取消操作不显示错误提示
+				if (error !== 'cancel') {
+					console.error('删除记录失败:', error)
+					message.error('删除失败: ' + error.message)
+				}
+			})
+		// if (confirm('确定要删除这条记录吗？')) {
+		// 	try {
+		// 		await recordsStore.deleteRecord(uiStore.editingRecord.id)
+		// 		message.success('记录删除成功')
+		// 		uiStore.closeModal()
+		// 	} catch (error) {
+		// 		message.error('删除失败: ' + error.message)
+		// 		console.error('删除记录失败:', error)
+		// 	}
+		// }
 	}
 }
 </script>

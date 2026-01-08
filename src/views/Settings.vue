@@ -158,8 +158,11 @@ const handleClearData = () => {
 			message.success('数据已清除')
 		})
 		.catch(e => {
-			console.log('数据清除失败', e)
-			message.error('数据清除失败', e)
+			// 用户取消操作不显示错误提示
+			if (e !== 'cancel') {
+				console.error('数据清除失败', e)
+				message.error('数据清除失败', e)
+			}
 		})
 }
 </script>
