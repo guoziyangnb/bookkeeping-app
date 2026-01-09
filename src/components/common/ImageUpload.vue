@@ -9,7 +9,7 @@
 			:max-size="maxSize * 1024 * 1024"
 			@oversize="handleImageOversize"
 			:max-count="1"
-			accept=".jpg, .jpeg, .png"
+			accept="image/*"
 			class="hidden-uploader">
 			<template #default>
 				<!-- 上传按钮 -->
@@ -32,7 +32,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { Uploader as VanUploader, Button as VanButton, showLoadingToast, showSuccessToast, showFailToast } from 'vant'
 import 'vant/lib/uploader/style'
 import 'vant/lib/button/style'
@@ -54,7 +54,12 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
-const fileList = computed(() => (props.modelValue ? [{ url: props.modelValue, isImage: true }] : []))
+const fileList = ref([
+	{
+		url: props.modelValue ? props.modelValue : '',
+		isImage: true
+	}
+])
 const uploaderRef = ref(null)
 
 // 图片上传前校验
@@ -228,9 +233,9 @@ const handleDeleteImage = async () => {
 .image-preview-wrapper {
 	position: absolute;
 	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
+	right: 0;
+	width: 36px;
+	height: 36px;
 	z-index: 2;
 	border-radius: 16px;
 	overflow: hidden;
