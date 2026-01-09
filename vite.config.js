@@ -18,8 +18,21 @@ export default defineConfig({
 	base: './',
 	build: {
 		// 可选：确保打包输出目录
-		outDir: 'dist',
-		assetsDir: 'assets'
+		// outDir: 'dist',
+		// assetsDir: 'assets',
+		// 分块策略
+		rollupOptions: {
+			output: {
+				chunkFileNames: 'js/[name]-[hash].js',
+				entryFileNames: 'js/[name]-[hash].js',
+				assetFileNames: '[ext]/[name]-[hash].[ext]',
+				manualChunks(id) {
+					if (id.includes('node_modules')) {
+						return 'vendor'
+					}
+				}
+			}
+		}
 	},
 	resolve: {
 		alias: {
