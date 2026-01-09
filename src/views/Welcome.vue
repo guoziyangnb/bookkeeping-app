@@ -9,7 +9,10 @@
 
 		<!-- 中心插画 -->
 		<div class="illustration-section">
-			<img src="/images/bg.png" alt="阳阳记账小店" class="main-illustration" />
+			<img
+				src="https://gzypicture-1339229861.cos.ap-nanjing.myqcloud.com/gzyPicture/public/1878374171889680385/2026-01-09_ha5vrmfc60c0043v.webp"
+				alt="阳阳记账小店"
+				class="main-illustration" />
 		</div>
 
 		<!-- 按钮区域 -->
