@@ -97,13 +97,19 @@ const formItems = computed(() => [
 		field: 'phone'
 	}
 ])
-// 退出登录配置
+// 登录配置
 const loginOutItems = computed(() => [
-	{
-		icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z',
-		label: '退出登录',
-		field: 'logout'
-	}
+	userStore.userProfile
+		? {
+				icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z',
+				label: '退出登录',
+				field: 'logout'
+			}
+		: {
+				icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z',
+				label: '登录',
+				field: 'login'
+			}
 ])
 
 // 跳转到编辑页面

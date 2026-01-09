@@ -23,7 +23,7 @@ import TabBar from '@/components/layout/TabBar.vue'
 import AddRecordModal from '@/components/features/AddRecordModal.vue'
 import Toast from '@/components/common/Toast.vue'
 import { useToast } from '@/utils/message'
-import { getStorage } from '@/utils/storage'
+import { getStorage, setStorage } from '@/utils/storage'
 
 const route = useRoute()
 const router = useRouter()
@@ -43,6 +43,11 @@ onMounted(async () => {
 
 	// 初始化用户认证状态
 	const user = await userStore.initializeAuth()
+	const backupSettings = {
+		localBackup: false, // 本地存储，默认打开
+		cloudBackup: true // 云端存储，默认关闭
+	}
+	setStorage('backupSettings', backupSettings)
 	const settings = getStorage('backupSettings', {})
 	const isCloud = settings['cloudBackup']
 	console.log('🚀 ~ isCloud:', isCloud)
