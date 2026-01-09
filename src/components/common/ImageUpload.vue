@@ -54,12 +54,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
-const fileList = ref([
-	{
-		url: props.modelValue ? props.modelValue : '',
-		isImage: true
-	}
-])
+const fileList = ref(props.modelValue ? [{ url: props.modelValue, isImage: true }] : [])
 const uploaderRef = ref(null)
 
 // 图片上传前校验
