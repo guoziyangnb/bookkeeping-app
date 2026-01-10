@@ -8,8 +8,6 @@
 		<router-view></router-view>
 		<TabBar v-if="!isSubPage" />
 		<AddRecordModal />
-		<!-- 全局 Toast 组件 -->
-		<Toast :message="toastState.message" :type="toastState.type" :visible="toastState.visible" />
 	</div>
 </template>
 
@@ -20,15 +18,12 @@ import { useUIStore } from '@/stores/ui'
 import { useUserStore } from '@/stores/user'
 import TabBar from '@/components/layout/TabBar.vue'
 import AddRecordModal from '@/components/features/AddRecordModal.vue'
-import Toast from '@/components/common/Toast.vue'
-import { useToast } from '@/utils/message'
 // import { getStorage, setStorage } from '@/utils/storage'
 
 const route = useRoute()
 // const router = useRouter()
 const uiStore = useUIStore()
 const userStore = useUserStore()
-const { state: toastState } = useToast()
 
 // 判断是否是子页面（不需要显示 TabBar 的页面）
 const isSubPage = computed(() => {
