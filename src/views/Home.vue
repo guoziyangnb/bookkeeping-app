@@ -50,6 +50,7 @@ import QuickActions from '@/components/features/QuickActions.vue'
 import TransactionItem from '@/components/features/TransactionItem.vue'
 import Overlay from '@/components/common/Overlay.vue'
 import { message } from '@/utils/message'
+import { getStorage } from '@/utils/storage'
 
 const recordsStore = useRecordsStore()
 const userStore = useUserStore()
@@ -65,10 +66,7 @@ onMounted(async () => {
 	const settings = getStorage('backupSettings', {})
 	const isCloud = settings['cloudBackup']
 	console.log('🚀 ~ isCloud:', isCloud)
-	if (userStore.userId) {
-		if (!isCloud) {
-			message.error('请先勾选云存储')
-		}
+	if (userStore.userId && isCloud) {
 		try {
 			await recordsStore.fetchRecentRecords(userStore.userId, 30)
 		} catch (error) {
