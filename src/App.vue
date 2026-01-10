@@ -17,7 +17,6 @@
 import { onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUIStore } from '@/stores/ui'
-// import { useRecordsStore } from '@/stores/records'
 import { useUserStore } from '@/stores/user'
 import TabBar from '@/components/layout/TabBar.vue'
 import AddRecordModal from '@/components/features/AddRecordModal.vue'
@@ -28,7 +27,6 @@ import { useToast } from '@/utils/message'
 const route = useRoute()
 // const router = useRouter()
 const uiStore = useUIStore()
-// const recordsStore = useRecordsStore()
 const userStore = useUserStore()
 const { state: toastState } = useToast()
 
@@ -42,7 +40,7 @@ onMounted(async () => {
 	uiStore.initTheme()
 
 	// 初始化用户认证状态
-	const user = await userStore.initializeAuth()
+	await userStore.initializeAuth()
 	// const backupSettings = {
 	// 	localBackup: false, // 本地存储，默认打开
 	// 	cloudBackup: true // 云端存储，默认关闭
@@ -61,7 +59,7 @@ onMounted(async () => {
 <style scoped>
 #app {
 	min-height: 100vh;
-	min-width: 375px;
+	min-width: 350px;
 	width: 100%;
 	padding-bottom: 120px;
 	position: relative;
