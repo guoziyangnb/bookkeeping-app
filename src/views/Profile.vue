@@ -290,11 +290,14 @@ const loadUserProfile = () => {
 	 * ? 本地舍弃，改成云
 	 */
 	// let savedProfile = getStorage('userProfile', {})
-	fileList.value = userStore.userAvatar ? [{ url: userStore.userAvatar }] : []
-	avatarUrl.value = userStore.userAvatar
-	formData.username = userStore.userName
-	formData.email = userStore.userEmail
-	formData.phone = userStore.userPhone
+	// 只有用户登陆了才加载用户数据
+	if (userStore.userId) {
+		fileList.value = userStore.userAvatar ? [{ url: userStore.userAvatar }] : []
+		avatarUrl.value = userStore.userAvatar
+		formData.username = userStore.userName
+		formData.email = userStore.userEmail
+		formData.phone = userStore.userPhone
+	}
 }
 
 // 初始化时加载数据

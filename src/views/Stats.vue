@@ -62,6 +62,7 @@ import Header from '@/components/layout/Header.vue'
 import PieChart from '@/components/features/PieChart.vue'
 import Overlay from '@/components/common/Overlay.vue'
 import { message } from '@/utils/message'
+import { getStorage } from '@/utils/storage'
 
 const recordsStore = useRecordsStore()
 const userStore = useUserStore()
@@ -72,12 +73,16 @@ onMounted(async () => {
 	const now = new Date()
 	const year = now.getFullYear()
 	const month = now.getMonth() // 0-11
+	const settings = getStorage('backupSettings', {})
+	const isCloud = settings['cloudBackup']
 
-	try {
-		await recordsStore.fetchMonthlyRecords(userStore.userId, year, month)
-	} catch (error) {
-		console.error('加载本月统计数据失败:', error)
-		message.error('加载记录失败', error.message)
+	if (userStore.userId && isCloud) {
+		try {
+			await recordsStore.fetchMonthlyRecords(userStore.userId, year, month)
+		} catch (error) {
+			console.error('加载本月统计数据失败:', error)
+			message.error('加载记录失败', error.message)
+		}
 	}
 })
 
