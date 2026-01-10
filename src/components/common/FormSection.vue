@@ -16,7 +16,7 @@
 				<path :d="item.icon" />
 			</svg>
 			<span class="form-label-text">{{ item.label }}</span>
-			<span v-if="!item.switchable" class="form-value">{{ item.field != 'logout' ? item.value || item.emptyText || '未设置' : '' }}</span>
+			<span v-if="!item.switchable" class="form-value">{{ !['logout', 'login'].includes(item.field) ? item.value || item.emptyText || '未设置' : '' }}</span>
 			<van-switch
 				v-if="item.switchable"
 				:model-value="item.switchValue"

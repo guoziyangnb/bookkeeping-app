@@ -39,8 +39,9 @@
 			<!-- 个人资料表单区域 -->
 			<FormSection :items="formItems" title="个人资料设置" @click="goToEdit" />
 
-			<!-- 退出登录区域 -->
-			<FormSection :items="loginOutItems" title="退出登录" @click="handleLogout" />
+			<!-- 退出/登录区域 -->
+			<FormSection v-if="userStore.userId" :items="logoutItems" title="退出登录" @click="handleLogout" />
+			<FormSection v-else :items="loginItems" title="登录" @click="handleLogin" />
 		</div>
 	</div>
 </template>
@@ -97,19 +98,21 @@ const formItems = computed(() => [
 		field: 'phone'
 	}
 ])
-// 登录配置
-const loginOutItems = computed(() => [
-	userStore.userProfile
-		? {
-				icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z',
-				label: '退出登录',
-				field: 'logout'
-			}
-		: {
-				icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z',
-				label: '登录',
-				field: 'login'
-			}
+
+// 退出/登录配置
+const logoutItems = computed(() => [
+	{
+		icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z',
+		label: '退出登录',
+		field: 'logout'
+	}
+])
+const loginItems = computed(() => [
+	{
+		icon: 'M11 7L9.6 8.4l2.6 2.6H2v2h10.2l-2.6 2.6L11 17l5-5-5-5zm9 12h-8v2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-8v2h8v14z',
+		label: '登录',
+		field: 'login'
+	}
 ])
 
 // 跳转到编辑页面
@@ -282,6 +285,21 @@ const handleLogout = async () => {
 			showFailToast('退出登录失败')
 		}
 	}
+}
+
+// 登录
+const handleLogin = async () => {
+	try {
+		const result = await showConfirmDialog({
+			title: '登录',
+			message: '确定要去登录吗？',
+			confirmButtonColor: '#ff8a5b',
+			cancelButtonColor: '#8a8a8a'
+		})
+		if (result) {
+			router.push('/welcome')
+		}
+	} catch (error) {}
 }
 
 // 加载用户数据
