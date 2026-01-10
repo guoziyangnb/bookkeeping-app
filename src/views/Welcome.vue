@@ -18,7 +18,6 @@
 		<!-- 按钮区域 -->
 		<div class="actions-section">
 			<button class="btn btn-primary" @click="goToLogin">登录</button>
-			<!-- <button class="btn btn-secondary" @click="goToRegister">注册</button> -->
 		</div>
 
 		<!-- 用户协议 -->
@@ -39,7 +38,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { Image as VanImage, Checkbox as VanCheckbox } from 'vant'
+import { Checkbox as VanCheckbox } from 'vant'
 import 'vant/lib/image/style'
 import 'vant/lib/checkbox/style'
 import { message } from '@/utils/message'
@@ -53,10 +52,6 @@ const goToLogin = () => {
 		return
 	}
 	router.push('/login')
-}
-
-const goToRegister = () => {
-	router.push('/register')
 }
 </script>
 
@@ -76,11 +71,12 @@ const goToRegister = () => {
 	width: 100%;
 	text-align: left;
 	margin-bottom: 40px;
-	padding: 100px 44px 0;
+	padding: 100px 36px 0;
 	animation: fadeInDown 0.8s ease-out;
 }
 
 .greeting {
+	font-size: 28px;
 	letter-spacing: 2px;
 }
 
@@ -101,8 +97,8 @@ const goToRegister = () => {
 
 .main-illustration {
 	max-width: 350px;
-	max-height: 300px;
 	object-fit: contain;
+	background-color: transparent;
 	filter: drop-shadow(0 8px 24px rgba(255, 122, 69, 0.15));
 }
 
@@ -143,24 +139,8 @@ const goToRegister = () => {
 }
 
 .btn-primary:active {
-	transform: translateY(0);
+	transform: translateY(2px);
 }
-
-/* .btn-secondary {
-	background: #ff7a45;
-	color: #ffffff;
-	box-shadow: 0 4px 12px rgba(255, 122, 69, 0.3);
-}
-
-.btn-secondary:hover {
-	background: #ff6b35;
-	transform: translateY(-2px);
-	box-shadow: 0 6px 20px rgba(255, 122, 69, 0.4);
-}
-
-.btn-secondary:active {
-	transform: translateY(0);
-} */
 
 /* 用户协议 */
 .agreement-section {
@@ -245,11 +225,7 @@ const goToRegister = () => {
 }
 
 /* 响应式 */
-@media (max-height: 700px) {
-	.welcome-container {
-		padding: 40px 24px 30px;
-	}
-
+@media (min-width: 375px) and (max-width: 700px) {
 	.greeting {
 		font-size: 36px;
 	}
@@ -258,12 +234,9 @@ const goToRegister = () => {
 		font-size: 18px;
 	}
 
-	.illustration-section {
-		margin-bottom: 40px;
-	}
-
 	.main-illustration {
-		max-width: 500px;
+		max-width: 350px;
+		max-height: 320px;
 	}
 
 	.btn {
@@ -272,13 +245,22 @@ const goToRegister = () => {
 	}
 }
 
-@media (max-width: 375px) {
+@media (min-width: 700px) {
+	.welcome-container {
+		padding: 40px 24px 30px;
+	}
+
 	.greeting {
 		font-size: 40px;
 	}
 
+	.illustration-section {
+		margin-bottom: 40px;
+	}
+
 	.main-illustration {
-		max-height: 320px;
+		max-width: 600px;
+		max-height: 460px;
 	}
 }
 </style>
