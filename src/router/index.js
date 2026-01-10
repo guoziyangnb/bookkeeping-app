@@ -60,6 +60,18 @@ const routes = [
 		name: 'backup',
 		component: () => import('@/views/Backup.vue'),
 		meta: { title: '数据备份', isSubPage: true }
+	},
+	{
+		path: '/welcome/user-agreement',
+		name: 'userAgreement',
+		component: () => import('@/views/UserAgreement.vue'),
+		meta: { title: '用户协议', isSubPage: true }
+	},
+	{
+		path: '/welcome/privacy-policy',
+		name: 'privacyPolicy',
+		component: () => import('@/views/PrivacyPolicy.vue'),
+		meta: { title: '隐私政策', isSubPage: true }
 	}
 ]
 

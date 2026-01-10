@@ -27,9 +27,9 @@
 				<span>我已阅读并同意</span>
 			</label>
 			<div class="agreement-links">
-				<a href="#" class="link">《用户协议》</a>
+				<a href="#" class="link" @click.prevent="goToUserAgreement">《用户协议》</a>
 				<span>和</span>
-				<a href="#" class="link">《隐私政策》</a>
+				<a href="#" class="link" @click.prevent="goToPrivacyPolicy">《隐私政策》</a>
 			</div>
 		</div>
 	</div>
@@ -52,6 +52,14 @@ const goToLogin = () => {
 		return
 	}
 	router.push('/login')
+}
+
+const goToUserAgreement = () => {
+	router.push('/welcome/user-agreement')
+}
+
+const goToPrivacyPolicy = () => {
+	router.push('/welcome/privacy-policy')
 }
 </script>
 
