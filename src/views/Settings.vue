@@ -68,7 +68,7 @@
 							</svg>
 						</div>
 						<div class="settings-item-info">
-							<div class="settings-item-title">数据备份</div>
+							<div class="settings-item-title">数据存储</div>
 							<div class="settings-item-desc">云端同步与恢复</div>
 						</div>
 					</div>

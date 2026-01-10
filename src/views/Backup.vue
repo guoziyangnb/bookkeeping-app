@@ -1,7 +1,7 @@
 <template>
 	<div class="backup-page">
 		<!-- 返回导航栏 -->
-		<BackNavBar title="数据备份" />
+		<BackNavBar title="数据存储" />
 
 		<div class="backup-container">
 			<!-- 备份说明 -->
