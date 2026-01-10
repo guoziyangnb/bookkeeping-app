@@ -24,7 +24,6 @@
 						:maxlength="fieldConfig.maxlength"
 						class="edit-input"
 						:border="false"
-						autofocus
 						clearable
 						clear-trigger="always" />
 				</div>
