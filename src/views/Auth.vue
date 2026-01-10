@@ -36,9 +36,9 @@
 					</div>
 				</div>
 
-				<!-- 邮箱 -->
+				<!-- 账号 -->
 				<div class="form-group">
-					<label class="form-label">邮箱</label>
+					<label class="form-label">账号</label>
 					<div class="input-wrapper">
 						<span class="input-icon">
 							<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -46,7 +46,7 @@
 								<path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2" />
 							</svg>
 						</span>
-						<input v-model="formData.email" type="email" placeholder="请输入邮箱" required />
+						<input v-model="formData.email" type="email" placeholder="请输入邮箱/手机号" required />
 					</div>
 				</div>
 
