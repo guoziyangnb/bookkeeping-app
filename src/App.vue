@@ -54,11 +54,11 @@ onMounted(async () => {
 <style scoped>
 #app {
 	min-height: 100vh;
-	min-width: 350px;
 	width: 100%;
 	padding-bottom: 120px;
 	position: relative;
 	z-index: 1;
+	overflow-x: hidden;
 }
 </style>
 
