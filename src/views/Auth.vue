@@ -99,7 +99,7 @@
 							</svg>
 						</span>
 						<input v-model="formData.verificationCode" type="text" placeholder="请输入验证码" required />
-						<van-button type="button" class="send-code-btn" :disabled="isSendingCode || countdown > 0" @click="sendVerificationCode">
+						<van-button type="button" class="send-code-btn" :loading="loading" :disabled="isSendingCode || countdown > 0" @click="sendVerificationCode">
 							{{ countdown > 0 ? `${countdown}秒后重新发送` : '发送验证码' }}
 						</van-button>
 					</div>
@@ -181,6 +181,7 @@ const isLoading = ref(false)
 // 验证码相关
 const countdown = ref(0)
 const isSendingCode = ref(false)
+const loading = ref(false)
 let countdownTimer = null
 
 // 判断输入的是手机号还是邮箱
@@ -225,12 +226,14 @@ const sendVerificationCode = async () => {
 	}
 
 	try {
+		loading.value = true
 		isSendingCode.value = true
 		// TODO: 调用发送验证码的API
 		// await userStore.sendVerificationCode({ phone: formData.account })
 
 		// 模拟发送成功
 		message.success('验证码已发送，请注意查收')
+		loading.value = false
 
 		// 开始倒计时
 		countdown.value = 60
@@ -245,6 +248,7 @@ const sendVerificationCode = async () => {
 		console.error('发送验证码失败:', error)
 		message.error(error.message || '发送验证码失败，请重试')
 	} finally {
+		loading.value = false
 		isSendingCode.value = false
 	}
 }
