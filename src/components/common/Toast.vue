@@ -102,7 +102,7 @@ defineProps({
 /* 移动端适配 */
 @media (max-width: 768px) {
 	.toast-container {
-		min-width: 180px;
+		min-width: 200px;
 		max-width: calc(100vw - 20px);
 		padding: 12px 16px;
 		font-size: 14px;

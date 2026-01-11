@@ -232,7 +232,7 @@ const sendVerificationCode = async () => {
 		// await userStore.sendVerificationCode({ phone: formData.account })
 
 		// 模拟发送成功
-		message.success('验证码已发送，请注意查收')
+		message.success('验证码已发送')
 		loading.value = false
 
 		// 开始倒计时
