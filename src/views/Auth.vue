@@ -46,7 +46,7 @@
 								<path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2" />
 							</svg>
 						</span>
-						<input v-model="formData.account" type="text" placeholder="请输入手机号/邮箱" required />
+						<input v-model="formData.account" type="text" :placeholder="registerMode === 'email' ? '请输入邮箱' : '请输入手机号'" required />
 					</div>
 				</div>
 
@@ -88,6 +88,23 @@
 					</div>
 				</div>
 
+				<!-- 手机号注册时的验证码 -->
+				<div v-if="!isLogin && registerMode === 'phone'" class="form-group">
+					<label class="form-label">验证码</label>
+					<div class="input-wrapper verify-input-wrapper">
+						<span class="input-icon">
+							<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+								<rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2" />
+							</svg>
+						</span>
+						<input v-model="formData.verificationCode" type="text" placeholder="请输入验证码" required />
+						<van-button type="button" class="send-code-btn" :disabled="isSendingCode || countdown > 0" @click="sendVerificationCode">
+							{{ countdown > 0 ? `${countdown}秒后重新发送` : '发送验证码' }}
+						</van-button>
+					</div>
+				</div>
+
 				<!-- 登录时的额外选项 -->
 				<div v-if="isLogin" class="form-options">
 					<a href="#" class="forgot-link">忘记密码？</a>
@@ -105,6 +122,22 @@
 						{{ isLogin ? '立即注册' : '立即登录' }}
 					</button>
 				</div>
+
+				<!-- 注册方式选择（仅注册时显示） -->
+				<div v-if="!isLogin" class="register-methods">
+					<button type="button" class="method-btn" :class="{ active: registerMode === 'email' }" @click="setRegisterMode('email')" title="邮箱注册">
+						<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="2" />
+							<path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2" />
+						</svg>
+					</button>
+					<button type="button" class="method-btn" :class="{ active: registerMode === 'phone' }" @click="setRegisterMode('phone')" title="手机号验证注册">
+						<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<rect x="5" y="2" width="14" height="20" rx="2" stroke="currentColor" stroke-width="2" />
+							<path d="M12 18H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+						</svg>
+					</button>
+				</div>
 			</form>
 		</div>
 
@@ -116,10 +149,12 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { message } from '@/utils/message'
+import { Button as VanButton } from 'vant'
+import 'vant/lib/button/style'
 
 const router = useRouter()
 const route = useRoute()
@@ -128,16 +163,25 @@ const userStore = useUserStore()
 // 判断是登录还是注册
 const isLogin = computed(() => route.path === '/login')
 
+// 注册模式（email/phone）
+const registerMode = ref('email')
+
 // 表单数据
 const formData = reactive({
 	username: '',
 	account: '', // 账号（可以是邮箱或手机号）
-	password: ''
+	password: '',
+	verificationCode: '' // 验证码（手机号注册时需要）
 })
 
 // UI状态
 const showPassword = ref(false)
 const isLoading = ref(false)
+
+// 验证码相关
+const countdown = ref(0)
+const isSendingCode = ref(false)
+let countdownTimer = null
 
 // 判断输入的是手机号还是邮箱
 const accountType = computed(() => {
@@ -159,6 +203,52 @@ const accountType = computed(() => {
 	return null
 })
 
+// 设置注册模式
+const setRegisterMode = mode => {
+	registerMode.value = mode
+	// 切换模式时清空验证码
+	formData.verificationCode = ''
+	// 如果有倒计时，清空倒计时
+	if (countdownTimer) {
+		clearInterval(countdownTimer)
+		countdownTimer = null
+	}
+	countdown.value = 0
+}
+
+// 发送验证码
+const sendVerificationCode = async () => {
+	// 验证手机号
+	if (accountType.value !== 'phone') {
+		message.error('请输入有效的手机号')
+		return
+	}
+
+	try {
+		isSendingCode.value = true
+		// TODO: 调用发送验证码的API
+		// await userStore.sendVerificationCode({ phone: formData.account })
+
+		// 模拟发送成功
+		message.success('验证码已发送，请注意查收')
+
+		// 开始倒计时
+		countdown.value = 60
+		countdownTimer = setInterval(() => {
+			countdown.value--
+			if (countdown.value <= 0) {
+				clearInterval(countdownTimer)
+				countdownTimer = null
+			}
+		}, 1000)
+	} catch (error) {
+		console.error('发送验证码失败:', error)
+		message.error(error.message || '发送验证码失败，请重试')
+	} finally {
+		isSendingCode.value = false
+	}
+}
+
 // 验证账号输入
 const validateAccount = () => {
 	const account = formData.account.trim()
@@ -172,12 +262,40 @@ const validateAccount = () => {
 		return false
 	}
 
+	// 手机号注册模式需要验证手机号
+	if (!isLogin.value && registerMode.value === 'phone') {
+		if (accountType.value !== 'phone') {
+			message.error('手机号验证注册模式需要输入手机号')
+			return false
+		}
+		if (!formData.verificationCode) {
+			message.error('请输入验证码')
+			return false
+		}
+	}
+
+	// 邮箱注册模式需要验证邮箱
+	if (!isLogin.value && registerMode.value === 'email') {
+		if (accountType.value !== 'email') {
+			message.error('邮箱注册模式需要输入邮箱')
+			return false
+		}
+	}
+
 	return true
 }
 
 // 切换登录/注册模式
 const toggleMode = () => {
 	resetFormData()
+	// 重置注册模式和验证码状态
+	registerMode.value = 'email'
+	if (countdownTimer) {
+		clearInterval(countdownTimer)
+		countdownTimer = null
+	}
+	countdown.value = 0
+
 	if (isLogin.value) {
 		router.push('/register')
 	} else {
@@ -208,16 +326,23 @@ const handleSubmit = async () => {
 			}
 		} else {
 			// 注册逻辑
-			const userInfo = await userStore.register({
+			const registerData = {
 				username: formData.username,
 				account: formData.account,
 				password: formData.password
-			})
+			}
+
+			// 如果是手机号验证注册，添加验证码
+			if (registerMode.value === 'phone') {
+				registerData.verificationCode = formData.verificationCode
+			}
+
+			const userInfo = await userStore.register(registerData)
 			resetFormData()
 			console.log('🚀 ~ handleSubmit ~ formData:', formData)
 			if (userInfo?.user?.id) {
 				router.push('/login')
-				if (accountType.value === 'phone') {
+				if (registerMode.value === 'phone') {
 					message.success('注册成功，请查收短信验证码进行验证！', 6000)
 				} else {
 					message.success('注册成功，你会收到一封邮件，请先点击邮件中的链接进行验证才能登录！', 6000)
@@ -239,12 +364,21 @@ const resetFormData = () => {
 	formData.username = ''
 	formData.account = ''
 	formData.password = ''
+	formData.verificationCode = ''
 }
 
 // 返回
 const goBack = () => {
 	router.push('/welcome')
 }
+
+// 组件卸载时清理定时器
+onUnmounted(() => {
+	if (countdownTimer) {
+		clearInterval(countdownTimer)
+		countdownTimer = null
+	}
+})
 </script>
 
 <style scoped>
@@ -284,8 +418,8 @@ const goBack = () => {
 /* 顶部标题 */
 .header-section {
 	text-align: center;
-	margin-top: 60px;
-	margin-bottom: 40px;
+	margin-top: 40px;
+	margin-bottom: 30px;
 	animation: fadeInDown 0.6s ease-out;
 }
 
@@ -312,7 +446,7 @@ const goBack = () => {
 }
 
 .form-group {
-	margin-bottom: 20px;
+	margin-bottom: 12px;
 }
 
 .form-label {
@@ -354,7 +488,7 @@ const goBack = () => {
 	flex: 1;
 	border: none;
 	outline: none;
-	padding: 14px 12px 14px 0;
+	padding: 8px 8px 8px 0;
 	font-size: 16px;
 	color: #333333;
 	background: transparent;
@@ -384,7 +518,7 @@ const goBack = () => {
 	display: flex;
 	justify-content: flex-end;
 	align-items: center;
-	margin-bottom: 24px;
+	margin-bottom: 12px;
 	font-size: 14px;
 }
 
@@ -402,8 +536,9 @@ const goBack = () => {
 /* 提交按钮 */
 .submit-btn {
 	width: 100%;
-	height: 54px;
+	height: 48px;
 	background: #ff7a45;
+	margin-top: 12px;
 	color: #ffffff;
 	border: none;
 	border-radius: 27px;
@@ -451,6 +586,97 @@ const goBack = () => {
 
 .link-btn:hover {
 	opacity: 0.7;
+}
+
+/* 注册方式选择按钮 */
+.register-methods {
+	display: flex;
+	justify-content: center;
+	gap: 24px;
+	margin-top: 20px;
+}
+
+.method-btn {
+	width: 56px;
+	height: 56px;
+	border-radius: 50%;
+	background: #f5f5f5;
+	border: 2px solid transparent;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #999999;
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+.method-btn svg {
+	width: 28px;
+	height: 28px;
+}
+
+.method-btn:hover {
+	background: #eeeeee;
+	color: #ff7a45;
+}
+
+.method-btn.active {
+	background: #ff7a45;
+	color: #ffffff;
+	border-color: #ff7a45;
+	box-shadow: 0 4px 12px rgba(255, 122, 69, 0.3);
+}
+
+/* 验证码输入框 */
+.verify-input-wrapper {
+	position: relative;
+	display: flex;
+	align-items: center;
+	background: #f5f5f5;
+	border: 2px solid transparent;
+	border-radius: 12px;
+	transition: all 0.3s ease;
+}
+
+.verify-input-wrapper:focus-within {
+	background: #ffffff;
+	border-color: #ff7a45;
+	box-shadow: 0 0 0 3px rgba(255, 122, 69, 0.1);
+}
+
+.verify-input-wrapper input {
+	flex: 1;
+	border: none;
+	outline: none;
+	padding: 8px 8px 8px 0;
+	font-size: 16px;
+	color: #333333;
+	background: transparent;
+}
+
+.send-code-btn {
+	position: absolute;
+	right: 0px;
+	padding: 8px 16px;
+	background: #ff7a45;
+	color: #ffffff;
+	border: none;
+	border-radius: 0 8px 8px 0;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	white-space: nowrap;
+	transition: all 0.3s ease;
+}
+
+.send-code-btn:hover:not(:disabled) {
+	background: #ff6b35;
+}
+
+.send-code-btn:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+	background: #cccccc;
 }
 
 /* 底部装饰 */
