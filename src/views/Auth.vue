@@ -46,7 +46,7 @@
 								<path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2" />
 							</svg>
 						</span>
-						<input v-model="formData.email" type="email" placeholder="请输入邮箱/手机号" required />
+						<input v-model="formData.account" type="text" placeholder="请输入手机号/邮箱" required />
 					</div>
 				</div>
 
@@ -131,14 +131,49 @@ const isLogin = computed(() => route.path === '/login')
 // 表单数据
 const formData = reactive({
 	username: '',
-	email: '',
+	account: '', // 账号（可以是邮箱或手机号）
 	password: ''
 })
 
 // UI状态
 const showPassword = ref(false)
-
 const isLoading = ref(false)
+
+// 判断输入的是手机号还是邮箱
+const accountType = computed(() => {
+	const account = formData.account.trim()
+	if (!account) return null
+
+	// 手机号正则（中国大陆手机号）
+	const phoneRegex = /^1[3-9]\d{9}$/
+	if (phoneRegex.test(account)) {
+		return 'phone'
+	}
+
+	// 邮箱正则
+	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+	if (emailRegex.test(account)) {
+		return 'email'
+	}
+
+	return null
+})
+
+// 验证账号输入
+const validateAccount = () => {
+	const account = formData.account.trim()
+	if (!account) {
+		message.error('请输入手机号或邮箱')
+		return false
+	}
+
+	if (!accountType.value) {
+		message.error('请输入有效的手机号或邮箱')
+		return false
+	}
+
+	return true
+}
 
 // 切换登录/注册模式
 const toggleMode = () => {
@@ -152,32 +187,41 @@ const toggleMode = () => {
 
 // 处理表单提交
 const handleSubmit = async () => {
+	// 验证账号格式
+	if (!validateAccount()) {
+		return
+	}
+
 	isLoading.value = true
 	try {
 		if (isLogin.value) {
 			// 登录逻辑
 			const userInfo = await userStore.login({
-				email: formData.email,
+				account: formData.account,
 				password: formData.password
 			})
 			if (userInfo?.session?.access_token) {
 				router.push('/')
 				message.success('登录成功')
 			} else {
-				message.error('登录失败，请查看邮件里的链接是否已点击，或者检查邮箱和密码是否正确', 6000)
+				message.error('登录失败，请检查账号和密码是否正确', 6000)
 			}
 		} else {
 			// 注册逻辑
 			const userInfo = await userStore.register({
 				username: formData.username,
-				email: formData.email,
+				account: formData.account,
 				password: formData.password
 			})
 			resetFormData()
 			console.log('🚀 ~ handleSubmit ~ formData:', formData)
 			if (userInfo?.user?.id) {
 				router.push('/login')
-				message.success('注册成功，你会收到一封邮件，请先点击邮件中的链接进行验证才能登录！', 6000)
+				if (accountType.value === 'phone') {
+					message.success('注册成功，请查收短信验证码进行验证！', 6000)
+				} else {
+					message.success('注册成功，你会收到一封邮件，请先点击邮件中的链接进行验证才能登录！', 6000)
+				}
 			} else {
 				message.error('注册失败，请重试')
 			}
@@ -193,7 +237,7 @@ const handleSubmit = async () => {
 // 定义重置表单的函数
 const resetFormData = () => {
 	formData.username = ''
-	formData.email = ''
+	formData.account = ''
 	formData.password = ''
 }
 

@@ -23,11 +23,21 @@ export const signUp = async ({ email, phone, password, username }) => {
 
 // 登录
 export const signIn = async data => {
-	const { email, password } = data
-	const { data: user, error } = await supabase.auth.signInWithPassword({
-		email,
-		password
-	})
+	const { email, phone, password } = data
+
+	// 判断使用手机号还是邮箱登录
+	const credentials = {}
+	if (phone) {
+		credentials.phone = phone
+	} else if (email) {
+		credentials.email = email
+	} else {
+		throw new Error('请提供手机号或邮箱')
+	}
+
+	credentials.password = password
+
+	const { data: user, error } = await supabase.auth.signInWithPassword(credentials)
 	if (error) throw new Error(error.message)
 	return user
 }

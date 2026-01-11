@@ -3,6 +3,20 @@ import { getStorage, setStorage, removeStorage } from '@/utils/storage'
 import router from '@/router'
 import { signUp, signIn, logout, getCurrentUser, updateUser } from '@/service/user'
 
+// 判断输入是手机号还是邮箱
+const identifyAccountType = (account) => {
+	const phoneRegex = /^1[3-9]\d{9}$/
+	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+	if (phoneRegex.test(account)) {
+		return 'phone'
+	}
+	if (emailRegex.test(account)) {
+		return 'email'
+	}
+	return null
+}
+
 export const useUserStore = defineStore('user', {
 	state: () => {
 		// 在初始化时从 localStorage 加载用户数据
@@ -62,10 +76,21 @@ export const useUserStore = defineStore('user', {
 		},
 
 		// 注册
-		async register({ username, email, password }) {
+		async register({ username, account, password }) {
 			try {
-				// 调用supabase注册接口，并传递username
-				const user = await signUp({ email, password, username })
+				// 识别账号类型
+				const accountType = identifyAccountType(account)
+
+				if (!accountType) {
+					throw new Error('请输入有效的手机号或邮箱')
+				}
+
+				// 调用supabase注册接口
+				const user = await signUp({
+					username,
+					password,
+					[accountType]: account // 根据类型传递 phone 或 email
+				})
 
 				// 存储用户元数据（包含username）
 				if (user) {
@@ -82,10 +107,20 @@ export const useUserStore = defineStore('user', {
 		},
 
 		// 登录
-		async login({ email, password }) {
+		async login({ account, password }) {
 			try {
+				// 识别账号类型
+				const accountType = identifyAccountType(account)
+
+				if (!accountType) {
+					throw new Error('请输入有效的手机号或邮箱')
+				}
+
 				// 调用supabase登录接口
-				const user = await signIn({ email, password })
+				const user = await signIn({
+					[accountType]: account, // 根据类型传递 phone 或 email
+					password
+				})
 
 				// 设置当前用户
 				this.userProfile = user
