@@ -10,7 +10,7 @@
  */
 
 // 当前应用版本号（需要与 package.json 和 HBuilderX 的 manifest.json 保持一致）
-export const CURRENT_VERSION = '1.0.2'
+export const CURRENT_VERSION = '1.0.3'
 
 // GitHub 仓库配置（请替换为你的仓库信息）
 export const GITHUB_REPO = {
@@ -51,4 +51,11 @@ export const VERSION_CONFIG = {
 // GitHub 下载加速代理（可选）
 // 留空则不使用代理，直接从 GitHub 下载
 // 常用代理：https://hk.gh-proxy.org/、https://ghproxy.com/、https://mirror.ghproxy.com/
-export const GH_PROXY = 'https://hk.gh-proxy.org/'
+export const GH_PROXY = ''
+
+// GitHub Personal Access Token（可选）
+// 用于提高 API 速率限制（从 60次/小时 提升到 5000次/小时）
+// 获取方式：GitHub Settings -> Developer settings -> Personal access tokens -> Tokens (classic)
+// 创建一个 token，只需要选择 public_repo 权限即可
+// 留空则不使用认证（受速率限制）
+export const GITHUB_TOKEN = import.meta.env.VITE_GITHUB_TOKEN || ''

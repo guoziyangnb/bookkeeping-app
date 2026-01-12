@@ -24,7 +24,9 @@
       "mcp__chrome-devtools__close_page",
       "Bash(npm run build:*)",
       "Bash(claude mcp add:*)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "mcp__supabase__list_edge_functions",
+      "mcp__supabase__get_logs"
     ]
   }
 }

@@ -3,7 +3,7 @@
  * 功能：检查更新、下载APK、安装
  */
 
-import { CURRENT_VERSION, GITHUB_REPO, getGithubApiUrl, VERSION_CONFIG, GH_PROXY } from '@/config/version'
+import { CURRENT_VERSION, GITHUB_REPO, getGithubApiUrl, VERSION_CONFIG, GH_PROXY, GITHUB_TOKEN } from '@/config/version'
 
 /**
  * 比较版本号
@@ -39,15 +39,26 @@ export function compareVersions(version1, version2) {
 export async function checkForUpdate() {
 	try {
 		const apiUrl = getGithubApiUrl(GITHUB_REPO.owner, GITHUB_REPO.repo)
+		// 构建请求头
+		const headers = {
+			Accept: 'application/vnd.github.v3+json'
+		}
 
-		const response = await fetch(apiUrl, {
-			headers: {
-				Accept: 'application/vnd.github.v3+json'
-			}
-		})
+		// 如果配置了 GitHub Token，添加认证头
+		if (GITHUB_TOKEN) {
+			headers.Authorization = `Bearer ${GITHUB_TOKEN}`
+		} else {
+			console.warn('未配置 GitHub Token，可能受速率限制影响')
+		}
+
+		const response = await fetch(apiUrl, { headers })
+
+		console.log('GitHub API 响应状态:', response.status)
 
 		if (!response.ok) {
-			throw new Error(`GitHub API 请求失败: ${response.status}`)
+			const errorText = await response.text()
+			console.error('GitHub API 错误响应:', errorText)
+			throw new Error(`GitHub API 请求失败: ${response.status} - ${errorText}`)
 		}
 
 		const releaseData = await response.json()
@@ -108,45 +119,46 @@ export function formatFileSize(bytes) {
 }
 
 /**
- * 下载 APK 文件
+ * 下载 APK 文件（使用打开新浏览器窗口的方式）
  * @param {string} url - 下载地址
  * @param {string} fileName - 文件名
- * @param {Function} onProgress - 进度回调
- * @returns {Promise<Blob>} 文件 Blob 对象
+ * @param {Function} onProgress - 进度回调（此方式不支持实时进度）
+ * @returns {Promise<void>}
  */
 export async function downloadAPK(url, fileName, onProgress) {
 	try {
-		const response = await fetch(url)
+		console.log('准备在新浏览器窗口打开下载链接:', url)
 
-		if (!response.ok) {
-			throw new Error(`下载失败: ${response.status}`)
+		// 立即调用进度回调，显示为完成（因为无法获取实际进度）
+		if (onProgress) {
+			onProgress(100, 0, 0)
 		}
 
-		const contentLength = response.headers.get('content-length')
-		const total = contentLength ? parseInt(contentLength, 10) : 0
+		// 打开新窗口/标签页进行下载
+		// 在 WebView 中会打开系统浏览器，在普通浏览器中会打开新标签页
+		const opened = window.open(url, '_blank')
 
-		const reader = response.body.getReader()
-		let receivedLength = 0
-		const chunks = []
+		if (!opened) {
+			// 如果被弹窗拦截器阻止，尝试使用 <a> 标签方式
+			console.warn('window.open 被阻止，尝试使用 <a> 标签方式')
+			const a = document.createElement('a')
+			a.href = url
+			a.target = '_blank'
+			a.rel = 'noopener noreferrer'
+			a.style.display = 'none'
 
-		while (true) {
-			const { done, value } = await reader.read()
+			document.body.appendChild(a)
+			a.click()
 
-			if (done) break
-
-			chunks.push(value)
-			receivedLength += value.length
-
-			// 调用进度回调
-			if (onProgress && total > 0) {
-				const percent = Math.round((receivedLength / total) * 100)
-				onProgress(percent, receivedLength, total)
-			}
+			setTimeout(() => {
+				document.body.removeChild(a)
+			}, 100)
+		} else {
+			console.log('已在新窗口打开下载链接')
 		}
 
-		// 合并所有 chunks
-		const blob = new Blob(chunks, { type: 'application/vnd.android.package-archive' })
-		return blob
+		// 不返回 Blob，直接返回成功
+		return
 	} catch (error) {
 		console.error('下载 APK 失败:', error)
 		throw error
@@ -155,67 +167,15 @@ export async function downloadAPK(url, fileName, onProgress) {
 
 /**
  * 保存并安装 APK（适用于 Webview/5+ 环境）
- * @param {Blob} blob - APK 文件 Blob
+ * 注意：由于使用直接下载方式，此函数已不再需要
+ * @param {any} blob - 保留参数（兼容性）
  * @param {string} fileName - 文件名
  */
 export async function installAPK(blob, fileName) {
-	// 检测运行环境
-	const isPlus = typeof plus !== 'undefined'
-	const isAndroid = /Android/i.test(navigator.userAgent)
-
-	if (!isAndroid) {
-		throw new Error('当前平台不支持 APK 安装')
-	}
-
-	// 创建下载链接
-	const url = URL.createObjectURL(blob)
-	const a = document.createElement('a')
-	a.href = url
-	a.download = fileName
-	document.body.appendChild(a)
-	a.click()
-
-	// 清理
-	setTimeout(() => {
-		document.body.removeChild(a)
-		URL.revokeObjectURL(url)
-	}, 100)
-
-	// 如果在 5+ Runtime 环境，可以调用原生安装
-	if (isPlus && plus.runtime) {
-		try {
-			// 保存到本地文件系统
-			const filePath = `_downloads/${fileName}`
-			const entry = await new Promise((resolve, reject) => {
-				plus.io.resolveLocalFileSystemURL(
-					'_downloads',
-					dirEntry => {
-						dirEntry.getFile(fileName, { create: true }, fileEntry => {
-							fileEntry.createWriter(writer => {
-								writer.write(blob)
-								resolve(fileEntry)
-							}, reject)
-						}, reject)
-					},
-					reject
-				)
-			})
-
-			// 调用安装
-			plus.runtime.install(
-				entry.toLocalURL(),
-				{},
-				() => {
-					console.log('APK 安装成功')
-				},
-				error => {
-					console.error('APK 安装失败:', error)
-				}
-			)
-		} catch (error) {
-			console.error('原生安装失败，使用浏览器下载:', error)
-		}
-	}
+	// 直接下载方式已经触发了浏览器的下载，无需额外处理
+	// 用户可以在浏览器下载列表中查看下载的文件
+	console.log('APK 下载已触发，请查看浏览器下载列表')
+	return
 }
 
 /**
@@ -225,11 +185,11 @@ export async function installAPK(blob, fileName) {
  */
 export async function downloadAndInstall(updateInfo, onProgress) {
 	try {
-		// 下载 APK
-		const blob = await downloadAPK(updateInfo.downloadUrl, updateInfo.fileName, onProgress)
+		// 直接下载 APK（会触发浏览器下载）
+		await downloadAPK(updateInfo.downloadUrl, updateInfo.fileName, onProgress)
 
-		// 安装 APK
-		await installAPK(blob, updateInfo.fileName)
+		// 提示用户查看浏览器下载
+		console.log('下载完成，请查看浏览器下载列表')
 
 		return true
 	} catch (error) {
