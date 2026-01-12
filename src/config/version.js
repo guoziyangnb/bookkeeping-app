@@ -10,7 +10,7 @@
  */
 
 // 当前应用版本号（需要与 package.json 和 HBuilderX 的 manifest.json 保持一致）
-export const CURRENT_VERSION = '1.0.0'
+export const CURRENT_VERSION = '1.0.2'
 
 // GitHub 仓库配置（请替换为你的仓库信息）
 export const GITHUB_REPO = {
