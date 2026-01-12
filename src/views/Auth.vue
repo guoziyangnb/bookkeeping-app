@@ -213,17 +213,17 @@ const handleSubmit = async () => {
 				account: formData.account,
 				password: formData.password
 			})
-			resetFormData()
 			if (userInfo?.user?.id) {
 				router.push('/login')
 				if (accountType.value === 'phone') {
-					message.success('注册成功，请查收短信验证码进行验证！', 6000)
+					message.success('手机注册成功！')
 				} else {
 					message.success('注册成功，你会收到一封邮件，请先点击邮件中的链接进行验证才能登录！', 6000)
 				}
 			} else {
 				message.error('注册失败，请重试')
 			}
+			resetFormData()
 		}
 	} catch (error) {
 		console.error('认证失败:', error)
