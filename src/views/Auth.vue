@@ -214,7 +214,6 @@ const handleSubmit = async () => {
 				password: formData.password
 			})
 			resetFormData()
-			console.log('🚀 ~ handleSubmit ~ formData:', formData)
 			if (userInfo?.user?.id) {
 				router.push('/login')
 				if (accountType.value === 'phone') {

@@ -5,19 +5,43 @@ import supabase from '.' // 引入supabase实例
 
 // 账户注册
 export const signUp = async ({ email, phone, password, username }) => {
-	const { data: user, error } = await supabase.auth.signUp({
-		email,
-		phone,
+	// 验证：必须提供邮箱或手机号之一
+	if (!email && !phone) {
+		console.error('❌ email 和 phone 都为空！')
+		throw new Error('请提供有效的手机号或邮箱')
+	}
+
+	// 构建注册参数
+	const signUpData = {
 		password,
 		options: {
 			data: {
 				username: username || '',
-				avatar: '',
-				phone: ''
+				avatar: ''
 			}
 		}
-	})
-	if (error) throw new Error(error.message)
+	}
+
+	// 根据提供的凭证添加对应字段
+	if (email) {
+		signUpData.email = email
+		console.log('✅ 添加 email:', email)
+	}
+	if (phone) {
+		signUpData.phone = '+' + phone
+		console.log('✅ 添加 phone:', '+' + phone)
+	}
+
+	console.log('🚀 准备发送给 Supabase 的数据:', JSON.stringify(signUpData, null, 2))
+
+	const { data: user, error } = await supabase.auth.signUp(signUpData)
+
+	console.log('🚀 Supabase 返回结果:', { user, error })
+
+	if (error) {
+		console.error('❌ Supabase 注册错误:', error)
+		throw new Error(error.message)
+	}
 	return user
 }
 
@@ -28,7 +52,7 @@ export const signIn = async data => {
 	// 判断使用手机号还是邮箱登录
 	const credentials = {}
 	if (phone) {
-		credentials.phone = phone
+		credentials.phone = '+' + phone
 	} else if (email) {
 		credentials.email = email
 	} else {
@@ -63,11 +87,11 @@ export const updateUser = async data => {
 	const { username, avatar, phone, email, password } = data
 	const { data: user, error } = await supabase.auth.updateUser({
 		email: email,
+		phone: '+' + phone,
 		password: password,
 		data: {
 			username: username,
-			avatar: avatar,
-			phone: phone
+			avatar: avatar
 		}
 	})
 	if (error) throw new Error(error.message)
