@@ -142,6 +142,11 @@ export const useUserStore = defineStore('user', {
 			} catch (error) {
 				console.error('退出登录失败:', error)
 			} finally {
+				// 清除记录数据缓存
+				const { useRecordsStore } = await import('./records')
+				const recordsStore = useRecordsStore()
+				recordsStore.clearCache()
+
 				// 清除本地状态
 				this.userProfile = null
 				this.isAuthenticated = false
