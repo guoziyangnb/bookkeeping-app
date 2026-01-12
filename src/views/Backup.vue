@@ -120,8 +120,8 @@ const handleSwitchChange = (field, newValue, item) => {
 
 // 立即备份
 const handleBackup = async () => {
-	if (!backupSettings.localBackup && !backupSettings.cloudBackup) {
-		message.warning('请先开启至少一种备份方式')
+	if (!backupSettings.localBackup) {
+		message.warning('请先开启本地存储！')
 		return
 	}
 
@@ -177,6 +177,7 @@ const handleRestore = async () => {
 		message.warning('恢复数据仅支持本地存储，请先开启')
 		return
 	}
+	await new Promise(resolve => setTimeout(resolve, 1000))
 	message.warning('Sorry, 恢复数据功能其实还在开发中,后续会上线哦')
 	return
 
