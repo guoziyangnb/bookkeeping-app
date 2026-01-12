@@ -30,6 +30,23 @@
 
 			<!-- 其他设置 -->
 			<div class="settings-group">
+				<div class="settings-item" @click="goToUpdate">
+					<div class="settings-item-left">
+						<div class="settings-icon" style="background: var(--accent-purple)">
+							<svg viewBox="0 0 24 24">
+								<path
+									d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.15 15.36l-2.5-1.01L12 14.17V7h1v6.27l3.45 1.39-.3.92z"
+								/>
+							</svg>
+						</div>
+						<div class="settings-item-info">
+							<div class="settings-item-title">检查更新</div>
+							<div class="settings-item-desc">v{{ currentVersion }}</div>
+						</div>
+					</div>
+					<div class="settings-arrow">›</div>
+				</div>
+
 				<div class="settings-item" @click="goToProfile">
 					<div class="settings-item-left">
 						<div class="settings-icon" style="background: var(--accent-blue)">
@@ -116,6 +133,7 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUIStore } from '@/stores/ui'
 import { useRecordsStore } from '@/stores/records'
@@ -123,11 +141,17 @@ import { clearStorage } from '@/utils/storage'
 import Header from '@/components/layout/Header.vue'
 import { message } from '@/utils/message'
 import { showConfirmDialog } from 'vant'
+import { CURRENT_VERSION } from '@/config/version'
 import 'vant/lib/dialog/style'
 
 const router = useRouter()
 const uiStore = useUIStore()
 const recordsStore = useRecordsStore()
+const currentVersion = ref(CURRENT_VERSION)
+
+const goToUpdate = () => {
+	router.push('/settings/update')
+}
 
 const goToProfile = () => {
 	router.push('/settings/profile')

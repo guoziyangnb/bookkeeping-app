@@ -62,6 +62,12 @@ const routes = [
 		meta: { title: '数据备份', isSubPage: true }
 	},
 	{
+		path: '/settings/update',
+		name: 'update',
+		component: () => import('@/views/AppUpdate.vue'),
+		meta: { title: '检查更新', isSubPage: true }
+	},
+	{
 		path: '/welcome/user-agreement',
 		name: 'userAgreement',
 		component: () => import('@/views/UserAgreement.vue'),
