@@ -4,7 +4,7 @@ import router from '@/router'
 import { signUp, signIn, logout, getCurrentUser, updateUser } from '@/service/user'
 
 // 判断输入是手机号还是邮箱
-const identifyAccountType = (account) => {
+const identifyAccountType = account => {
 	const phoneRegex = /^1[3-9]\d{9}$/
 	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -146,7 +146,6 @@ export const useUserStore = defineStore('user', {
 				this.userProfile = null
 				this.isAuthenticated = false
 				removeStorage('userProfile')
-				router.push('/welcome')
 			}
 		},
 
