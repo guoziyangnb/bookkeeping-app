@@ -25,18 +25,12 @@ export const signUp = async ({ email, phone, password, username }) => {
 	// 根据提供的凭证添加对应字段
 	if (email) {
 		signUpData.email = email
-		console.log('✅ 添加 email:', email)
 	}
 	if (phone) {
 		signUpData.phone = '+' + phone
-		console.log('✅ 添加 phone:', '+' + phone)
 	}
 
-	console.log('🚀 准备发送给 Supabase 的数据:', JSON.stringify(signUpData, null, 2))
-
 	const { data: user, error } = await supabase.auth.signUp(signUpData)
-
-	console.log('🚀 Supabase 返回结果:', { user, error })
 
 	if (error) {
 		console.error('❌ Supabase 注册错误:', error)
