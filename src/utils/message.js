@@ -4,10 +4,11 @@ import Toast from '@/components/common/Toast.vue'
 // Toast 实例容器
 let toastInstance = null
 let toastContainer = null
+let toastState = null
 
 // 创建 Toast 容器和实例
 function createToastInstance() {
-	if (toastInstance) return toastInstance
+	if (toastInstance) return toastState
 
 	// 创建容器元素
 	toastContainer = document.createElement('div')
@@ -15,7 +16,7 @@ function createToastInstance() {
 	document.body.appendChild(toastContainer)
 
 	// 创建 Toast 状态
-	const state = reactive({
+	toastState = reactive({
 		message: '',
 		type: 'success',
 		visible: false,
@@ -26,9 +27,9 @@ function createToastInstance() {
 	const app = createApp({
 		render() {
 			return h(Toast, {
-				message: state.message,
-				type: state.type,
-				visible: state.visible
+				message: toastState.message,
+				type: toastState.type,
+				visible: toastState.visible
 			})
 		}
 	})
@@ -36,13 +37,13 @@ function createToastInstance() {
 	// 挂载到容器
 	toastInstance = app.mount(toastContainer)
 
-	return { state, app }
+	return toastState
 }
 
 // 显示 Toast
 function show(message, type = 'success', duration = 2000) {
 	// 创建或获取 Toast 实例
-	const { state } = createToastInstance()
+	const state = createToastInstance()
 
 	// 清除之前的定时器
 	if (state.timer) {
