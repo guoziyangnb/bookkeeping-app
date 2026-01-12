@@ -2,7 +2,7 @@
 	<div class="transaction-item" @click="handleClick">
 		<div class="transaction-icon" :style="{ background: hasImage ? 'transparent' : categoryColor }">
 			<!-- 优先展示图片 -->
-			<img v-if="record.image" :src="record.image" class="transaction-image" alt="记录图片" />
+			<img v-if="record.image_url" :src="record.image_url" class="transaction-image" alt="记录图片" />
 			<!-- 降级展示分类图标 -->
 			<svg v-else v-html="categoryIcon"></svg>
 		</div>
