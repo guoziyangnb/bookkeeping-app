@@ -47,3 +47,8 @@ export const VERSION_CONFIG = {
 	// 自动检查更新的间隔时间（毫秒）- 24小时
 	checkInterval: 24 * 60 * 60 * 1000
 }
+
+// GitHub 下载加速代理（可选）
+// 留空则不使用代理，直接从 GitHub 下载
+// 常用代理：https://hk.gh-proxy.org/、https://ghproxy.com/、https://mirror.ghproxy.com/
+export const GH_PROXY = 'https://hk.gh-proxy.org/'

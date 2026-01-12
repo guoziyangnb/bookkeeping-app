@@ -3,7 +3,7 @@
  * 功能：检查更新、下载APK、安装
  */
 
-import { CURRENT_VERSION, GITHUB_REPO, getGithubApiUrl, VERSION_CONFIG } from '@/config/version'
+import { CURRENT_VERSION, GITHUB_REPO, getGithubApiUrl, VERSION_CONFIG, GH_PROXY } from '@/config/version'
 
 /**
  * 比较版本号
@@ -71,11 +71,15 @@ export async function checkForUpdate() {
 			return null
 		}
 
+		// 使用代理加速下载
+		const originalUrl = apkAsset.browser_download_url
+		const downloadUrl = GH_PROXY ? GH_PROXY + originalUrl : originalUrl
+
 		// 返回更新信息
 		return {
 			latestVersion,
 			currentVersion: CURRENT_VERSION,
-			downloadUrl: apkAsset.browser_download_url,
+			downloadUrl,
 			fileSize: apkAsset.size,
 			fileName: apkAsset.name,
 			updateLog: releaseData.body || releaseData.name,
