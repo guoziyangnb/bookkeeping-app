@@ -12,8 +12,7 @@ export const signUp = async ({ email, phone, password, username }) => {
 		options: {
 			data: {
 				username: username || '',
-				avatar: '',
-				phone: ''
+				avatar: ''
 			}
 		}
 	})
@@ -28,7 +27,7 @@ export const signIn = async data => {
 	// 判断使用手机号还是邮箱登录
 	const credentials = {}
 	if (phone) {
-		credentials.phone = phone
+		credentials.phone = '+' + phone
 	} else if (email) {
 		credentials.email = email
 	} else {
@@ -64,10 +63,10 @@ export const updateUser = async data => {
 	const { data: user, error } = await supabase.auth.updateUser({
 		email: email,
 		password: password,
+		phone: '+' + phone,
 		data: {
 			username: username,
-			avatar: avatar,
-			phone: phone
+			avatar: avatar
 		}
 	})
 	if (error) throw new Error(error.message)

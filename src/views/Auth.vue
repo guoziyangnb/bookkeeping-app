@@ -155,6 +155,7 @@ import { useUserStore } from '@/stores/user'
 import { message } from '@/utils/message'
 import { Button as VanButton } from 'vant'
 import 'vant/lib/button/style'
+import supabase from '@/service/index'
 
 const router = useRouter()
 const route = useRoute()
@@ -219,21 +220,42 @@ const setRegisterMode = mode => {
 
 // 发送验证码
 const sendVerificationCode = async () => {
+	// 验证用户名
+	if (formData.username.trim() === '') {
+		message.error('请输入用户名')
+		return
+	}
+
 	// 验证手机号
 	if (accountType.value !== 'phone') {
 		message.error('请输入有效的手机号')
 		return
 	}
 
+	// 验证密码
+	if (formData.password.trim() === '') {
+		message.error('请输入注册密码')
+		return
+	}
+
 	try {
 		loading.value = true
 		isSendingCode.value = true
-		// TODO: 调用发送验证码的API
-		// await userStore.sendVerificationCode({ phone: formData.account })
 
-		// 模拟发送成功
-		message.success('验证码已发送')
-		loading.value = false
+		// 调用发送验证码的API
+		const { data, error } = await supabase.auth.signInWithOtp({
+			phone: `+${formData.account}`
+		})
+		// const { data, error } = await supabase.auth.signUp({
+		// 	phone: `+${formData.account}`,
+		// 	password: formData.password
+		// })
+
+		if (error) {
+			throw data.message || '发送验证码失败，请重试'
+		}
+
+		message.success('验证码已发送，请注意查收')
 
 		// 开始倒计时
 		countdown.value = 60
@@ -246,7 +268,7 @@ const sendVerificationCode = async () => {
 		}, 1000)
 	} catch (error) {
 		console.error('发送验证码失败:', error)
-		message.error(error.message || '发送验证码失败，请重试')
+		message.error(error || '发送验证码失败，请重试')
 	} finally {
 		loading.value = false
 		isSendingCode.value = false
@@ -329,30 +351,36 @@ const handleSubmit = async () => {
 				message.error('登录失败，请检查账号和密码是否正确', 6000)
 			}
 		} else {
-			// 注册逻辑
-			const registerData = {
-				username: formData.username,
-				account: formData.account,
-				password: formData.password
-			}
-
-			// 如果是手机号验证注册，添加验证码
-			if (registerMode.value === 'phone') {
-				registerData.verificationCode = formData.verificationCode
-			}
-
-			const userInfo = await userStore.register(registerData)
-			resetFormData()
-			console.log('🚀 ~ handleSubmit ~ formData:', formData)
-			if (userInfo?.user?.id) {
-				router.push('/login')
-				if (registerMode.value === 'phone') {
-					message.success('注册成功，请查收短信验证码进行验证！', 6000)
-				} else {
-					message.success('注册成功，你会收到一封邮件，请先点击邮件中的链接进行验证才能登录！', 6000)
+			// 邮箱注册逻辑
+			if (registerMode.value === 'email') {
+				const registerData = {
+					username: formData.username,
+					account: formData.account,
+					password: formData.password
 				}
-			} else {
-				message.error('注册失败，请重试')
+				const userInfo = await userStore.register(registerData)
+				console.log('🚀 ~ handleSubmit ~ formData:', formData)
+				if (userInfo?.user?.id) {
+					resetFormData()
+					router.push('/login')
+					message.success('注册成功，你会收到一封邮件，请先点击邮件中的链接进行验证才能登录！', 6000)
+				} else {
+					message.error('注册失败，请重试')
+				}
+			} else if (registerMode.value === 'phone') {
+				const verifyData = {
+					phone: formData.account,
+					token: formData.verificationCode
+				}
+				// 如果是手机号验证注册，添加验证码
+				const result = await userStore.verifyCode(verifyData)
+				if (result?.user?.id) {
+					resetFormData()
+					router.push('/login')
+					message.success('注册成功')
+				} else {
+					message.error('注册失败，请重试')
+				}
 			}
 		}
 	} catch (error) {
