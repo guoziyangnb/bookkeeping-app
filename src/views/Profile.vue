@@ -259,6 +259,10 @@ const handleLogout = async () => {
 			// 清空本地文件列表
 			fileList.value = []
 			avatarUrl.value = ''
+			formData.username = ''
+			formData.email = ''
+			formData.phone = ''
+
 			const loadingToast = showLoadingToast({
 				message: '退出中...',
 				forbidClick: true
@@ -311,10 +315,10 @@ const loadUserProfile = () => {
 	// 只有用户登陆了才加载用户数据
 	if (userStore.userId) {
 		fileList.value = userStore.userAvatar ? [{ url: userStore.userAvatar }] : []
-		avatarUrl.value = userStore.userAvatar
-		formData.username = userStore.userName
-		formData.email = userStore.userEmail
-		formData.phone = userStore.userPhone
+		avatarUrl.value = userStore.userAvatar ? userStore.userAvatar : ''
+		formData.username = userStore.userName ? userStore.userName : ''
+		formData.email = userStore.userEmail ? userStore.userEmail : ''
+		formData.phone = userStore.userPhone ? userStore.userPhone : ''
 	}
 }
 
