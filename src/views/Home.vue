@@ -64,8 +64,8 @@ const hasMoreRecords = computed(() => recordsStore.records.length > 30)
 // 加载最近记录
 onMounted(async () => {
 	const settings = getStorage('backupSettings', {})
-	const isCloud = settings['cloudBackup']
-	console.log('🚀 ~ isCloud:', isCloud)
+	// 如果未设置 backupSettings，默认使用云端存储
+	const isCloud = settings['cloudBackup'] === undefined ? true : settings['cloudBackup']
 	if (userStore.userId && isCloud) {
 		try {
 			await recordsStore.fetchRecentRecords(userStore.userId, 30)
