@@ -40,6 +40,7 @@ import 'vant/lib/toast/style'
 import { message } from '@/utils/message'
 import { uploadFile, deleteFile } from '@/service/file'
 import Compressor from 'compressorjs'
+import { useUserStore } from '@/stores/user'
 
 const props = defineProps({
 	modelValue: {
@@ -56,6 +57,7 @@ const emit = defineEmits(['update:modelValue'])
 
 const fileList = ref(props.modelValue ? [{ url: props.modelValue, isImage: true }] : [])
 const uploaderRef = ref(null)
+const userStore = useUserStore()
 
 // 图片上传前校验
 const beforeImageRead = file => {
@@ -69,6 +71,10 @@ const beforeImageRead = file => {
 
 // 图片读取与压缩
 const handleImageRead = async file => {
+	if (!userStore.userId) {
+		message.warning('请先到设置页 -> 个人资料 -> 登录')
+		return
+	}
 	if (file instanceof Array) file = file[0]
 	file.status = 'uploading'
 	try {

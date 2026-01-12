@@ -205,6 +205,11 @@ function selectCategory(categoryName) {
 }
 
 async function handleSubmit() {
+	if (!userStore.userId) {
+		message.warning('请先到设置页 -> 个人资料 -> 登录')
+		return
+	}
+
 	if (!formData.amount || formData.amount <= 0) {
 		message.warning('请输入有效金额')
 		return
