@@ -48,7 +48,7 @@ export const useUserStore = defineStore('user', {
 		userEmail: state => state.userProfile?.user?.user_metadata?.email || '',
 
 		// 获取用户电话
-		userPhone: state => state.userProfile?.user?.user_metadata?.phone || ''
+		userPhone: state => state.userProfile?.user?.phone || ''
 	},
 
 	actions: {
