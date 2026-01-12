@@ -84,16 +84,30 @@ export const getCurrentUser = async () => {
 
 // 更新用户信息
 export const updateUser = async data => {
-	const { username, avatar, phone, email, password } = data
-	const { data: user, error } = await supabase.auth.updateUser({
-		email: email,
-		phone: '+' + phone,
-		password: password,
-		data: {
-			username: username,
-			avatar: avatar
-		}
-	})
+	// 1. 创建空的更新配置对象
+	const updateConfig = {}
+
+	// 2. 处理基础用户信息字段，只添加存在的字段
+	if (data.email) updateConfig.email = data.email
+	if (data.phone) updateConfig.phone = '+' + data.phone
+	if (data.password) updateConfig.password = data.password
+
+	// 3. 处理自定义用户数据（data 字段）
+	const userMetadata = {}
+	if (data.username) userMetadata.username = data.username
+	if (data.avatar) userMetadata.avatar = data.avatar
+
+	// 只有当自定义数据不为空时，才添加到更新配置中
+	if (Object.keys(userMetadata).length > 0) {
+		updateConfig.data = userMetadata
+	}
+
+	// 4. 调用 supabase 更新接口（确保配置对象不为空）
+	if (Object.keys(updateConfig).length === 0) {
+		throw new Error('没有可更新的用户信息字段')
+	}
+
+	const { data: user, error } = await supabase.auth.updateUser(updateConfig)
 	if (error) throw new Error(error.message)
 	return user
 }
