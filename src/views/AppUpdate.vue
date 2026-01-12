@@ -53,7 +53,7 @@
 			<div v-if="updateInfo" class="update-card">
 				<div class="update-header">
 					<div class="update-badge">发现新版本</div>
-					<div class="new-version">v{{ updateInfo.latestVersion }}</div>
+					<div class="new-version">{{ updateInfo.latestVersion }}</div>
 				</div>
 
 				<div class="update-details">
@@ -100,8 +100,10 @@
 				<!-- 下载完成 -->
 				<div v-if="downloadComplete" class="download-complete">
 					<div class="complete-icon">✓</div>
-					<div class="complete-text">下载完成，请安装更新</div>
-					<div class="complete-hint">如果没有自动打开安装页面，请查看下载文件夹</div>
+					<div class="complete-text">已打开下载页面</div>
+					<div class="complete-hint">
+						请在浏览器中完成下载。Android 用户可在"文件管理器"的"下载"文件夹找到 APK 文件
+					</div>
 				</div>
 			</div>
 		</div>
@@ -145,8 +147,8 @@ const handleCheckUpdate = async () => {
 		saveLastCheckTime()
 	} catch (err) {
 		console.error('检查更新失败:', err)
-		error.value = '检查更新失败，请检查网络连接'
-		message.error('检查更新失败')
+		error.value = err.message || '检查更新失败，请检查网络连接'
+		message.error(err.message || '检查更新失败')
 	} finally {
 		isChecking.value = false
 		hasChecked.value = true
@@ -166,7 +168,7 @@ const handleDownload = async () => {
 		})
 
 		downloadComplete.value = true
-		message.success('下载完成！请在浏览器下载中查看')
+		message.success('已打开浏览器下载页面，请在浏览器中完成下载')
 	} catch (err) {
 		console.error('下载失败:', err)
 		error.value = '下载失败，请稍后重试'
