@@ -20,7 +20,15 @@
 					<label class="form-label">金额</label>
 					<div class="amount-input-wrapper">
 						<span class="currency-symbol">¥</span>
-						<input ref="amountInput" v-model.number="formData.amount" type="number" class="form-input amount-input" placeholder="0.00" step="0.01" min="0" />
+						<input
+							ref="amountInput"
+							v-model="formData.amount"
+							type="number"
+							class="form-input amount-input"
+							placeholder="0.00"
+							step="0.01"
+							min="0.00"
+							@input="handleAmountInput" />
 					</div>
 				</div>
 
@@ -204,6 +212,42 @@ function selectCategory(categoryName) {
 	formData.category = categoryName
 }
 
+// 处理金额输入，限制小数点后最多两位
+function handleAmountInput(event) {
+	const value = event.target.value
+
+	// 空值处理
+	if (value === '' || value === null || value === undefined) {
+		formData.amount = ''
+		return
+	}
+
+	// 转为字符串处理
+	let strValue = String(value)
+
+	// 检查是否包含小数点
+	if (strValue.includes('.')) {
+		const parts = strValue.split('.')
+		const integerPart = parts[0] || '0'
+		const decimalPart = parts[1] || ''
+
+		// 如果小数部分超过2位，截断并更新
+		if (decimalPart.length > 2) {
+			const truncatedValue = `${integerPart}.${decimalPart.substring(0, 2)}`
+			// 更新 input 的值
+			event.target.value = truncatedValue
+			// 更新 formData.amount 为数字
+			formData.amount = truncatedValue
+		} else {
+			// 小数部分不超过2位，正常转换
+			formData.amount = strValue
+		}
+	} else {
+		// 没有小数点，正常转换
+		formData.amount = strValue
+	}
+}
+
 async function handleSubmit() {
 	if (!userStore.userId) {
 		message.warning('请先到设置页 -> 个人资料 -> 登录')
@@ -214,6 +258,13 @@ async function handleSubmit() {
 		message.warning('请输入有效金额')
 		return
 	}
+
+	// 检查最小金额（0.01元，即1分）
+	if (formData.amount < 0.01) {
+		message.warning('金额不能低于 0.01 元')
+		return
+	}
+
 	isSaveLoading.value = true
 	try {
 		if (isEditMode.value) {
