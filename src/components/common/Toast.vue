@@ -39,14 +39,16 @@ defineProps({
 .toast-container {
 	position: fixed;
 	top: 80px;
-	left: 50%;
-	transform: translateX(-50%);
-	min-width: 240px;
-	max-width: 380px;
+	left: 20px;
+	right: 20px;
+	/* 桌面端最大800px，移动端自动填满左右20px的间距 */
+	margin: 0 auto;
+	max-width: 800px;
 	padding: 14px 20px;
 	border-radius: 16px;
 	display: flex;
 	align-items: center;
+	justify-content: center;
 	gap: 10px;
 	backdrop-filter: blur(20px);
 	-webkit-backdrop-filter: blur(20px);
@@ -54,6 +56,7 @@ defineProps({
 	z-index: 9999;
 	font-size: 15px;
 	font-weight: 500;
+	width: fit-content;
 }
 
 .toast-success {
@@ -79,8 +82,11 @@ defineProps({
 }
 
 .toast-message {
-	flex: 1;
-	word-break: break-word;
+	/* 根据内容自适应宽度，不拉伸 */
+	flex: 0 1 auto;
+	/* 正常的换行行为，不要在单词中间断开 */
+	word-break: normal;
+	overflow-wrap: break-word;
 }
 
 /* 过渡动画 */
@@ -91,19 +97,17 @@ defineProps({
 
 .toast-enter-from {
 	opacity: 0;
-	transform: translateX(-50%) translateY(-20px);
+	transform: translateY(-20px);
 }
 
 .toast-leave-to {
 	opacity: 0;
-	transform: translateX(-50%) translateY(-20px);
+	transform: translateY(-20px);
 }
 
 /* 移动端适配 */
 @media (max-width: 768px) {
 	.toast-container {
-		min-width: 200px;
-		max-width: calc(100vw - 20px);
 		padding: 12px 16px;
 		font-size: 14px;
 	}
