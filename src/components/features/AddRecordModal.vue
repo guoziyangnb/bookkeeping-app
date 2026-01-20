@@ -22,12 +22,11 @@
 						<span class="currency-symbol">¥</span>
 						<input
 							ref="amountInput"
-							v-model="formData.amount"
-							type="number"
+							v-model="localAmount"
+							type="text"
+							inputmode="decimal"
 							class="form-input amount-input"
 							placeholder="0.00"
-							step="0.01"
-							min="0.00"
 							@input="handleAmountInput" />
 					</div>
 				</div>
@@ -92,6 +91,9 @@ const recordsStore = useRecordsStore()
 const amountInput = ref(null)
 const isSaveLoading = ref(false)
 const isDelLoading = ref(false)
+
+// 本地金额输入状态，避免频繁更新响应式数据导致光标问题
+const localAmount = ref('')
 
 // 是否为编辑模式
 const isEditMode = computed(() => uiStore.editingRecord !== null)
@@ -172,7 +174,8 @@ watch(
 				const record = uiStore.editingRecord
 				formData.type = record.type
 				formData.category = record.category
-				formData.amount = Math.abs(record.amount)
+				const absAmount = Math.abs(record.amount)
+				localAmount.value = absAmount.toString()
 				formData.note = record.note || ''
 				formData.date = record.date.split('T')[0]
 				formData.image = record.image_url || ''
@@ -186,7 +189,7 @@ watch(
 					const firstCategory = allCategories.find(cat => cat.type === formData.type || cat.type === 'both')
 					formData.category = firstCategory?.name || '餐饮'
 				}
-				formData.amount = ''
+				localAmount.value = ''
 				formData.note = ''
 				formData.date = formatToLocalISODate(new Date())
 				formData.image = ''
@@ -214,38 +217,48 @@ function selectCategory(categoryName) {
 
 // 处理金额输入，限制小数点后最多两位
 function handleAmountInput(event) {
-	const value = event.target.value
+	let value = event.target.value
+	const cursorPosition = event.target.selectionStart
 
 	// 空值处理
 	if (value === '' || value === null || value === undefined) {
+		localAmount.value = ''
 		formData.amount = ''
 		return
 	}
 
-	// 转为字符串处理
-	let strValue = String(value)
+	// 只允许数字和一个小数点
+	value = value.replace(/[^0-9.]/g, '')
+	// 移除多余的小数点
+	const dotIndex = value.indexOf('.')
+	if (dotIndex !== -1) {
+		value = value.substring(0, dotIndex + 1) + value.substring(dotIndex + 1).replace(/\./g, '')
+	}
 
 	// 检查是否包含小数点
-	if (strValue.includes('.')) {
-		const parts = strValue.split('.')
+	if (value.includes('.')) {
+		const parts = value.split('.')
 		const integerPart = parts[0] || '0'
-		const decimalPart = parts[1] || ''
+		let decimalPart = parts[1] || ''
 
-		// 如果小数部分超过2位，截断并更新
+		// 如果小数部分超过2位，截断
 		if (decimalPart.length > 2) {
-			const truncatedValue = `${integerPart}.${decimalPart.substring(0, 2)}`
-			// 更新 input 的值
-			event.target.value = truncatedValue
-			// 更新 formData.amount 为数字
-			formData.amount = truncatedValue
-		} else {
-			// 小数部分不超过2位，正常转换
-			formData.amount = strValue
+			decimalPart = decimalPart.substring(0, 2)
 		}
-	} else {
-		// 没有小数点，正常转换
-		formData.amount = strValue
+
+		value = `${integerPart}.${decimalPart}`
 	}
+
+	// 更新本地状态
+	localAmount.value = value
+	// 同时更新 formData 用于提交
+	formData.amount = value
+
+	// 恢复光标位置
+	nextTick(() => {
+		const newPos = Math.min(cursorPosition, value.length)
+		event.target.setSelectionRange(newPos, newPos)
+	})
 }
 
 async function handleSubmit() {
@@ -254,16 +267,21 @@ async function handleSubmit() {
 		return
 	}
 
-	if (!formData.amount || formData.amount <= 0) {
+	const amountNum = parseFloat(localAmount.value)
+
+	if (!localAmount.value || isNaN(amountNum) || amountNum <= 0) {
 		message.warning('请输入有效金额')
 		return
 	}
 
 	// 检查最小金额（0.01元，即1分）
-	if (formData.amount < 0.01) {
+	if (amountNum < 0.01) {
 		message.warning('金额不能低于 0.01 元')
 		return
 	}
+
+	// 使用 localAmount 的值
+	formData.amount = amountNum
 
 	isSaveLoading.value = true
 	try {
