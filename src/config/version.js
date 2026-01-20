@@ -10,7 +10,7 @@
  */
 
 // 当前应用版本号（需要与 package.json 和 HBuilderX 的 manifest.json 保持一致）
-export const CURRENT_VERSION = '1.0.4'
+export const CURRENT_VERSION = '1.0.5'
 
 // GitHub 仓库配置（请替换为你的仓库信息）
 export const GITHUB_REPO = {
@@ -51,7 +51,7 @@ export const VERSION_CONFIG = {
 // GitHub 下载加速代理（可选）
 // 留空则不使用代理，直接从 GitHub 下载
 // 常用代理：https://hk.gh-proxy.org/、https://ghproxy.com/、https://mirror.ghproxy.com/
-export const GH_PROXY = ''
+export const GH_PROXY = 'https://hk.gh-proxy.org/'
 
 // GitHub Personal Access Token（可选）
 // 用于提高 API 速率限制（从 60次/小时 提升到 5000次/小时）
