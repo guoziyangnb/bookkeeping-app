@@ -94,8 +94,8 @@ const handleSwitchChange = item => {
 	content: '';
 	position: absolute;
 	bottom: 0;
-	right: 0;
-	width: calc(100% - 44px);
+	left: 52px;
+	width: calc(100% - 76px);
 	border-bottom: 0.5px solid var(--van-gray-5);
 }
 
@@ -181,6 +181,11 @@ const handleSwitchChange = item => {
 @media (max-width: 480px) {
 	.form-card {
 		padding: 10px 16px;
+	}
+
+	.form-card::after {
+		left: 48px;
+		width: calc(100% - 72px);
 	}
 
 	.form-icon {
