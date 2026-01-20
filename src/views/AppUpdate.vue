@@ -100,8 +100,8 @@
 				<!-- 下载完成 -->
 				<div v-if="downloadComplete" class="download-complete">
 					<div class="complete-icon">✓</div>
-					<div class="complete-text">已打开下载页面</div>
-					<div class="complete-hint">请在浏览器中完成下载。Android 用户可在"文件管理器"的"下载"文件夹找到 APK 文件</div>
+					<div class="complete-text">已开始进行下载</div>
+					<div class="complete-hint">Android 用户可在"文件管理器"的"下载 -> 安装包"文件夹找到 APK 文件</div>
 				</div>
 			</div>
 		</div>
