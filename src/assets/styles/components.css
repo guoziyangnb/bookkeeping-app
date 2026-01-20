@@ -658,10 +658,6 @@
 		font-size: 36px;
 	}
 
-	.quick-actions {
-		grid-template-columns: repeat(4, 1fr);
-	}
-
 	.tabbar-container {
 		padding: 2px 8px;
 	}
