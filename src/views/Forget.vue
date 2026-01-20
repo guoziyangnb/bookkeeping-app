@@ -10,32 +10,13 @@
 
 		<!-- 顶部标题 -->
 		<div class="header-section">
-			<h1 class="page-title">{{ isLogin ? '登录' : '注册' }}</h1>
-			<p class="page-subtitle">{{ isLogin ? '欢迎回来！' : '创建您的账户' }}</p>
+			<h1 class="page-title">忘记密码</h1>
+			<p class="page-subtitle">重置您的密码</p>
 		</div>
 
 		<!-- 表单 -->
 		<div class="form-section">
 			<form @submit.prevent="handleSubmit">
-				<!-- 注册时显示用户名 -->
-				<div v-if="!isLogin" class="form-group">
-					<label class="form-label">用户名</label>
-					<div class="input-wrapper">
-						<span class="input-icon">
-							<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-								<path
-									d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round" />
-								<circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2" />
-							</svg>
-						</span>
-						<input v-model="formData.username" type="text" placeholder="请输入用户名" required />
-					</div>
-				</div>
-
 				<!-- 账号 -->
 				<div class="form-group">
 					<label class="form-label">账号</label>
@@ -50,9 +31,34 @@
 					</div>
 				</div>
 
-				<!-- 密码 -->
+				<!-- 验证码 -->
+				<!-- <div class="form-group">
+					<label class="form-label">验证码</label>
+					<div class="input-wrapper">
+						<span class="input-icon">
+							<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path
+									d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+									stroke="currentColor"
+									stroke-width="2" />
+								<path
+									d="M12 16V12C12 11.4477 11.5523 11 11 11H10"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round" />
+								<path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+							</svg>
+						</span>
+						<input v-model="formData.code" type="text" placeholder="请输入验证码" required />
+						<button type="button" class="send-code-btn" :disabled="isSending ||   > 0" @click="sendCode">
+							{{ countdown > 0 ? `${countdown}s` : '发送验证码' }}
+						</button>
+					</div>
+				</div> -->
+
+				<!-- 新密码 -->
 				<div class="form-group">
-					<label class="form-label">密码</label>
+					<label class="form-label">新密码</label>
 					<div class="input-wrapper">
 						<span class="input-icon">
 							<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -64,7 +70,7 @@
 									stroke-linecap="round" />
 							</svg>
 						</span>
-						<input v-model="formData.password" :type="showPassword ? 'text' : 'password'" placeholder="请输入密码" required />
+						<input v-model="formData.newPassword" :type="showPassword ? 'text' : 'password'" placeholder="请输入新密码" required />
 						<button type="button" class="toggle-password" @click="showPassword = !showPassword">
 							<svg v-if="!showPassword" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 								<path
@@ -88,22 +94,53 @@
 					</div>
 				</div>
 
-				<!-- 登录时的额外选项 -->
-				<div v-if="isLogin" class="form-options">
-					<a href="#/forget" class="forgot-link">忘记密码？</a>
+				<!-- 确认新密码 -->
+				<div class="form-group">
+					<label class="form-label">确认新密码</label>
+					<div class="input-wrapper">
+						<span class="input-icon">
+							<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke="currentColor" stroke-width="2" />
+								<path
+									d="M7 11V7C7 5.67392 7.52678 4.40215 8.46447 3.46447C9.40215 2.52678 10.6739 2 12 2C13.3261 2 14.5979 2.52678 15.5355 3.46447C16.4732 4.40215 17 5.67392 17 7V11"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round" />
+							</svg>
+						</span>
+						<input v-model="formData.confirmPassword" :type="showConfirmPassword ? 'text' : 'password'" placeholder="请再次输入新密码" required />
+						<button type="button" class="toggle-password" @click="showConfirmPassword = !showConfirmPassword">
+							<svg v-if="!showConfirmPassword" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path
+									d="M1 12S5 4 12 4S23 12 23 12S19 20 12 20S1 12 1 12Z"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round" />
+								<circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" />
+							</svg>
+							<svg v-else viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path
+									d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round" />
+								<line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+							</svg>
+						</button>
+					</div>
 				</div>
 
 				<!-- 提交按钮 -->
 				<button type="submit" class="submit-btn" :disabled="isLoading">
-					{{ isLoading ? '处理中...' : isLogin ? '登录' : '注册' }}
+					{{ isLoading ? '处理中...' : '重置密码' }}
 				</button>
 
-				<!-- 切换登录/注册 -->
+				<!-- 返回登录 -->
 				<div class="switch-form">
-					<span>{{ isLogin ? '还没有账号？' : '已有账号？' }}</span>
-					<button type="button" class="link-btn" @click="toggleMode">
-						{{ isLogin ? '立即注册' : '立即登录' }}
-					</button>
+					<span>想起密码了？</span>
+					<button type="button" class="link-btn" @click="goToLogin">返回登录</button>
 				</div>
 			</form>
 		</div>
@@ -116,28 +153,27 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useUserStore } from '@/stores/user'
+import { ref, reactive, computed, watchEffect } from 'vue'
+import { useRouter } from 'vue-router'
 import { message } from '@/utils/message'
+import supabase from '@/service/index'
 
 const router = useRouter()
-const route = useRoute()
-const userStore = useUserStore()
-
-// 判断是登录还是注册
-const isLogin = computed(() => route.path === '/login')
 
 // 表单数据
 const formData = reactive({
-	username: '',
 	account: '', // 账号（可以是邮箱或手机号）
-	password: ''
+	// code: '',
+	newPassword: '',
+	confirmPassword: ''
 })
 
 // UI状态
 const showPassword = ref(false)
+const showConfirmPassword = ref(false)
 const isLoading = ref(false)
+// const isSending = ref(false)
+const countdown = ref(0)
 
 // 判断输入的是手机号还是邮箱
 const accountType = computed(() => {
@@ -175,74 +211,104 @@ const validateAccount = () => {
 	return true
 }
 
-// 切换登录/注册模式
-const toggleMode = () => {
-	resetFormData()
-	if (isLogin.value) {
-		router.push('/register')
-	} else {
-		router.push('/login')
-	}
-}
+// // 发送验证码
+// const sendCode = async () => {
+// 	// 验证账号
+// 	if (!validateAccount()) {
+// 		return
+// 	}
+
+// 	// TODO: 实现发送验证码的逻辑
+// 	isSending.value = true
+// 	try {
+// 		// 这里暂时只显示提示，实际逻辑待实现
+// 		message.success('验证码发送成功（模拟）')
+
+// 		// 倒计时60秒
+// 		countdown.value = 60
+// 		const timer = setInterval(() => {
+// 			countdown.value--
+// 			if (countdown.value <= 0) {
+// 				clearInterval(timer)
+// 			}
+// 		}, 1000)
+// 	} catch (error) {
+// 		message.error(error.message || '发送验证码失败')
+// 	} finally {
+// 		isSending.value = false
+// 	}
+// }
 
 // 处理表单提交
 const handleSubmit = async () => {
-	// 验证账号格式
+	// 验证账号
 	if (!validateAccount()) {
 		return
 	}
 
-	isLoading.value = true
-	try {
-		if (isLogin.value) {
-			// 登录逻辑
-			const userInfo = await userStore.login({
-				account: formData.account,
-				password: formData.password
-			})
-			if (userInfo?.session?.access_token) {
-				router.push('/')
-				message.success('登录成功')
-			} else {
-				message.error('登录失败，请检查账号和密码是否正确', 6000)
-			}
-		} else {
-			// 注册逻辑
-			const userInfo = await userStore.register({
-				username: formData.username,
-				account: formData.account,
-				password: formData.password
-			})
-			if (userInfo?.user?.id) {
-				router.push('/login')
-				if (accountType.value === 'phone') {
-					message.success('手机注册成功！')
-				} else {
-					message.success('注册成功，你会收到一封邮件，请先点击邮件中的链接进行验证才能登录！', 6000)
-				}
-			} else {
-				message.error('注册失败，请重试')
-			}
-			resetFormData()
-		}
-	} catch (error) {
-		console.error('认证失败:', error)
-		message.error(error.message || '登录注册操作失败，请重试')
-	} finally {
-		isLoading.value = false
+	// // 验证验证码
+	// if (!formData.code.trim()) {
+	// 	message.error('请输入验证码')
+	// 	return
+	// }
+
+	// 验证新密码
+	if (!formData.newPassword) {
+		message.error('请输入新密码')
+		return
 	}
+
+	if (formData.newPassword.length < 6) {
+		message.error('密码长度不能少于6位')
+		return
+	}
+
+	// 验证确认密码
+	if (!formData.confirmPassword) {
+		message.error('请再次输入新密码')
+		return
+	}
+
+	if (formData.newPassword !== formData.confirmPassword) {
+		message.error('两次输入的密码不一致')
+		return
+	}
+
+	const { data1, error1 } = await supabase.auth.resetPasswordForEmail('2263831821@qq.com')
+	console.log('🚀 ~ handleSubmit ~ error1:', error1)
+	console.log('🚀 ~ handleSubmit ~ data1:', data1)
+
+	watchEffect(() => {
+		supabase.auth.onAuthStateChange(async (event, session) => {
+			if (event == 'PASSWORD_RECOVERY') {
+				//  const newPassword = prompt("What would you like your new password to be?");
+				const { data, error } = await supabase.auth.updateUser({ password: formData.newPassword })
+				console.log('🚀 ~ handleSubmit ~ error:', error)
+				console.log('🚀 ~ handleSubmit ~ data:', data)
+				if (data) message.info('Password updated successfully!')
+				if (error) message.info('There was an error updating your password.')
+			}
+		})
+	})
+
+	// TODO: 实现重置密码的逻辑
+	// const { data, error } = await supabase.auth.updateUser({
+	// 	password: formData.newPassword
+	// })
+
+	// if (data.user) {
+	// 	message.info('重置密码功能完成')
+	// }
 }
 
-// 定义重置表单的函数
-const resetFormData = () => {
-	formData.username = ''
-	formData.account = ''
-	formData.password = ''
+// 返回登录
+const goToLogin = () => {
+	router.push('/login')
 }
 
 // 返回
 const goBack = () => {
-	router.push('/welcome')
+	router.push('/login')
 }
 </script>
 
@@ -363,6 +429,29 @@ const goBack = () => {
 	color: #cccccc;
 }
 
+.send-code-btn {
+	padding: 8px 16px;
+	white-space: nowrap;
+	background: #ff7a45;
+	color: #ffffff;
+	border: none;
+	border-radius: 8px;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	margin-right: 8px;
+}
+
+.send-code-btn:hover:not(:disabled) {
+	background: #ff6b35;
+}
+
+.send-code-btn:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
 .toggle-password {
 	padding: 8px 12px;
 	background: none;
@@ -378,26 +467,6 @@ const goBack = () => {
 	color: #ff7a45;
 }
 
-/* 表单选项 */
-.form-options {
-	display: flex;
-	justify-content: flex-end;
-	align-items: center;
-	margin-bottom: 24px;
-	font-size: 14px;
-}
-
-.forgot-link {
-	color: #ff7a45;
-	text-decoration: none;
-	font-size: 14px;
-	transition: opacity 0.3s ease;
-}
-
-.forgot-link:hover {
-	opacity: 0.7;
-}
-
 /* 提交按钮 */
 .submit-btn {
 	width: 100%;
@@ -411,6 +480,7 @@ const goBack = () => {
 	cursor: pointer;
 	transition: all 0.3s ease;
 	box-shadow: 0 4px 12px rgba(255, 122, 69, 0.3);
+	margin-top: 8px;
 }
 
 .submit-btn:hover:not(:disabled) {
@@ -516,6 +586,11 @@ const goBack = () => {
 
 	.form-section {
 		max-width: 100%;
+	}
+
+	.send-code-btn {
+		font-size: 12px;
+		padding: 6px 12px;
 	}
 }
 </style>

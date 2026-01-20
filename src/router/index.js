@@ -20,6 +20,12 @@ const routes = [
 		meta: { title: '注册', isSubPage: true }
 	},
 	{
+		path: '/forget',
+		name: 'forget',
+		component: () => import('@/views/Forget.vue'),
+		meta: { title: '忘记密码', isSubPage: true }
+	},
+	{
 		path: '/',
 		name: 'home',
 		component: () => import('@/views/Home.vue'),
