@@ -197,8 +197,8 @@ const handleSubmit = async () => {
 		if (isLogin.value) {
 			// 登录逻辑
 			const userInfo = await userStore.login({
-				account: formData.account.trim(),
-				password: formData.password.trim()
+				account: formData.account,
+				password: formData.password
 			})
 			if (userInfo?.session?.access_token) {
 				router.push('/')
@@ -209,9 +209,9 @@ const handleSubmit = async () => {
 		} else {
 			// 注册逻辑
 			const userInfo = await userStore.register({
-				username: formData.username.trim(),
-				account: formData.account.trim(),
-				password: formData.password.trim()
+				username: formData.username,
+				account: formData.account,
+				password: formData.password
 			})
 			if (userInfo?.user?.id) {
 				router.push('/login')
