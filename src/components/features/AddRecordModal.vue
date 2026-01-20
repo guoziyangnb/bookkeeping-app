@@ -483,6 +483,11 @@ async function handleDelete() {
 	color: var(--text-primary);
 }
 
+/* 暗黑主题适配 */
+[data-theme='dark'] .type-btn {
+	background: rgba(255, 255, 255, 0.08);
+}
+
 .type-btn:hover {
 	background: rgba(0, 0, 0, 0.06);
 }
@@ -522,6 +527,11 @@ async function handleDelete() {
 	font-family: inherit;
 	color: var(--text-primary);
 	transition: all 0.3s ease;
+}
+
+/* 暗黑主题适配 */
+[data-theme='dark'] .form-input {
+	background: rgba(255, 255, 255, 0.08);
 }
 
 .form-input:focus {
@@ -574,6 +584,11 @@ async function handleDelete() {
 	flex-direction: column;
 	align-items: center;
 	gap: 6px;
+}
+
+/* 暗黑主题适配 */
+[data-theme='dark'] .category-option {
+	background: rgba(255, 255, 255, 0.08);
 }
 
 .category-option:hover {

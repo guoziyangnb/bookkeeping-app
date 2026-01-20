@@ -190,6 +190,11 @@ const handleDeleteImage = async () => {
 	transition: all 0.3s ease;
 }
 
+/* 暗黑主题适配 */
+[data-theme='dark'] .upload-button {
+	background: rgba(255, 255, 255, 0.08);
+}
+
 /* 通过父容器触发 hover，因为 van-uploader 的 input 元素会覆盖 */
 .hidden-uploader:hover .upload-button {
 	background: rgba(0, 0, 0, 0.04);
