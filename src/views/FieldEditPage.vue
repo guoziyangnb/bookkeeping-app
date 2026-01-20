@@ -8,7 +8,7 @@
 				</svg>
 			</button>
 			<h1 class="edit-title">{{ fieldConfig.title }}</h1>
-			<van-button :loading="loading" class="nav-save-btn" @click="handleSave">
+			<van-button :disabled="!inputValue" :loading="loading" class="nav-save-btn" @click="handleSave">
 				<span>保存</span>
 			</van-button>
 		</div>
@@ -34,6 +34,7 @@
 						<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
 					</svg>
 					<span>{{ fieldConfig.hint }}</span>
+					<span style="color: red">{{ fieldConfig.note }}</span>
 				</div>
 			</div>
 
@@ -88,7 +89,8 @@ const fieldConfigs = {
 		title: '修改邮箱',
 		placeholder: '请输入邮箱地址',
 		inputType: 'email',
-		hint: '用于接收重要通知和账单信息',
+		hint: '用于账户安全验证',
+		note: '如果用手机号登录了，无需再设置邮箱',
 		validate: value => {
 			if (!value) {
 				return null // 邮箱可以为空
@@ -106,6 +108,7 @@ const fieldConfigs = {
 		inputType: 'tel',
 		maxlength: 11,
 		hint: '用于账户安全验证',
+		note: '如果用邮箱登录了，无需再设置手机号',
 		validate: value => {
 			if (!value) {
 				return null // 手机号可以为空
