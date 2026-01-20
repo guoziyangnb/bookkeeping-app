@@ -89,9 +89,9 @@
 				</div>
 
 				<!-- 登录时的额外选项 -->
-				<div v-if="isLogin" class="form-options">
+				<!-- <div v-if="isLogin" class="form-options">
 					<a href="#" class="forgot-link">忘记密码？</a>
-				</div>
+				</div> -->
 
 				<!-- 提交按钮 -->
 				<button type="submit" class="submit-btn" :disabled="isLoading">
@@ -197,8 +197,8 @@ const handleSubmit = async () => {
 		if (isLogin.value) {
 			// 登录逻辑
 			const userInfo = await userStore.login({
-				account: formData.account,
-				password: formData.password
+				account: formData.account.trim(),
+				password: formData.password.trim()
 			})
 			if (userInfo?.session?.access_token) {
 				router.push('/')
@@ -209,9 +209,9 @@ const handleSubmit = async () => {
 		} else {
 			// 注册逻辑
 			const userInfo = await userStore.register({
-				username: formData.username,
-				account: formData.account,
-				password: formData.password
+				username: formData.username.trim(),
+				account: formData.account.trim(),
+				password: formData.password.trim()
 			})
 			if (userInfo?.user?.id) {
 				router.push('/login')
