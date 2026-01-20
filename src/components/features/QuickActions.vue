@@ -1,5 +1,12 @@
 <template>
-	<div class="quick-actions">
+	<div
+		ref="containerRef"
+		class="quick-actions"
+		@mousedown="handleMouseDown"
+		@mouseleave="handleMouseLeave"
+		@mouseup="handleMouseUp"
+		@mousemove="handleMouseMove"
+		@wheel="handleWheel">
 		<div v-for="action in actions" :key="action.name" class="quick-action-item" @click="handleClick(action)">
 			<div class="quick-action-icon">
 				<svg viewBox="0 0 24 24" v-html="action.icon"></svg>
@@ -10,7 +17,10 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
+
 const emit = defineEmits(['click'])
+const containerRef = ref(null)
 
 const actions = [
 	{
@@ -78,7 +88,66 @@ const actions = [
 	}
 ]
 
+// 鼠标拖拽滚动相关状态
+const isDragging = ref(false)
+const startX = ref(0)
+const scrollLeft = ref(0)
+
 function handleClick(action) {
 	emit('click', action)
+}
+
+// 鼠标按下
+function handleMouseDown(e) {
+	isDragging.value = true
+	startX.value = e.pageX - containerRef.value.offsetLeft
+	scrollLeft.value = containerRef.value.scrollLeft
+	containerRef.value.style.cursor = 'grabbing'
+	containerRef.value.style.userSelect = 'none'
+}
+
+// 鼠标离开
+function handleMouseLeave() {
+	isDragging.value = false
+	if (containerRef.value) {
+		containerRef.value.style.cursor = 'grab'
+		containerRef.value.style.userSelect = ''
+	}
+}
+
+// 鼠标松开
+function handleMouseUp() {
+	isDragging.value = false
+	if (containerRef.value) {
+		containerRef.value.style.cursor = 'grab'
+		containerRef.value.style.userSelect = ''
+	}
+}
+
+// 鼠标移动
+function handleMouseMove(e) {
+	if (!isDragging.value) return
+	e.preventDefault()
+	const x = e.pageX - containerRef.value.offsetLeft
+	const walk = (x - startX.value) * 2 // 滚动速度系数
+	containerRef.value.scrollLeft = scrollLeft.value - walk
+}
+
+// 鼠标滚轮支持（将垂直滚动转换为横向滚动）
+function handleWheel(e) {
+	if (!containerRef.value) return
+
+	// 检查是否可以横向滚动
+	const canScrollLeft = containerRef.value.scrollLeft > 0
+	const canScrollRight =
+		containerRef.value.scrollLeft < containerRef.value.scrollWidth - containerRef.value.clientWidth
+
+	// 如果可以横向滚动，则转换滚轮方向
+	if (canScrollLeft || canScrollRight) {
+		// 阻止默认的垂直滚动
+		e.preventDefault()
+		// 将垂直滚动转换为横向滚动
+		containerRef.value.scrollLeft += e.deltaY
+	}
 }
 </script>
