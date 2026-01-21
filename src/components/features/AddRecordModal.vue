@@ -238,15 +238,26 @@ function handleAmountInput(event) {
 	// 检查是否包含小数点
 	if (value.includes('.')) {
 		const parts = value.split('.')
-		const integerPart = parts[0] || '0'
+		let integerPart = parts[0] || ''
 		let decimalPart = parts[1] || ''
 
-		// 如果小数部分超过2位，截断
-		if (decimalPart.length > 2) {
-			decimalPart = decimalPart.substring(0, 2)
-		}
+		// 特殊处理：如果整数部分为空，只有小数点，不自动补0
+		// 这样用户可以删除"0."中的"0"
+		if (integerPart === '' && decimalPart === '') {
+			value = '.'
+		} else {
+			// 如果整数部分为空但有小数部分，补0
+			if (integerPart === '') {
+				integerPart = '0'
+			}
 
-		value = `${integerPart}.${decimalPart}`
+			// 如果小数部分超过2位，截断
+			if (decimalPart.length > 2) {
+				decimalPart = decimalPart.substring(0, 2)
+			}
+
+			value = `${integerPart}.${decimalPart}`
+		}
 	}
 
 	// 更新本地状态
@@ -449,6 +460,11 @@ async function handleDelete() {
 	justify-content: center;
 	cursor: pointer;
 	transition: all 0.3s ease;
+}
+
+/* 暗黑主题适配 */
+[data-theme='dark'] .modal-close-btn {
+	background: rgba(255, 255, 255, 0.08);
 }
 
 .modal-close-btn:hover {
