@@ -33,8 +33,9 @@
 					<svg viewBox="0 0 24 24">
 						<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
 					</svg>
-					<span>{{ fieldConfig.hint }}</span>
-					<span style="color: red">{{ fieldConfig.note }}</span>
+					<span
+						>{{ fieldConfig.hint }} <span style="color: red">{{ fieldConfig.note }}</span></span
+					>
 				</div>
 			</div>
 
@@ -90,7 +91,7 @@ const fieldConfigs = {
 		placeholder: '请输入邮箱地址',
 		inputType: 'email',
 		hint: '用于账户安全验证',
-		note: '如果用手机号登录了，无需再设置邮箱',
+		note: '如果用手机号码登录了，无需再设置邮箱',
 		validate: value => {
 			if (!value) {
 				return null // 邮箱可以为空
@@ -108,7 +109,7 @@ const fieldConfigs = {
 		inputType: 'tel',
 		maxlength: 11,
 		hint: '用于账户安全验证',
-		note: '如果用邮箱登录了，无需再设置手机号',
+		note: '如果用邮箱登录了，无需再设置手机号码',
 		validate: value => {
 			if (!value) {
 				return null // 手机号可以为空
