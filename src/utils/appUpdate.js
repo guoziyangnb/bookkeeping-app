@@ -127,34 +127,43 @@ export function formatFileSize(bytes) {
  */
 export async function downloadAPK(url, fileName, onProgress) {
 	try {
-		console.log('准备在新浏览器窗口打开下载链接:', url)
+		console.log('准备打开浏览器下载链接:', url)
 
 		// 立即调用进度回调，显示为完成（因为无法获取实际进度）
 		if (onProgress) {
 			onProgress(100, 0, 0)
 		}
 
-		// 打开新窗口/标签页进行下载
-		// 在 WebView 中会打开系统浏览器，在普通浏览器中会打开新标签页
-		const opened = window.open(url, '_blank')
-
-		if (!opened) {
-			// 如果被弹窗拦截器阻止，尝试使用 <a> 标签方式
-			console.warn('window.open 被阻止，尝试使用 <a> 标签方式')
-			const a = document.createElement('a')
-			a.href = url
-			a.target = '_blank'
-			a.rel = 'noopener noreferrer'
-			a.style.display = 'none'
-
-			document.body.appendChild(a)
-			a.click()
-
-			setTimeout(() => {
-				document.body.removeChild(a)
-			}, 100)
+		// 跳转到手机默认浏览器打开链接（无需额外权限）
+		if (typeof plus !== 'undefined' && plus.runtime) {
+			// 在 5+ App 环境中使用 plus.runtime.openURL
+			plus.runtime.openURL(url, function(res) {
+				console.log('跳转成功')
+			}, function(err) {
+				console.error('跳转失败：', err)
+				throw new Error('打开浏览器失败')
+			})
 		} else {
-			console.log('已在新窗口打开下载链接')
+			// 在普通浏览器中使用 window.open 作为降级方案
+			const opened = window.open(url, '_blank')
+			if (!opened) {
+				// 如果被弹窗拦截器阻止，尝试使用 <a> 标签方式
+				console.warn('window.open 被阻止，尝试使用 <a> 标签方式')
+				const a = document.createElement('a')
+				a.href = url
+				a.target = '_blank'
+				a.rel = 'noopener noreferrer'
+				a.style.display = 'none'
+
+				document.body.appendChild(a)
+				a.click()
+
+				setTimeout(() => {
+					document.body.removeChild(a)
+				}, 100)
+			} else {
+				console.log('已在新窗口打开下载链接')
+			}
 		}
 
 		// 不返回 Blob，直接返回成功
