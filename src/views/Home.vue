@@ -22,7 +22,7 @@
 			<div class="transactions-section">
 				<div class="section-header">
 					<div class="section-title">最近交易</div>
-					<router-link to="/calendar" class="view-all-btn">查看全部</router-link>
+					<router-link to="/calendar" class="view-all-btn">查看更多</router-link>
 				</div>
 
 				<div v-if="recentRecords.length > 0">
