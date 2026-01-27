@@ -34,9 +34,7 @@
 					<div class="settings-item-left">
 						<div class="settings-icon" style="background: var(--accent-purple)">
 							<svg viewBox="0 0 24 24">
-								<path
-									d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.15 15.36l-2.5-1.01L12 14.17V7h1v6.27l3.45 1.39-.3.92z"
-								/>
+								<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.15 15.36l-2.5-1.01L12 14.17V7h1v6.27l3.45 1.39-.3.92z" />
 							</svg>
 						</div>
 						<div class="settings-item-info">
@@ -77,7 +75,9 @@
 					<div class="settings-arrow">›</div>
 				</div>
 
-				<div class="settings-item" @click="goToBackup">
+				<!-- TODO: 后续改为导入与备份 -->
+				<!-- 数据存储 -->
+				<!-- <div class="settings-item" @click="goToBackup">
 					<div class="settings-item-left">
 						<div class="settings-icon" style="background: var(--accent-green)">
 							<svg viewBox="0 0 24 24">
@@ -90,7 +90,7 @@
 						</div>
 					</div>
 					<div class="settings-arrow">›</div>
-				</div>
+				</div> -->
 			</div>
 
 			<!-- <div class="settings-group">
