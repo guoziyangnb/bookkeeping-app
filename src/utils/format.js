@@ -9,11 +9,43 @@
  * @returns {string} 格式化后的金额
  */
 export function formatAmount(amount, showSign = true) {
-	const formatted = new Intl.NumberFormat('zh-CN', {
-		style: 'currency',
-		currency: 'CNY',
-		minimumFractionDigits: 2
-	}).format(Math.abs(amount))
+	const absAmount = Math.abs(amount)
+
+	let formatted
+
+	// 小于1万：正常显示货币格式
+	if (absAmount < 10_000) {
+		formatted = new Intl.NumberFormat('zh-CN', {
+			style: 'currency',
+			currency: 'CNY',
+			minimumFractionDigits: 2
+		}).format(absAmount)
+	}
+	// 1万-1000万：显示"万"
+	else if (absAmount < 10_000_000) {
+		const wan = absAmount / 10_000
+		formatted = `¥${wan.toFixed(1)}万`
+	}
+	// 1000万-1亿：显示"千万"
+	else if (absAmount < 100_000_000) {
+		const qianwan = absAmount / 10_000_000
+		formatted = `¥${qianwan.toFixed(2)}千万`
+	}
+	// 1亿-1000亿：显示"亿"
+	else if (absAmount < 100_000_000_000) {
+		const yi = absAmount / 100_000_000
+		formatted = `¥${yi.toFixed(1)}亿`
+	}
+	// 1000亿-10000亿：显示"千亿"
+	else if (absAmount < 1_000_000_000_000) {
+		const qianyi = absAmount / 100_000_000_000
+		formatted = `¥${qianyi.toFixed(1)}千亿`
+	}
+	// 1000亿-10000亿：显示"千亿"
+	else {
+		const wanyi = absAmount / 1_000_000_000_000
+		formatted = `¥${wanyi.toFixed(1)}万亿`
+	}
 
 	if (showSign) {
 		return amount >= 0 ? `${formatted}` : `- ${formatted}`
