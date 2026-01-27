@@ -67,10 +67,61 @@ function getWeekData() {
 	}
 }
 
+/**
+ * 根据数值最大值确定单位信息
+ * @param {number[]} data - 数据数组
+ * @returns {Object} { unit: 单位名称, divisor: 转换系数, formatter: 数值格式化函数 }
+ */
+function getUnitInfo(data) {
+	const max = Math.max(...data, 0)
+
+	if (max < 10_000) {
+		return {
+			unit: '元',
+			divisor: 1,
+			formatter: value => value.toFixed(0)
+		}
+	} else if (max < 10_000_000) {
+		return {
+			unit: '万元',
+			divisor: 10_000,
+			formatter: value => (value / 10_000).toFixed(1)
+		}
+	} else if (max < 100_000_000) {
+		return {
+			unit: '千万元',
+			divisor: 10_000_000,
+			formatter: value => (value / 10_000_000).toFixed(2)
+		}
+	} else if (max < 100_000_000_000) {
+		return {
+			unit: '亿元',
+			divisor: 100_000_000,
+			formatter: value => (value / 100_000_000).toFixed(1)
+		}
+	} else if (max < 1_000_000_000_000) {
+		return {
+			unit: '千亿元',
+			divisor: 100_000_000_000,
+			formatter: value => (value / 100_000_000_000).toFixed(1)
+		}
+	} else {
+		return {
+			unit: '万亿元',
+			divisor: 1_000_000_000_000,
+			formatter: value => (value / 1_000_000_000_000).toFixed(1)
+		}
+	}
+}
+
 // 获取图表配置
 function getChartOption() {
 	const weekData = getWeekData()
 	const isDark = uiStore.isDark
+
+	// 获取支出和收入的单位信息
+	const expenseUnitInfo = getUnitInfo(weekData.expenseData)
+	const incomeUnitInfo = getUnitInfo(weekData.incomeData)
 
 	return {
 		grid: {
@@ -91,6 +142,19 @@ function getChartOption() {
 			axisPointer: {
 				//选中的时候有阴影
 				type: 'shadow'
+			},
+			formatter: params => {
+				let result = `<div style="margin-bottom: 4px; font-weight: 600;">${params[0].axisValue}</div>`
+				params.forEach(item => {
+					const unitInfo = item.seriesName === '支出' ? expenseUnitInfo : incomeUnitInfo
+					const formattedValue = unitInfo.formatter(item.value)
+					result += `<div style="display: flex; align-items: center; margin: 4px 0;">
+						<span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${item.color}; margin-right: 8px;"></span>
+						<span style="flex: 1;">${item.seriesName}：</span>
+						<span style="font-weight: 600;">${formattedValue} ${unitInfo.unit}</span>
+					</div>`
+				})
+				return result
 			}
 		},
 		xAxis: {
@@ -110,12 +174,13 @@ function getChartOption() {
 		yAxis: [
 			{
 				type: 'value',
-				name: '支出/元', // 左侧Y轴名称
+				name: `支出/${expenseUnitInfo.unit}`, // 左侧Y轴名称（动态单位）
 				position: 'left', // 左侧Y轴（支出）
 				axisLine: {
 					show: false
 				},
 				axisLabel: {
+					formatter: expenseUnitInfo.formatter, // 使用智能数值格式化
 					color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
 					fontSize: 11
 				},
@@ -132,12 +197,13 @@ function getChartOption() {
 			},
 			{
 				type: 'value',
-				name: '收入/元', // 右侧Y轴名称
+				name: `收入/${incomeUnitInfo.unit}`, // 右侧Y轴名称（动态单位）
 				position: 'right', // 右侧Y轴（收入）
 				axisLine: {
 					show: false
 				},
 				axisLabel: {
+					formatter: incomeUnitInfo.formatter, // 使用智能数值格式化
 					color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
 					fontSize: 11
 				},
